@@ -9,3 +9,6 @@ plugins/*
 build/
 logs/
 
+run.sh
+
+build.gradle
