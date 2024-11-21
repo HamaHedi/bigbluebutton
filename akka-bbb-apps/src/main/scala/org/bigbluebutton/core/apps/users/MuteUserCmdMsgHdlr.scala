@@ -44,8 +44,6 @@ trait MuteUserCmdMsgHdlr extends RightsManagementTrait {
       } yield {
 
         if (requester.role != Roles.MODERATOR_ROLE
-          && permissions.disableMic
-          && requester.locked
           && u.muted &&
           msg.body.userId == msg.header.userId) {
           // unmuting self while not moderator and mic disabled. Do not allow.

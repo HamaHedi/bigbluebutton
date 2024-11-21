@@ -5,7 +5,6 @@ import org.bigbluebutton.core.models.{ Users2x, VoiceUsers }
 import org.bigbluebutton.core.running.{ LiveMeeting }
 import org.bigbluebutton.LockSettingsUtil
 import org.bigbluebutton.SystemConfiguration
-import org.bigbluebutton.core.models.Roles
 
 object VoiceHdlrHelpers extends SystemConfiguration {
   def isGlobalAudioSubscribeAllowed(
@@ -38,11 +37,8 @@ object VoiceHdlrHelpers extends SystemConfiguration {
           liveMeeting.voiceUsers
         )
 
-        val hasUnmutePermission = user.role == Roles.MODERATOR_ROLE
-
         (applyPermissionCheck &&
           !isCallerBanned &&
-          hasUnmutePermission &&
           liveMeeting.props.meetingProp.intId == meetingId &&
           liveMeeting.props.voiceProp.voiceConf == voiceConf)
       }
