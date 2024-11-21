@@ -37,8 +37,12 @@ object VoiceHdlrHelpers extends SystemConfiguration {
           liveMeeting.voiceUsers
         )
 
+        val hasUnmutePermission = user.role == Roles.MODERATOR_ROLE || 
+                                    user.hasExplicitUnmutePermission
+
         (applyPermissionCheck &&
           !isCallerBanned &&
+          hasUnmutePermission &&
           liveMeeting.props.meetingProp.intId == meetingId &&
           liveMeeting.props.voiceProp.voiceConf == voiceConf)
       }
