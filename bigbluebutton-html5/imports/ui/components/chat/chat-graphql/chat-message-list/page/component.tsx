@@ -329,11 +329,20 @@ const ChatListPageContainer: React.FC<ChatListPageContainerProps> = ({
   let chatMessageData: Message[] | null = null;
   if (data) {
     if ('chat_message_public' in data) {
-      chatMessageData = data.chat_message_public;
+      if (currentUserIsModerator === true) {
+        chatMessageData = data.chat_message_public;
+      } else {
+        chatMessageData = data.chat_message_public.filter(
+          message =>
+            message.user.userId === currentUserId ||
+            message.senderRole === "MODERATOR"
+        );
+      }
     } else if ('chat_message_private' in data) {
       chatMessageData = data.chat_message_private;
     }
   }
+  
  console.log('chatMessageData',chatMessageData)
   useEffect(() => {
     // component will unmount
