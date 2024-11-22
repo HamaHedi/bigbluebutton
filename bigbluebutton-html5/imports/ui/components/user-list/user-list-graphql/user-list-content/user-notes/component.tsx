@@ -114,81 +114,81 @@ const UserNotesGraphql: React.FC<UserNotesGraphqlProps> = (props) => {
     setPinWasNotified(false);
   }
 
-  const renderNotes = () => {
-    let notification = null;
-    if (unread && !isPinned) {
-      notification = (
-        <Styled.UnreadMessages aria-label={intl.formatMessage(intlMessages.unreadContent)}>
-          <Styled.UnreadMessagesText aria-hidden="true">
-            ···
-          </Styled.UnreadMessagesText>
-        </Styled.UnreadMessages>
-      );
-    }
+  // const renderNotes = () => {
+  //   let notification = null;
+  //   if (unread && !isPinned) {
+  //     notification = (
+  //       <Styled.UnreadMessages aria-label={intl.formatMessage(intlMessages.unreadContent)}>
+  //         <Styled.UnreadMessagesText aria-hidden="true">
+  //           ···
+  //         </Styled.UnreadMessagesText>
+  //       </Styled.UnreadMessages>
+  //     );
+  //   }
 
-    const showTitle = isPinned ? intl.formatMessage(intlMessages.sharedNotesPinned)
-      : intl.formatMessage(intlMessages.sharedNotes);
-    return (
-      // @ts-ignore
-      <Styled.ListItem
-        aria-label={showTitle}
-        aria-describedby="lockedNotes"
-        role="button"
-        tabIndex={0}
-        active={notesOpen}
-        data-test="sharedNotesButton"
-        onClick={() => toggleNotesPanel(sidebarContentPanel, layoutContextDispatch)}
-        // @ts-ignore
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            toggleNotesPanel(sidebarContentPanel, layoutContextDispatch);
-          }
-        }}
-        as={isPinned ? 'button' : 'div'}
-        disabled={isPinned}
-        $disabled={isPinned}
-      >
-        {/* @ts-ignore */}
-        <Icon iconName="copy" />
-        <div aria-hidden>
-          <Styled.NotesTitle data-test="sharedNotes">
-            { showTitle }
-          </Styled.NotesTitle>
-          {disableNotes
-            ? (
-              <Styled.NotesLock>
-                {/* @ts-ignore */}
-                <span id="lockedNotes">
-                  <Icon iconName="lock" />
-                  &nbsp;
-                  {`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}
-                </span>
-              </Styled.NotesLock>
-            ) : null}
-          {isPinned
-            ? (
-              <span className="sr-only">{`${intl.formatMessage(intlMessages.disabled)}`}</span>
-            ) : null}
-        </div>
-        {notification}
-      </Styled.ListItem>
-    );
-  };
+  //   const showTitle = isPinned ? intl.formatMessage(intlMessages.sharedNotesPinned)
+  //     : intl.formatMessage(intlMessages.sharedNotes);
+  //   return (
+  //     // @ts-ignore
+  //     <Styled.ListItem
+  //       aria-label={showTitle}
+  //       aria-describedby="lockedNotes"
+  //       role="button"
+  //       tabIndex={0}
+  //       active={notesOpen}
+  //       data-test="sharedNotesButton"
+  //       onClick={() => toggleNotesPanel(sidebarContentPanel, layoutContextDispatch)}
+  //       // @ts-ignore
+  //       onKeyDown={(e) => {
+  //         if (e.key === 'Enter') {
+  //           toggleNotesPanel(sidebarContentPanel, layoutContextDispatch);
+  //         }
+  //       }}
+  //       as={isPinned ? 'button' : 'div'}
+  //       disabled={isPinned}
+  //       $disabled={isPinned}
+  //     >
+  //       {/* @ts-ignore */}
+  //       <Icon iconName="copy" />
+  //       <div aria-hidden>
+  //         <Styled.NotesTitle data-test="sharedNotes">
+  //           { showTitle }
+  //         </Styled.NotesTitle>
+  //         {disableNotes
+  //           ? (
+  //             <Styled.NotesLock>
+  //               {/* @ts-ignore */}
+  //               <span id="lockedNotes">
+  //                 <Icon iconName="lock" />
+  //                 &nbsp;
+  //                 {`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}
+  //               </span>
+  //             </Styled.NotesLock>
+  //           ) : null}
+  //         {isPinned
+  //           ? (
+  //             <span className="sr-only">{`${intl.formatMessage(intlMessages.disabled)}`}</span>
+  //           ) : null}
+  //       </div>
+  //       {notification}
+  //     </Styled.ListItem>
+  //   );
+  // };
 
   if (!isEnabled) return null;
 
   return (
     <Styled.Messages>
-      <Styled.Container>
+      {/* <Styled.Container>
         <Styled.SmallTitle data-test="notesTitle">
           {intl.formatMessage(intlMessages.title)}
         </Styled.SmallTitle>
       </Styled.Container>
       <Styled.ScrollableList>
-        {/* <Styled.List>
+        <Styled.List>
           {renderNotes()}
-        </Styled.List> */}
-      </Styled.ScrollableList>
+        </Styled.List>
+      </Styled.ScrollableList> */}
     </Styled.Messages>
   );
 };
