@@ -334,7 +334,7 @@ const ChatListPageContainer: React.FC<ChatListPageContainerProps> = ({
       chatMessageData = data.chat_message_private;
     }
   }
-
+ console.log('chatMessageData',chatMessageData)
   useEffect(() => {
     // component will unmount
     return () => {
