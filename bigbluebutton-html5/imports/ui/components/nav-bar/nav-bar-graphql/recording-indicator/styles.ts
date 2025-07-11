@@ -56,7 +56,7 @@ const RecordingControl = styled.button<RecordingIndicatorProps>`
     box-shadow: none;
     background-color: transparent !important;
     color: ${colorWhite} !important;
-    font-size:30px
+    font-size:20px
   }
 
   &:hover:not(:disabled) {
@@ -82,10 +82,10 @@ const RecordingControl = styled.button<RecordingIndicatorProps>`
   `}
 
   ${({ recording }) => !recording && `
-    padding: 17px;
+    padding: 13px;
     border: ${borderSizeSmall} solid ${colorWhite};
     border-radius: 2em 2em;
-
+    
     &:focus {
       padding: 5px;
       border: ${borderSizeLarge} solid ${colorWhite};
