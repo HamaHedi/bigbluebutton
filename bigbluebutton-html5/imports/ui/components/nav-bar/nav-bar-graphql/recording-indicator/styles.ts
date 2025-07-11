@@ -35,7 +35,7 @@ interface SpinnerOverlayProps {
 const RecordingIndicatorIcon = styled.span<RecordingIndicatorIconProps>`
   width: ${fontSizeLarge};
   height: ${fontSizeLarge};
-  font-size: ${fontSizeBase};
+  font-size: 30px;
   user-select: none;
 
   ${({ titleMargin }) => titleMargin && `

@@ -32,7 +32,7 @@ const Description = styled.div`
 
 const DescriptionText = styled.span`
   white-space: pre-line;
-  font-size : 30px
+  font-size : 20px
 `;
 
 const Checkbox = styled.input`
