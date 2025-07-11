@@ -72,7 +72,7 @@ const Chat: React.FC<ChatProps> = ({ isRTL }) => {
       <ChatHeader />
       <ChatMessageListContainer />
       <ChatMessageFormContainer />
-      <ChatTypingIndicatorContainer />
+      {/* <ChatTypingIndicatorContainer /> */}
     </Styled.Chat>
   );
 };
