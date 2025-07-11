@@ -35,7 +35,7 @@ interface SpinnerOverlayProps {
 const RecordingIndicatorIcon = styled.span<RecordingIndicatorIconProps>`
   width: ${fontSizeLarge};
   height: ${fontSizeLarge};
-  font-size: 30px;
+  font-size: ${fontSizeBase};
   user-select: none;
 
   ${({ titleMargin }) => titleMargin && `
@@ -56,6 +56,7 @@ const RecordingControl = styled.button<RecordingIndicatorProps>`
     box-shadow: none;
     background-color: transparent !important;
     color: ${colorWhite} !important;
+    font-size:30px
   }
 
   &:hover:not(:disabled) {
@@ -81,7 +82,7 @@ const RecordingControl = styled.button<RecordingIndicatorProps>`
   `}
 
   ${({ recording }) => !recording && `
-    padding: 7px;
+    padding: 17px;
     border: ${borderSizeSmall} solid ${colorWhite};
     border-radius: 2em 2em;
 
