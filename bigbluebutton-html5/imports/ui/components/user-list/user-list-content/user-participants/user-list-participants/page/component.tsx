@@ -21,6 +21,8 @@ interface RaiseHandUser extends User {
 }
 
 const sortUsersByRaiseHand = (users: User[], raiseHandUsers: RaiseHandUser[]) => {
+console.log({raiseHandUsers})
+
   const raiseHandUserMap = new Map<string, RaiseHandUser>();
   raiseHandUsers.forEach(u => {
     if (u.userId) {
