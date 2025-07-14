@@ -110,6 +110,7 @@ const intlMessages = defineMessages({
 });
 
 export const toggleMute = (muted: boolean, exceptPresenter: boolean, setMuted: ({ variables }: { variables: { muted: boolean, exceptPresenter: boolean } }) => void) => {
+  console.log("toggleMute" , {muted, exceptPresenter, setMuted})
   setMuted({
     variables: {
       muted,
