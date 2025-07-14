@@ -12,6 +12,7 @@ import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedS
 import UserListParticipantsPageContainer from './page/component';
 import IntersectionWatcher from './intersection-watcher/intersectionWatcher';
 import { setLocalUserList } from '/imports/ui/core/hooks/useLoadedUserList';
+import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
 
 interface UserListParticipantsProps {
   count: number;
@@ -222,7 +223,12 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
 const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ searchQuery = '' }) => {
   const [internalSearchQuery, setInternalSearchQuery] = useState(searchQuery);
-  
+    const { data: currentUserData } = useCurrentUser((user) => ({
+      away: user.away,
+      isModerator: user.isModerator,
+    }));
+    const isModerator = currentUserData?.isModerator;
+
   const {
     data: countData,
   } = useDeduplicatedSubscription(USER_AGGREGATE_COUNT_SUBSCRIPTION);
@@ -238,8 +244,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
 
   return (
     <>
-      {/* Search Input */}
-      <div style={{ 
+{isModerator &&  <div style={{ 
         position: 'relative', 
         margin: '8px 12px',
         display: 'flex',
@@ -286,7 +291,8 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
           </button>
         )}
       </div>
-
+}
+     
       <UserListParticipants
         count={count ?? 0}
         searchQuery={internalSearchQuery}
