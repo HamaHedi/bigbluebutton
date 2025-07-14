@@ -50,7 +50,18 @@ const NoPointerEvents = styled.div`
   pointer-events: none;
 `;
 
+const ToggleVoiceButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+`;
+
 export default {
   UserActionsTrigger,
   NoPointerEvents,
+  ToggleVoiceButton,
 };
+
