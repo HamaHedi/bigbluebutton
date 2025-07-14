@@ -279,8 +279,13 @@ const UserListItem = styled.div`
 const LowerHnads = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  margin-top: 8px;
+  margin: 8px 0;
+  padding-inline-start: 0.75rem;
+  cursor: pointer;
+  padding: 5px 0;
+  &:hover {
+    background-color: var(--list-item-bg-hover, #DCE4ED);
+  }
 `;
 
 const HandIcon = styled(Icon)`
@@ -289,26 +294,17 @@ const HandIcon = styled(Icon)`
 `;
 
 const LowerHnadsTitle = styled.div`
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: ${colorWhite};
-  margin-left: 8px;
+  text-transform: uppercase;
+  padding: 0px 0.2rem;
+  color: var(--color-gray, #4E5A66);
+  flex: 1 1 0%;
+  margin: 0px;
   flex: 1;
 `;
 
-const HandsCount = styled.div`
-  font-size: 1rem;
-  font-weight: 600;
-  color: ${colorWhite};
-  margin-right: 8px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: ${colorPrimary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+
 
 export default {
   Avatar,
@@ -318,6 +314,5 @@ export default {
   UserListItem,
   LowerHnads,
   HandIcon,
-  LowerHnadsTitle,
-  HandsCount
+  LowerHnadsTitle
 };
