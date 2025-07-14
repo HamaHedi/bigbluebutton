@@ -16,6 +16,7 @@ import {
 import {
   ScrollboxVertical,
 } from '/imports/ui/stylesheets/styled-components/scrollable';
+import { Icon } from '/imports/ui/components/chat/chat-graphql/chat-message-list/page/chat-message/message-content/notification-content/styles';
 
 interface AvatarProps {
   color: string;
@@ -275,10 +276,48 @@ const UserListItem = styled.div`
   margin-left: .5rem;
 `;
 
+const LowerHnads = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  margin-top: 8px;
+`;
+
+const HandIcon = styled(Icon)`
+  font-size: 1.5rem;
+  color: ${colorPrimary};
+`;
+
+const LowerHnadsTitle = styled.div`
+  font-size: 1rem;
+  font-weight: 600;
+  color: ${colorWhite};
+  margin-left: 8px;
+  flex: 1;
+`;
+
+const HandsCount = styled.div`
+  font-size: 1rem;
+  font-weight: 600;
+  color: ${colorWhite};
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: ${colorPrimary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export default {
   Avatar,
   Skeleton,
   UserListColumn,
   VirtualizedList,
   UserListItem,
+  LowerHnads,
+  HandIcon,
+  LowerHnadsTitle,
+  HandsCount
 };
