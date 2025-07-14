@@ -351,13 +351,13 @@ const UserAdditionalInformationIcon = styled(Icon)`
 
 const pulse = (color: string) => keyframes`
   0% {
-    box-shadow: 0 0 0 0 ${color}CC, 0 0 8px 2px ${color}99;
+    box-shadow: 0 0 0 0 ${color}CC, 0 0 4px 1px ${color}99;
   }
   50% {
-    box-shadow: 0 0 0 16px ${color}40, 0 0 16px 4px ${color}66;
+    box-shadow: 0 0 0 12px ${color}40, 0 0 12px 2px ${color}66;
   }
   100% {
-    box-shadow: 0 0 0 24px ${color}00, 0 0 24px 8px ${color}00;
+    box-shadow: 0 0 0 12px ${color}00, 0 0 12px 2px ${color}00;
   }
 `;
 
@@ -451,14 +451,13 @@ const ToggleVoiceButton = styled.div`
 `;
 
 const MoreIcon = styled.div`
-  i{
-  transform: rotate(90deg);
-  }
-  margin: .25rem;
   cursor: pointer;
   padding: 3px;
   border: none;
   border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default {

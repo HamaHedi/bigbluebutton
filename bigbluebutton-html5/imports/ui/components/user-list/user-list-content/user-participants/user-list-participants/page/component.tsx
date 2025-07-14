@@ -183,7 +183,6 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     ));
   }
 
-  console.log({users})
 
   return (
     <UsersListParticipantsPage
