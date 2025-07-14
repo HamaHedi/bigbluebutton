@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { UI_DATA_LISTENER_SUBSCRIBED } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data-hooks/consts';
 import { UserListUiDataPayloads } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data-hooks/user-list/types';
 import * as PluginSdk from 'bigbluebutton-html-plugin-sdk';
+import { useMutation } from '@apollo/client';
 import { User } from '/imports/ui/Types/user';
 import Styled from './styles';
 import {
@@ -13,6 +14,8 @@ import UserListParticipantsPageContainer from './page/component';
 import IntersectionWatcher from './intersection-watcher/intersectionWatcher';
 import { setLocalUserList } from '/imports/ui/core/hooks/useLoadedUserList';
 import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
+import { SET_RAISE_HAND } from '/imports/ui/core/graphql/mutations/userMutations';
+import { RAISED_HAND_USERS } from '/imports/ui/components/raisehand-notifier/queries';
 
 interface UserListParticipantsProps {
   count: number;
@@ -57,6 +60,8 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     return filtered;
   }, [visibleUsers, searchQuery]);
 
+
+
   // Calculate filtered count
   const filteredCount = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -86,6 +91,10 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
       setLocalUserList([]);
     }
   }, [filteredVisibleUsers, searchQuery]);
+
+  console.log({visibleUsers})
+
+
 
   // --- Plugin related code ---
   useEffect(() => {
@@ -226,6 +235,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
     const { data: currentUserData } = useCurrentUser((user) => ({
       away: user.away,
       isModerator: user.isModerator,
+      userId: user.userId,
     }));
     const isModerator = currentUserData?.isModerator;
 
@@ -242,9 +252,36 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
     setInternalSearchQuery('');
   };
 
+  const [setRaiseHand] = useMutation(SET_RAISE_HAND);
+
+  const lowerUserHands = (userId: string) => {
+    console.log({userId})
+    setRaiseHand({
+      variables: {
+        userId,
+        raiseHand: false,
+      },
+    });
+  };
+
+  const {
+    data: usersData,
+    error: usersError,
+  } = useDeduplicatedSubscription(RAISED_HAND_USERS);
+  const raiseHandUsers = usersData?.user || [];
+
+  console.log({raiseHandUsers , usersError})
+
   return (
     <>
-{isModerator &&  <div style={{ 
+    {isModerator &&  
+      <div>
+        <Styled.LowerHnads onClick={() => lowerUserHands(currentUserData?.userId ?? '')}>
+          <Styled.HandIcon iconName="hand" />
+          <Styled.LowerHnadsTitle >Lower Hnads</Styled.LowerHnadsTitle>
+          <Styled.HandsCount>1</Styled.HandsCount>
+        </Styled.LowerHnads>
+       <div style={{ 
         position: 'relative', 
         margin: '8px 12px',
         display: 'flex',
@@ -290,9 +327,11 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
             ×
           </button>
         )}
+       </div>
       </div>
-}
-     
+    }
+
+  
       <UserListParticipants
         count={count ?? 0}
         searchQuery={internalSearchQuery}
