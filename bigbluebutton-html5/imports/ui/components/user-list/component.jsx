@@ -52,53 +52,7 @@ class UserList extends PureComponent {
           <CustomLogo CustomLogoUrl={logoUrl} />
         )}
         
-        <div style={{ 
-          position: 'relative', 
-          margin: '8px 12px',
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={searchQuery}
-            onChange={this.handleSearchChange}
-            aria-label="Search users"
-            style={{
-              width: '100%',
-              padding: '8px 12px',
-              paddingRight: '32px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              fontSize: '14px',
-              backgroundColor: '#fff',
-              color: '#333'
-            }}
-          />
-          {searchQuery && (
-            <button
-              onClick={this.clearSearch}
-              aria-label="Clear search"
-              style={{
-                position: 'absolute',
-                right: '8px',
-                background: 'none',
-                border: 'none',
-                fontSize: '18px',
-                cursor: 'pointer',
-                color: '#666',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              ×
-            </button>
-          )}
-        </div>
-
+      
         <UserContentContainer 
           compact={compact}
           searchQuery={searchQuery}
