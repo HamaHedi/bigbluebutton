@@ -304,6 +304,9 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
       </Styled.UserNameContainer>
       {renderUserListItemIconsFromPlugin(userItemsFromPlugin)}
       {renderToggleVoiceButton()}
+      <Styled.MoreIcon >
+          <Icon iconName="more"  />
+      </Styled.MoreIcon>
     </Styled.UserItemContents>
   );
 };
