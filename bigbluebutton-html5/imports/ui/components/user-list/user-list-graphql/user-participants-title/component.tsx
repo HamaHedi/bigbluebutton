@@ -36,14 +36,14 @@ const UserTitle: React.FC<UserTitleProps> = ({
   }));
   const intl = useIntl();
   const { data: unmutedUsers } = useWhoIsUnmuted();
-  const isNotAllMuted = Object.keys(unmutedUsers).length > 0;
+  const isNotAllMuted = Object.keys(unmutedUsers).length > 1;
   const [setMuted] = useMutation(SET_MUTED);
   const { data: meetingInfo } = useMeeting((meeting: Partial<Meeting>) => ({
     voiceSettings: meeting?.voiceSettings,
   }));
 
   const toggleMuteHandler = () => {
-      toggleMute(!meetingInfo?.voiceSettings?.muteOnStart, true, setMuted);
+      toggleMute(!!meetingInfo?.voiceSettings?.muteOnStart, true, setMuted);
   }
 
   
@@ -60,7 +60,7 @@ const UserTitle: React.FC<UserTitleProps> = ({
         </span>
       </Styled.SmallTitle>
       {currentUserData?.isModerator && 
-      <Tooltip title={"Mute All"}>
+      <Tooltip title={"Mute All except presenter"}>
         <Styled.MuteAll onClick={toggleMuteHandler}>
           <Icon iconName="mute" className={isNotAllMuted ? 'inactive' : 'active'}/>
         </Styled.MuteAll>
