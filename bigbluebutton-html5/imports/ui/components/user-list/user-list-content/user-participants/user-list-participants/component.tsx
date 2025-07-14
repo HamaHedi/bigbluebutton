@@ -266,21 +266,25 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
 
   const {
     data: usersData,
-    error: usersError,
   } = useDeduplicatedSubscription(RAISED_HAND_USERS);
   const raiseHandUsers = usersData?.user || [];
 
-  console.log({raiseHandUsers , usersError})
+  
+  const lowerAllHands = () => {
+    raiseHandUsers.forEach((user: User) => 
+      lowerUserHands(user.userId)
+    );
+  };
+
 
   return (
     <>
     {isModerator &&  
       <div>
-        <Styled.LowerHnads onClick={() => lowerUserHands(currentUserData?.userId ?? '')}>
-          <Styled.HandIcon iconName="hand" />
-          <Styled.LowerHnadsTitle >Lower Hnads</Styled.LowerHnadsTitle>
-          <Styled.HandsCount>1</Styled.HandsCount>
-        </Styled.LowerHnads>
+        {raiseHandUsers.length > 0 && <Styled.LowerHnads onClick={lowerAllHands}>
+          {/* <Styled.HandIcon iconName="hand" /> */}
+          <Styled.LowerHnadsTitle >Lower All Hnads {raiseHandUsers.length}</Styled.LowerHnadsTitle>
+        </Styled.LowerHnads>}
        <div style={{ 
         position: 'relative', 
         margin: '8px 12px',
