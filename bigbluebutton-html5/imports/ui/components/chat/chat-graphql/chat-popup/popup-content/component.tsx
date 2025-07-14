@@ -20,7 +20,10 @@ const intlMessages = defineMessages({
 
 const PopupContent: React.FC<PopupContentProps> = ({ message, closePopup }) => {
   const intl = useIntl();
+<<<<<<< HEAD
   console.log("change made by hazem braiek")	
+=======
+>>>>>>> 0a0de1e029711e58039a400ab1db73f83ae72e83
   const [showPopup, setShowPopup] = React.useState(false);
   if (!showPopup) return null;
   return (
