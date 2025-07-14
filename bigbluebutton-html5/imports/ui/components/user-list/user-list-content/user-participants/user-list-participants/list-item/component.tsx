@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useContext } from 'react';
 import * as PluginSdk from 'bigbluebutton-html-plugin-sdk';
+import {  UsersPolicies } from '/imports/ui/Types/meeting';
 import {
   UserListItemAdditionalInformationType,
 } from 'bigbluebutton-html-plugin-sdk/dist/cjs/extensible-areas/user-list-item-additional-information/enums';
@@ -19,6 +20,7 @@ import { useIsReactionsEnabled } from '/imports/ui/services/features';
 import useWhoIsTalking from '/imports/ui/core/hooks/useWhoIsTalking';
 import useWhoIsUnmuted from '/imports/ui/core/hooks/useWhoIsUnmuted';
 import { getSettingsSingletonInstance } from '/imports/ui/services/settings';
+import { generateActionsPermissions, toggleVoice } from '../user-actions/service';
 
 const messages = defineMessages({
   moderator: {
@@ -71,6 +73,9 @@ interface UserListItemProps {
   user: User;
   lockSettings: LockSettings;
   index: number;
+  currentUser: User;
+  usersPolicies: UsersPolicies;
+  isBreakout: boolean;
 }
 
 const renderUserListItemIconsFromPlugin = (
@@ -92,7 +97,7 @@ const Emoji: React.FC<EmojiProps> = ({ emoji, native, size }) => (
   <em-emoji emoji={emoji} native={native} size={size} />
 );
 
-const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index }) => {
+const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index , currentUser, usersPolicies, isBreakout  }) => {
   const { pluginsExtensibleAreasAggregatedState } = useContext(PluginsContext);
   let userItemsFromPlugin = [] as PluginSdk.UserListItemAdditionalInformationInterface[];
   if (pluginsExtensibleAreasAggregatedState.userListItemAdditionalInformation) {
@@ -226,6 +231,34 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index }
     return modifiedElements;
   }
 
+
+  const isMuted = !unmutedUsers[user.userId];
+
+  const actionsnPermitions = generateActionsPermissions(
+    user,
+    currentUser,
+    lockSettings,
+    usersPolicies,
+    isBreakout,
+    isMuted,
+  );
+
+  const {
+    allowedToMuteAudio,
+    allowedToUnmuteAudio
+  } = actionsnPermitions
+
+  const canToggleVoice = (allowedToMuteAudio || allowedToUnmuteAudio) && currentUser?.isModerator
+
+  const renderToggleVoiceButton = () => {
+    if (canToggleVoice) {
+      return <Styled.ToggleVoiceButton onClick={() => toggleVoice(user.userId, !allowedToUnmuteAudio, voiceToggle)}>
+        <Icon iconName={isMuted ? 'mute' : 'unmute'} className={isMuted ? 'muted' : 'unmuted'} />
+      </Styled.ToggleVoiceButton>
+    }
+    return null
+  }
+
   const Settings = getSettingsSingletonInstance();
   const animations = Settings?.application?.animations;
 
@@ -265,6 +298,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index }
         </Styled.UserNameSub>
       </Styled.UserNameContainer>
       {renderUserListItemIconsFromPlugin(userItemsFromPlugin)}
+      {renderToggleVoiceButton()}
     </Styled.UserItemContents>
   );
 };
