@@ -21,6 +21,7 @@ import useWhoIsTalking from '/imports/ui/core/hooks/useWhoIsTalking';
 import useWhoIsUnmuted from '/imports/ui/core/hooks/useWhoIsUnmuted';
 import { getSettingsSingletonInstance } from '/imports/ui/services/settings';
 import { generateActionsPermissions, toggleVoice } from '../user-actions/service';
+import useToggleVoice from '/imports/ui/components/audio/audio-graphql/hooks/useToggleVoice';
 
 const messages = defineMessages({
   moderator: {
@@ -106,7 +107,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
       return userListItem.userId === user.userId;
     }) as PluginSdk.UserListItemAdditionalInformationInterface[];
   }
-
+  const voiceToggle = useToggleVoice();
   const intl = useIntl();
   const { data: talkingUsers } = useWhoIsTalking();
   const { data: unmutedUsers } = useWhoIsUnmuted();
@@ -250,9 +251,13 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
 
   const canToggleVoice = (allowedToMuteAudio || allowedToUnmuteAudio) && currentUser?.isModerator
 
+
   const renderToggleVoiceButton = () => {
     if (canToggleVoice) {
-      return <Styled.ToggleVoiceButton onClick={() => toggleVoice(user.userId, !allowedToUnmuteAudio, voiceToggle)}>
+      return <Styled.ToggleVoiceButton onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        toggleVoice(user.userId, !allowedToUnmuteAudio, voiceToggle)
+      }}>
         <Icon iconName={isMuted ? 'mute' : 'unmute'} className={isMuted ? 'muted' : 'unmuted'} />
       </Styled.ToggleVoiceButton>
     }

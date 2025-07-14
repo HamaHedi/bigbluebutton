@@ -435,11 +435,15 @@ const ToggleVoiceButton = styled.div`
     background-color: ${listItemBgHover};
   }
 
-  &.muted {
+  i{
+    font-size: 17px;
+  }
+
+  .muted {
     color: ${colorDanger};
   }
 
-  &.unmuted {
+  .unmuted {
     color: ${colorSuccess};
   }
 `;
