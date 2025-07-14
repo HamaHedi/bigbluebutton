@@ -12,6 +12,7 @@ import { useMutation } from '@apollo/client';
 import useMeeting from '/imports/ui/core/hooks/useMeeting';
 import { Meeting } from '/imports/ui/Types/meeting';
 import Tooltip from '../../../common/tooltip/component';
+import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
 
 interface UserTitleProps {
   count: number;
@@ -29,6 +30,10 @@ const UserTitle: React.FC<UserTitleProps> = ({
   count,
   countWithAudio,
 }) => {
+  const { data: currentUserData } = useCurrentUser((user) => ({
+    presenter: user.presenter,
+    isModerator: user.isModerator,
+  }));
   const intl = useIntl();
   const { data: unmutedUsers } = useWhoIsUnmuted();
   const isNotAllMuted = Object.keys(unmutedUsers).length > 0;
@@ -39,8 +44,10 @@ const UserTitle: React.FC<UserTitleProps> = ({
 
   const toggleMuteHandler = () => {
     console.log("toggleMuteHandler" , {unmutedUsers, isNotAllMuted})
-      toggleMute(meetingInfo?.voiceSettings?.muteOnStart, true, setMuted);
+    console.log({meetingInfo})
+      toggleMute.bind(null ,!!meetingInfo?.voiceSettings?.muteOnStart, true, setMuted);
   }
+
   
  
   return (
@@ -54,11 +61,12 @@ const UserTitle: React.FC<UserTitleProps> = ({
           {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
         </span>
       </Styled.SmallTitle>
+      {currentUserData?.isModerator && 
       <Tooltip title={"Mute All except presenter"}>
         <Styled.MuteAll onClick={toggleMuteHandler}>
           <Icon iconName="mute" className={isNotAllMuted ? 'inactive' : 'active'}/>
         </Styled.MuteAll>
-      </Tooltip>
+      </Tooltip>}
       <UserTitleOptionsContainer />
     </Styled.Container>
   );
