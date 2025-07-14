@@ -250,11 +250,11 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
 const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ searchQuery = '' }) => {
   const [internalSearchQuery, setInternalSearchQuery] = useState(searchQuery);
-    const { data: currentUserData } = useCurrentUser((user) => ({
-      away: user.away,
-      isModerator: user.isModerator,
-    }));
-    const isModerator = currentUserData?.isModerator;
+  const { data: currentUserData } = useCurrentUser((user) => ({
+    away: user.away,
+    isModerator: user.isModerator,
+  }));
+  const isModerator = currentUserData?.isModerator;
 
   const {
     data: countData,
@@ -329,3 +329,5 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
     </>
   );
 };
+
+export default UserListParticipantsContainer;
