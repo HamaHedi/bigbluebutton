@@ -11,7 +11,7 @@ const UserListContainer = (props) => {
 
   useEffect(() => {
     const handleDarkModeChange = (event) => {
-      setDarkModeIsEnabled(event.detail.enabled);
+      setDarkModeChange(event.detail.enabled);
     };
 
     window.addEventListener('darkmodechange', handleDarkModeChange);

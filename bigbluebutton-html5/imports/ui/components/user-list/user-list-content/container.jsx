@@ -30,14 +30,12 @@ const UserContentContainer = (props) => {
 
   return (
     <UserContent
-      {...{
-        isGuestLobbyMessageEnabled: APP_SETTINGS.enableGuestLobbyMessage,
-        currentUser,
-        isTimerActive: currentMeeting?.componentsFlags?.hasTimer && currentUser?.isModerator,
-        isWaitingRoomEnabled,
-        isChatEnabled,
-        ...props,
-      }}
+      isGuestLobbyMessageEnabled={APP_SETTINGS.enableGuestLobbyMessage}
+      currentUser={currentUser}
+      isTimerActive={currentMeeting?.componentsFlags?.hasTimer && currentUser?.isModerator}
+      isWaitingRoomEnabled={isWaitingRoomEnabled}
+      isChatEnabled={isChatEnabled}
+      {...props}
     />
   );
 };
