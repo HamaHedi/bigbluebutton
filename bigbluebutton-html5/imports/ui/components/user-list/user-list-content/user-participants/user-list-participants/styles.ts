@@ -282,7 +282,7 @@ const LowerHnads = styled.div`
   margin: 8px 0;
   padding-inline-start: 0.75rem;
   cursor: pointer;
-  padding: 5px 0;
+  padding: 5px 8px;
   &:hover {
     background-color: var(--list-item-bg-hover, #DCE4ED);
   }

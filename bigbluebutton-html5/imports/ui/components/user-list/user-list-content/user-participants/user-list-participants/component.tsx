@@ -20,11 +20,13 @@ import { RAISED_HAND_USERS } from '/imports/ui/components/raisehand-notifier/que
 interface UserListParticipantsProps {
   count: number;
   searchQuery: string;
+  raiseHandUsers: User[];
 }
 
 const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   count,
   searchQuery,
+  raiseHandUsers,
 }) => {
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
@@ -92,7 +94,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     }
   }, [filteredVisibleUsers, searchQuery]);
 
-  console.log({visibleUsers})
 
 
 
@@ -202,6 +203,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                     restOfUsers={isLastItem ? restOfUsers : 50}
                     setVisibleUsers={setVisibleUsers}
                     searchQuery={searchQuery}
+                    raiseHandUsers={raiseHandUsers}
                   />
                 )
                 : (
@@ -219,6 +221,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                       restOfUsers={isLastItem ? restOfUsers : 50}
                       setVisibleUsers={setVisibleUsers}
                       searchQuery={searchQuery}
+                      raiseHandUsers={raiseHandUsers}
                     />
                   </IntersectionWatcher>
                 );
@@ -283,7 +286,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
       <div>
         {raiseHandUsers.length > 0 && <Styled.LowerHnads onClick={lowerAllHands}>
           {/* <Styled.HandIcon iconName="hand" /> */}
-          <Styled.LowerHnadsTitle >Lower All Hnads {raiseHandUsers.length}</Styled.LowerHnadsTitle>
+          <Styled.LowerHnadsTitle >Lower All Hnads ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
         </Styled.LowerHnads>}
        <div style={{ 
         position: 'relative', 
@@ -339,6 +342,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
       <UserListParticipants
         count={count ?? 0}
         searchQuery={internalSearchQuery}
+        raiseHandUsers={raiseHandUsers}
       />
     </>
   );
