@@ -20,7 +20,7 @@ const intlMessages = defineMessages({
 
 const PopupContent: React.FC<PopupContentProps> = ({ message, closePopup }) => {
   const intl = useIntl();
-  const [showPopup, setShowPopup] = React.useState(true);
+  const [showPopup, setShowPopup] = React.useState(false);
   if (!showPopup) return null;
   return (
     <PopupContentBox data-test="welcomeMessage">
