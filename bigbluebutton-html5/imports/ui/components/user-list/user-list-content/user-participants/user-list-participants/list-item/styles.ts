@@ -418,6 +418,32 @@ const IconRightContainer = styled.div`
   margin: .25rem;  
 `;
 
+const ToggleVoiceButton = styled.div`
+  margin: .25rem;
+  cursor: pointer;
+  padding: 7px;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+
+  &:hover {
+    background-color: ${listItemBgHover};
+  }
+
+  &.muted {
+    color: ${colorDanger};
+  }
+
+  &.unmuted {
+    color: ${colorSuccess};
+  }
+`;
+
 export default {
   Avatar,
   Skeleton,
@@ -427,4 +453,5 @@ export default {
   UserNameSub,
   UserName,
   IconRightContainer,
+  ToggleVoiceButton
 };

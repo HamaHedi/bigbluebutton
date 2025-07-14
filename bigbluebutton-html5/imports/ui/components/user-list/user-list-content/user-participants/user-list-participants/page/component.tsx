@@ -21,8 +21,6 @@ interface RaiseHandUser extends User {
 }
 
 const sortUsersByRaiseHand = (users: User[], raiseHandUsers: RaiseHandUser[]) => {
-console.log({raiseHandUsers})
-
   const raiseHandUserMap = new Map<string, RaiseHandUser>();
   raiseHandUsers.forEach(u => {
     if (u.userId) {
@@ -108,7 +106,7 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
                 open={user.userId === openUserAction}
                 setOpenUserAction={setOpenUserAction}
               >
-                <ListItem index={offset + idx} user={user} lockSettings={meeting.lockSettings} />
+                <ListItem index={offset + idx} user={user} lockSettings={meeting.lockSettings} currentUser={currentUser as User} usersPolicies={meeting.usersPolicies} isBreakout={meeting.isBreakout} />
               </UserActions>
             </Styled.UserListItem>
           );
