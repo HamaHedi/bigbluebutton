@@ -45,18 +45,13 @@ console.log({raiseHandUsers})
     const bHasRaiseHand = !!bRaiseHand && bRaiseHand.raiseHandTime;
 
     if (aHasRaiseHand && bHasRaiseHand) {
-
       const aTime = new Date(aRaiseHand.raiseHandTime).getTime();
       const bTime = new Date(bRaiseHand.raiseHandTime).getTime();
-      return aTime - bTime;
+      return  bTime - aTime;
     }
 
-
     if (aHasRaiseHand && !bHasRaiseHand) return -1;
-
     if (!aHasRaiseHand && bHasRaiseHand) return 1;
-
-
     return 0;
   });
 
