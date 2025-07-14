@@ -258,7 +258,6 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
   const [setRaiseHand] = useMutation(SET_RAISE_HAND);
 
   const lowerUserHands = (userId: string) => {
-    console.log({userId})
     setRaiseHand({
       variables: {
         userId,

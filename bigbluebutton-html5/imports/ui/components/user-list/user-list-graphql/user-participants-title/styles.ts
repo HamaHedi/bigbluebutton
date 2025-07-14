@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 import { smPaddingX, lgPaddingY } from '/imports/ui/stylesheets/styled-components/general';
 
-import { colorGray } from '/imports/ui/stylesheets/styled-components/palette';
+import { colorDanger, colorGray } from '/imports/ui/stylesheets/styled-components/palette';
 
 export const Container = styled.div`
   display: flex;
@@ -21,7 +21,30 @@ export const SmallTitle = styled.h2`
   margin: 0;
 `;
 
+export const MuteAll = styled.div`
+  cursor: pointer;
+  padding: 7px;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  i {
+    font-size: 17px;
+  }
+
+  .inactive { 
+    color: ${colorGray};
+  }
+
+  .active {
+    color: ${colorDanger};
+  }
+`;
+
 export default {
   Container,
   SmallTitle,
+  MuteAll
 };

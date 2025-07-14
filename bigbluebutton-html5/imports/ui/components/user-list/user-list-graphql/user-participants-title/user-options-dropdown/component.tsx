@@ -109,6 +109,35 @@ const intlMessages = defineMessages({
   },
 });
 
+export const toggleMute = (muted: boolean, exceptPresenter: boolean, setMuted: ({ variables }: { variables: { muted: boolean, exceptPresenter: boolean } }) => void) => {
+  setMuted({
+    variables: {
+      muted,
+      exceptPresenter,
+    },
+  });
+
+  if (!muted) {
+    return logger.info(
+      {
+        logCode: 'useroptions_unmute_all',
+        extraInfo: { logType: 'moderator_action' },
+      },
+      'moderator disabled meeting mute',
+    );
+  }
+
+  const logCode = exceptPresenter ? 'useroptions_mute_all_except_presenter' : 'useroptions_mute_all';
+  const logMessage = exceptPresenter ? 'moderator enabled meeting mute, all users muted except presenter' : 'moderator enabled meeting mute, all users muted';
+  return logger.info(
+    {
+      logCode,
+      extraInfo: { logType: 'moderator_action' },
+    },
+    logMessage,
+  );
+};
+
 interface RenderModalProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
@@ -197,34 +226,7 @@ const UserTitleOptions: React.FC<UserTitleOptionsProps> = ({
     }
   }, [users]);
 
-  const toggleMute = (muted: boolean, exceptPresenter: boolean) => {
-    setMuted({
-      variables: {
-        muted,
-        exceptPresenter,
-      },
-    });
-
-    if (!muted) {
-      return logger.info(
-        {
-          logCode: 'useroptions_unmute_all',
-          extraInfo: { logType: 'moderator_action' },
-        },
-        'moderator disabled meeting mute',
-      );
-    }
-
-    const logCode = exceptPresenter ? 'useroptions_mute_all_except_presenter' : 'useroptions_mute_all';
-    const logMessage = exceptPresenter ? 'moderator enabled meeting mute, all users muted except presenter' : 'moderator enabled meeting mute, all users muted';
-    return logger.info(
-      {
-        logCode,
-        extraInfo: { logType: 'moderator_action' },
-      },
-      logMessage,
-    );
-  };
+ 
 
   const { dynamicGuestPolicy } = window.meetingClientSettings.public.app;
 
@@ -239,7 +241,7 @@ const UserTitleOptions: React.FC<UserTitleOptionsProps> = ({
         key: uuids.current[0],
         label: intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllLabel' : 'muteAllLabel']),
         description: intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllDesc' : 'muteAllDesc']),
-        onClick: toggleMute.bind(null, !isMeetingMuted, false),
+        onClick: toggleMute.bind(null, !isMeetingMuted, false, setMuted),
         icon: isMeetingMuted ? 'unmute' : 'mute',
         dataTest: 'muteAll',
       },
@@ -248,7 +250,7 @@ const UserTitleOptions: React.FC<UserTitleOptionsProps> = ({
         key: uuids.current[1],
         label: intl.formatMessage(intlMessages.muteAllExceptPresenterLabel),
         description: intl.formatMessage(intlMessages.muteAllExceptPresenterDesc),
-        onClick: toggleMute.bind(null, isMeetingMuted, true),
+        onClick: toggleMute.bind(null, isMeetingMuted, true, setMuted),
         icon: 'mute',
         dataTest: 'muteAllExceptPresenter',
       },

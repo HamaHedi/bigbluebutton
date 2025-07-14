@@ -1,10 +1,17 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { USER_AGGREGATE_COUNT_SUBSCRIPTION } from '/imports/ui/core/graphql/queries/users';
-import UserTitleOptionsContainer from './user-options-dropdown/component';
+import UserTitleOptionsContainer, { toggleMute } from './user-options-dropdown/component';
 import Styled from './styles';
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
 import { USER_WITH_AUDIO_AGGREGATE_COUNT_SUBSCRIPTION } from './queries';
+import { Icon } from '../../../chat/chat-graphql/chat-message-list/page/chat-message/message-content/notification-content/styles';
+import useWhoIsUnmuted from '/imports/ui/core/hooks/useWhoIsUnmuted';
+import { SET_MUTED } from './user-options-dropdown/mutations';
+import { useMutation } from '@apollo/client';
+import useMeeting from '/imports/ui/core/hooks/useMeeting';
+import { Meeting } from '/imports/ui/Types/meeting';
+import Tooltip from '../../../common/tooltip/component';
 
 interface UserTitleProps {
   count: number;
@@ -23,6 +30,19 @@ const UserTitle: React.FC<UserTitleProps> = ({
   countWithAudio,
 }) => {
   const intl = useIntl();
+  const { data: unmutedUsers } = useWhoIsUnmuted();
+  const isNotAllMuted = Object.keys(unmutedUsers).length > 0;
+  const [setMuted] = useMutation(SET_MUTED);
+  const { data: meetingInfo } = useMeeting((meeting: Partial<Meeting>) => ({
+    voiceSettings: meeting?.voiceSettings,
+  }));
+
+  const toggleMuteHandler = () => {
+    if (isNotAllMuted) 
+      toggleMute(meetingInfo?.voiceSettings?.muteOnStart, false, setMuted);
+  }
+  
+ 
   return (
     <Styled.Container>
       <Styled.SmallTitle>
@@ -34,6 +54,11 @@ const UserTitle: React.FC<UserTitleProps> = ({
           {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
         </span>
       </Styled.SmallTitle>
+      <Tooltip content={"Mute All except presenter"}>
+        <Styled.MuteAll onClick={toggleMuteHandler}>
+          <Icon iconName="mute" className={isNotAllMuted ? 'inactive' : 'active'}/>
+        </Styled.MuteAll>
+      </Tooltip>
       <UserTitleOptionsContainer />
     </Styled.Container>
   );
