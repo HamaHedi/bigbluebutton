@@ -33,6 +33,11 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
   // Filter users based on search query and moderator status
   const filteredVisibleUsers = useMemo(() => {
+    // Check if visibleUsers is defined and not null
+    if (!visibleUsers || Object.keys(visibleUsers).length === 0) {
+      return {};
+    }
+
     let baseUsers = visibleUsers;
 
     // If user is not a moderator, filter to only show moderator and themselves
@@ -41,13 +46,15 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
       
       Object.keys(visibleUsers).forEach((key) => {
         const pageUsers = visibleUsers[parseInt(key)];
-        const filteredPageUsers = pageUsers.filter((user: User) => {
-          // Show only moderators and the current user
-          return user.isModerator || user.isCurrentUser;
-        });
-        
-        if (filteredPageUsers.length > 0) {
-          restrictedUsers[parseInt(key)] = filteredPageUsers;
+        if (pageUsers && Array.isArray(pageUsers)) {
+          const filteredPageUsers = pageUsers.filter((user: User) => {
+            // Show only moderators and the current user
+            return user.isModerator || user.isCurrentUser;
+          });
+          
+          if (filteredPageUsers.length > 0) {
+            restrictedUsers[parseInt(key)] = filteredPageUsers;
+          }
         }
       });
       
@@ -64,17 +71,19 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
     Object.keys(baseUsers).forEach((key) => {
       const pageUsers = baseUsers[parseInt(key)];
-      const filteredPageUsers = pageUsers.filter((user: User) => {
-        // Search in user name, role, or any other relevant fields
-        return (
-          user.name?.toLowerCase().includes(lowerSearchQuery) ||
-          user.role?.toLowerCase().includes(lowerSearchQuery) ||
-          user.userId?.toLowerCase().includes(lowerSearchQuery)
-        );
-      });
-      
-      if (filteredPageUsers.length > 0) {
-        filtered[parseInt(key)] = filteredPageUsers;
+      if (pageUsers && Array.isArray(pageUsers)) {
+        const filteredPageUsers = pageUsers.filter((user: User) => {
+          // Search in user name, role, or any other relevant fields
+          return (
+            user.name?.toLowerCase().includes(lowerSearchQuery) ||
+            user.role?.toLowerCase().includes(lowerSearchQuery) ||
+            user.userId?.toLowerCase().includes(lowerSearchQuery)
+          );
+        });
+        
+        if (filteredPageUsers.length > 0) {
+          filtered[parseInt(key)] = filteredPageUsers;
+        }
       }
     });
 
@@ -87,20 +96,25 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
       return count;
     }
     
+    if (!filteredVisibleUsers || Object.keys(filteredVisibleUsers).length === 0) {
+      return 0;
+    }
+    
     return Object.values(filteredVisibleUsers).reduce((total, users) => {
-      return total + users.length;
+      return total + (users ? users.length : 0);
     }, 0);
   }, [filteredVisibleUsers, count, searchQuery, isModerator]);
 
   useEffect(() => {
-    const keys = Object.keys(filteredVisibleUsers);
+    const keys = Object.keys(filteredVisibleUsers || {});
     if (keys.length > 0) {
       // eslint-disable-next-line
       const visibleUserArr = keys.sort().reduce((acc, key) => {
+        const users = filteredVisibleUsers[parseInt(key)];
         return [
           ...acc,
           // @ts-ignore
-          ...filteredVisibleUsers[key],
+          ...(users || []),
         ];
       }, [] as User[]);
       // eslint-disable-next-line
