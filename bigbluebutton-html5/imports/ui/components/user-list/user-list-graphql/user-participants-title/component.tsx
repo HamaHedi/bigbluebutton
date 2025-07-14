@@ -36,15 +36,13 @@ const UserTitle: React.FC<UserTitleProps> = ({
   }));
   const intl = useIntl();
   const { data: unmutedUsers } = useWhoIsUnmuted();
-  const isNotAllMuted = Object.keys(unmutedUsers).length > 0;
+  const isNotAllMuted = Object.keys(unmutedUsers).length > 1;
   const [setMuted] = useMutation(SET_MUTED);
   const { data: meetingInfo } = useMeeting((meeting: Partial<Meeting>) => ({
     voiceSettings: meeting?.voiceSettings,
   }));
 
   const toggleMuteHandler = () => {
-    console.log("toggleMuteHandler" , {unmutedUsers, isNotAllMuted})
-    console.log({meetingInfo})
       toggleMute(!!meetingInfo?.voiceSettings?.muteOnStart, true, setMuted);
   }
 
