@@ -286,7 +286,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
       <div>
         {raiseHandUsers.length > 0 && <Styled.LowerHnads onClick={lowerAllHands}>
           {/* <Styled.HandIcon iconName="hand" /> */}
-          <Styled.LowerHnadsTitle >Lower All Hnads ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
+          <Styled.LowerHnadsTitle >Down All Hnads ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
         </Styled.LowerHnads>}
        <div style={{ 
         position: 'relative', 

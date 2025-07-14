@@ -585,23 +585,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     )),
   ];
 
-  const canToggleVoice = (allowedToUnmuteAudio
-  && !lockSettings?.disableMic
-  && !isBreakout) || (allowedToMuteAudio
-  && !isBreakout)
 
-  const renderToggleVoiceButton = () => {
-    if (canToggleVoice) {
-      return <Styled.ToggleVoiceButton onClick={() => toggleVoice(user.userId, !allowedToUnmuteAudio, voiceToggle)}>
-        <Icon iconName={allowedToUnmuteAudio
-        && !lockSettings?.disableMic
-        && !isBreakout ? 'unmute' : allowedToMuteAudio
-        && !isBreakout ? 'mute' : ''}
-        />
-      </Styled.ToggleVoiceButton>
-    }
-    return null
-  }
 
   const actions = dropdownOptions.filter((key) => key.allowed);
   if (!(actions.length > 1) || user.bot) {
@@ -629,7 +613,7 @@ const UserActions: React.FC<UserActionsProps> = ({
               }}
               role="button"
             >
-                {children} {renderToggleVoiceButton()}
+                {children}
             </Styled.UserActionsTrigger>
           )
         }
