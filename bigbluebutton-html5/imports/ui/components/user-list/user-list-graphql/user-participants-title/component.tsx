@@ -38,8 +38,8 @@ const UserTitle: React.FC<UserTitleProps> = ({
   }));
 
   const toggleMuteHandler = () => {
-    if (isNotAllMuted) 
-      toggleMute(meetingInfo?.voiceSettings?.muteOnStart, false, setMuted);
+    console.log("toggleMuteHandler" , {unmutedUsers, isNotAllMuted})
+      toggleMute(meetingInfo?.voiceSettings?.muteOnStart, true, setMuted);
   }
   
  
@@ -54,7 +54,7 @@ const UserTitle: React.FC<UserTitleProps> = ({
           {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
         </span>
       </Styled.SmallTitle>
-      <Tooltip content={"Mute All except presenter"}>
+      <Tooltip title={"Mute All except presenter"}>
         <Styled.MuteAll onClick={toggleMuteHandler}>
           <Icon iconName="mute" className={isNotAllMuted ? 'inactive' : 'active'}/>
         </Styled.MuteAll>
