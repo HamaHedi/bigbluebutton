@@ -41,6 +41,7 @@ import { PRESENTATION_SET_WRITERS } from '/imports/ui/components/presentation/mu
 import useToggleVoice from '/imports/ui/components/audio/audio-graphql/hooks/useToggleVoice';
 import useWhoIsUnmuted from '/imports/ui/core/hooks/useWhoIsUnmuted';
 import { notify } from '/imports/ui/services/notification';
+import { Icon } from '/imports/ui/components/chat/chat-graphql/chat-message-list/page/chat-message/message-content/notification-content/styles';
 
 interface UserActionsProps {
   userListDropdownItems: PluginSdk.UserListDropdownInterface[];
@@ -584,6 +585,24 @@ const UserActions: React.FC<UserActionsProps> = ({
     )),
   ];
 
+  const canToggleVoice = (allowedToUnmuteAudio
+  && !lockSettings?.disableMic
+  && !isBreakout) || (allowedToMuteAudio
+  && !isBreakout)
+
+  const renderToggleVoiceButton = () => {
+    if (canToggleVoice) {
+      return <Styled.ToggleVoiceButton onClick={() => toggleVoice(user.userId, !allowedToUnmuteAudio, voiceToggle)}>
+        <Icon iconName={allowedToUnmuteAudio
+        && !lockSettings?.disableMic
+        && !isBreakout ? 'unmute' : allowedToMuteAudio
+        && !isBreakout ? 'mute' : ''}
+        />
+      </Styled.ToggleVoiceButton>
+    }
+    return null
+  }
+
   const actions = dropdownOptions.filter((key) => key.allowed);
   if (!(actions.length > 1) || user.bot) {
     return (
@@ -610,7 +629,7 @@ const UserActions: React.FC<UserActionsProps> = ({
               }}
               role="button"
             >
-              {children}
+                {children} {renderToggleVoiceButton()}
             </Styled.UserActionsTrigger>
           )
         }
