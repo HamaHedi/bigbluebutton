@@ -11,7 +11,7 @@ const ChatBubble = () => {
   const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
 
   //bottom right initial position
-  const [position, setPosition] = useState({ x: window.innerWidth - 30, y: window.innerHeight - 30 }) // Bottom left initial position
+  const [position, setPosition] = useState({ x: window.innerWidth - 70, y: window.innerHeight - 150 }) // Bottom left initial position
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const bubbleRef = useRef<HTMLDivElement>(null)
 
