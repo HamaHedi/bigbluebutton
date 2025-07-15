@@ -12,6 +12,7 @@ const ChatBubble = () => {
   const fullscreen = layoutSelect((i : Layout) => i.fullscreen);
   const { element } = fullscreen;
   const isScreenshareFullScreen = (element === 'Screenshare');
+  console.log({fullscreen})
   const CHAT_CONFIG = window.meetingClientSettings.public.chat;
   const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id;
 
