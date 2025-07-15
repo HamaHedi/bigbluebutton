@@ -21,16 +21,12 @@ interface UserListParticipantsProps {
   count: number;
   searchQuery: string;
   raiseHandUsers: User[];
-  isModerator: boolean;
-  currentUserId: string;
 }
 
 const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   count,
   searchQuery,
   raiseHandUsers,
-  isModerator,
-  currentUserId,
 }) => {
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
@@ -38,37 +34,25 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const userListRef = React.useRef<HTMLDivElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
-  // Filter users based on moderator status first, then search query
+  // Filter users based on search query
   const filteredVisibleUsers = useMemo(() => {
-    // Return empty if no users have been made visible yet
-    if (Object.keys(visibleUsers).length === 0) return {};
-    
-    let filtered: { [key: number]: User[] } = {};
-    
-    // First filter by moderator status
+    if (!searchQuery.trim()) {
+      return visibleUsers;
+    }
+
+    const filtered: { [key: number]: User[] } = {};
+    const lowerSearchQuery = searchQuery.toLowerCase();
+
     Object.keys(visibleUsers).forEach((key) => {
       const pageUsers = visibleUsers[parseInt(key)];
-      console.log("pageUserspageUserspageUsers",pageUsers)
-      let filteredPageUsers = pageUsers;
-      
-
-      if (!isModerator) {
-        filteredPageUsers = pageUsers.filter((user: User) => {
-          return user.userId === currentUserId || user.isModerator;
-        });
-      }
-      
-      // Then filter by search query if provided
-      if (searchQuery.trim()) {
-        const lowerSearchQuery = searchQuery.toLowerCase();
-        filteredPageUsers = filteredPageUsers.filter((user: User) => {
-          return (
-            user.name?.toLowerCase().includes(lowerSearchQuery) ||
-            user.role?.toLowerCase().includes(lowerSearchQuery) ||
-            user.userId?.toLowerCase().includes(lowerSearchQuery)
-          );
-        });
-      }
+      const filteredPageUsers = pageUsers.filter((user: User) => {
+        // Search in user name, role, or any other relevant fields
+        return (
+          user.name?.toLowerCase().includes(lowerSearchQuery) ||
+          user.role?.toLowerCase().includes(lowerSearchQuery) ||
+          user.userId?.toLowerCase().includes(lowerSearchQuery)
+        );
+      });
       
       if (filteredPageUsers.length > 0) {
         filtered[parseInt(key)] = filteredPageUsers;
@@ -76,16 +60,20 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     });
 
     return filtered;
-  }, [visibleUsers, searchQuery, isModerator, currentUserId]);
-  console.log("filteredVisibleUsers", filteredVisibleUsers);
-  console.log("visibleUsers", visibleUsers);
+  }, [visibleUsers, searchQuery]);
+
+
 
   // Calculate filtered count
   const filteredCount = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return count;
+    }
+    
     return Object.values(filteredVisibleUsers).reduce((total, users) => {
       return total + users.length;
     }, 0);
-  }, [filteredVisibleUsers]);
+  }, [filteredVisibleUsers, count, searchQuery]);
 
   useEffect(() => {
     const keys = Object.keys(filteredVisibleUsers);
@@ -100,11 +88,14 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
       }, [] as User[]);
       // eslint-disable-next-line
       setLocalUserList(visibleUserArr);
-    } else {
-      // Set empty array if no users match the criteria
+    } else if (searchQuery.trim()) {
+      // If searching and no results, set empty array
       setLocalUserList([]);
     }
-  }, [filteredVisibleUsers]);
+  }, [filteredVisibleUsers, searchQuery]);
+
+
+
 
   // --- Plugin related code ---
   useEffect(() => {
@@ -168,42 +159,43 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     }
   };
 
-  const amountOfPages = Math.ceil(filteredCount / 50);
+  const amountOfPages = Math.ceil((searchQuery.trim() ? filteredCount : count) / 50);
 
-  // Show appropriate message when no users are found
-  
+  // Show "No users found" message when searching with no results
+  if (searchQuery.trim() && filteredCount === 0) {
+    return (
+      <Styled.UserListColumn
+        // @ts-ignore
+        onKeyDown={rove}
+        tabIndex={0}
+      >
+        <div style={{
+          padding: '20px',
+          textAlign: 'center',
+          color: '#666',
+          fontSize: '14px'
+        }}>
+          No users found matching "{searchQuery}"
+        </div>
+      </Styled.UserListColumn>
+    );
+  }
+
   return (
-    <Styled.UserListColumn
+    (
+      <Styled.UserListColumn
       // @ts-ignore
-      onKeyDown={rove}
-      tabIndex={0}
-    >
-      <Styled.VirtualizedList ref={userListRef}>
-        {
-          Array.from({ length: amountOfPages }).map((_, i) => {
-            const isLastItem = amountOfPages === (i + 1);
-            const restOfUsers = filteredCount % 50;
-            const key = i;
-            return i === 0
-              ? (
-                <UserListParticipantsPageContainer
-                  key={key}
-                  index={i}
-                  isLastItem={isLastItem}
-                  restOfUsers={isLastItem ? restOfUsers : 50}
-                  setVisibleUsers={setVisibleUsers}
-                  searchQuery={searchQuery}
-                  raiseHandUsers={raiseHandUsers}
-                />
-              )
-              : (
-                <IntersectionWatcher
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={i}
-                  ParentRef={userListRef}
-                  isLastItem={isLastItem}
-                  restOfUsers={isLastItem ? restOfUsers : 50}
-                >
+        onKeyDown={rove}
+        tabIndex={0}
+      >
+        <Styled.VirtualizedList ref={userListRef}>
+          {
+            Array.from({ length: amountOfPages }).map((_, i) => {
+              const isLastItem = amountOfPages === (i + 1);
+              const restOfUsers = (searchQuery.trim() ? filteredCount : count) % 50;
+              const key = i;
+              return i === 0
+                ? (
                   <UserListParticipantsPageContainer
                     key={key}
                     index={i}
@@ -213,26 +205,42 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                     searchQuery={searchQuery}
                     raiseHandUsers={raiseHandUsers}
                   />
-                </IntersectionWatcher>
-              );
-          })
-        }
-      </Styled.VirtualizedList>
-    </Styled.UserListColumn>
+                )
+                : (
+                  <IntersectionWatcher
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={i}
+                    ParentRef={userListRef}
+                    isLastItem={isLastItem}
+                    restOfUsers={isLastItem ? restOfUsers : 50}
+                  >
+                    <UserListParticipantsPageContainer
+                      key={key}
+                      index={i}
+                      isLastItem={isLastItem}
+                      restOfUsers={isLastItem ? restOfUsers : 50}
+                      setVisibleUsers={setVisibleUsers}
+                      searchQuery={searchQuery}
+                      raiseHandUsers={raiseHandUsers}
+                    />
+                  </IntersectionWatcher>
+                );
+            })
+          }
+        </Styled.VirtualizedList>
+      </Styled.UserListColumn>
+    )
   );
 };
 
 const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ searchQuery = '' }) => {
   const [internalSearchQuery, setInternalSearchQuery] = useState(searchQuery);
-  
-  const { data: currentUserData } = useCurrentUser((user) => ({
-    away: user.away,
-    isModerator: user.isModerator,
-    userId: user.userId,
-  }));
-  
-  const isModerator = currentUserData?.isModerator;
-  const currentUserId = currentUserData?.userId;
+    const { data: currentUserData } = useCurrentUser((user) => ({
+      away: user.away,
+      isModerator: user.isModerator,
+      userId: user.userId,
+    }));
+    const isModerator = currentUserData?.isModerator;
 
   const {
     data: countData,
@@ -264,80 +272,77 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
   } = useDeduplicatedSubscription(RAISED_HAND_USERS);
   const raiseHandUsers = usersData?.user || [];
 
+  
   const lowerAllHands = () => {
     raiseHandUsers.forEach((user: User) => 
       lowerUserHands(user.userId)
     );
   };
 
+
   return (
     <>
-      {isModerator && (
-        <div>
-          {raiseHandUsers.length > 0 && (
-            <Styled.LowerHnads onClick={lowerAllHands}>
-              {/* <Styled.HandIcon iconName="hand" /> */}
-              <Styled.LowerHnadsTitle>
-                Down All Hands ({raiseHandUsers.length})
-              </Styled.LowerHnadsTitle>
-            </Styled.LowerHnads>
-          )}
-          <div style={{ 
-            position: 'relative', 
-            margin: '8px 12px',
-            display: 'flex',
-            alignItems: 'center'
-          }}>
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={internalSearchQuery}
-              onChange={handleSearchChange}
-              aria-label="Search users"
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                paddingRight: '32px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                color: '#333',
-                boxSizing: 'border-box'
-              }}
-            />
-            {internalSearchQuery && (
-              <button
-                onClick={clearSearch}
-                aria-label="Clear search"
-                style={{
-                  position: 'absolute',
-                  right: '8px',
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '18px',
-                  cursor: 'pointer',
-                  color: '#666',
-                  width: '24px',
-                  height: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                ×
-              </button>
-            )}
-          </div>
-        </div>
-      )}
+    {isModerator &&  
+      <div>
+        {raiseHandUsers.length > 0 && <Styled.LowerHnads onClick={lowerAllHands}>
+          {/* <Styled.HandIcon iconName="hand" /> */}
+          <Styled.LowerHnadsTitle >Down All Hnads ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
+        </Styled.LowerHnads>}
+       <div style={{ 
+        position: 'relative', 
+        margin: '8px 12px',
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={internalSearchQuery}
+          onChange={handleSearchChange}
+          aria-label="Search users"
+          style={{
+            width: '100%',
+            padding: '8px 12px',
+            paddingRight: '32px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            fontSize: '14px',
+            backgroundColor: '#fff',
+            color: '#333',
+            boxSizing: 'border-box'
+          }}
+        />
+        {internalSearchQuery && (
+          <button
+            onClick={clearSearch}
+            aria-label="Clear search"
+            style={{
+              position: 'absolute',
+              right: '8px',
+              background: 'none',
+              border: 'none',
+              fontSize: '18px',
+              cursor: 'pointer',
+              color: '#666',
+              width: '24px',
+              height: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ×
+          </button>
+        )}
+       </div>
+      </div>
+    }
 
+  
       <UserListParticipants
         count={count ?? 0}
         searchQuery={internalSearchQuery}
         raiseHandUsers={raiseHandUsers}
-        isModerator={isModerator || false}
-        currentUserId={currentUserId || ''}
       />
     </>
   );

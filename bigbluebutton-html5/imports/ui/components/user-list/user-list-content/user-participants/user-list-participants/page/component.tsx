@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef,useMemo } from 'react';
 import * as PluginSdk from 'bigbluebutton-html-plugin-sdk';
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
 import { MEETING_PERMISSIONS_SUBSCRIPTION } from '../queries';
@@ -125,7 +125,14 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
 }) => {
   const offset = index * 50;
   const limit = useRef(50);
-
+  const { data: currentUserData } = useCurrentUser((user) => ({
+    away: user.away,
+    isModerator: user.isModerator,
+    userId: user.userId,
+  }));
+  const isModerator = currentUserData?.isModerator;
+  const currentUserId = currentUserData?.userId;
+  
   const {
     data: meetingData,
     loading: meetingLoading,
@@ -141,7 +148,23 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     data: usersData,
     loading: usersLoading,
   } = useLoadedUserList({ offset, limit: limit.current }, (u) => u) as GraphqlDataHookSubscriptionResponse<Array<User>>;
-  const users = sortUsersByRaiseHand(usersData ?? [], raiseHandUsers as RaiseHandUser[]) ?? [];
+  
+  // Filter users based on moderator status
+  const filteredUsers = useMemo(() => {
+    if (!usersData) return [];
+    
+    const sortedUsers = sortUsersByRaiseHand(usersData, raiseHandUsers as RaiseHandUser[]) ?? [];
+    
+    // If current user is moderator, show all users
+    if (isModerator) {
+      return sortedUsers;
+    }
+    
+    // If current user is not moderator, show only moderators and the current user
+    return sortedUsers.filter(user => 
+      user.isModerator || user.userId === currentUserId
+    );
+  }, [usersData, raiseHandUsers, isModerator, currentUserId]);
 
   const { data: currentUser, loading: currentUserLoading } = useCurrentUser((c: Partial<User>) => ({
     isModerator: c.isModerator,
@@ -159,10 +182,10 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
   useEffect(() => {
     setVisibleUsers((prev) => {
       const newList = { ...prev };
-      newList[index] = users;
+      newList[index] = filteredUsers;
       return newList;
     });
-  }, [usersData]);
+  }, [filteredUsers, index]);
 
   useEffect(() => {
     return () => {
@@ -183,11 +206,11 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     ));
   }
 
-  console.log({users})
+  console.log({users: filteredUsers})
 
   return (
     <UsersListParticipantsPage
-      users={users ?? []}
+      users={filteredUsers ?? []}
       meeting={meeting ?? {}}
       currentUser={currentUser ?? {}}
       pageId={pageId}
