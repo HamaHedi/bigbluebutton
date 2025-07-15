@@ -5,17 +5,17 @@ import { Layout } from '/imports/ui/components/layout/layoutTypes';
 const ChatBubble = ({
   children
 }) => {
-  const fullscreen = layoutSelect((i: Layout) => i.fullscreen);
+  const fullscreen = layoutSelect((i) => i.fullscreen);
   const { element } = fullscreen;
-  const fullscreenContext = (element === 'ExternalVideo');
+  const isScreenshareFullScreen = (element === 'Screenshare');
 
-  console.log({fullscreenContext , fullscreen})
+  console.log({isScreenshareFullScreen , fullscreen})
 
   return (
-    <Fragment>
-      {fullscreenContext && <div>ChatBubble</div>}
+    <>
+      {isScreenshareFullScreen && <div>ChatBubble</div>}
       {children}
-    </Fragment>
+    </>
   )
 }
 
