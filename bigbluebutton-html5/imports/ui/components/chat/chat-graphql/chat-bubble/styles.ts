@@ -95,9 +95,8 @@ const UnreadBadge = styled.div`
   right: 0;
   background: #DF2721;
   color: #ffffff;
-  font-size: 0.8rem;
-  line-height: calc(1px + 1rem);
-  padding: 0px 0.5rem;
+  font-size: 0.7rem;
+  padding: 0px 0.4rem;
   border-radius: 0.5rem / 50%;
   text-align: center;
 `;
