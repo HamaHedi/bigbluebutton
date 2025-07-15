@@ -1,22 +1,22 @@
-import React, { Fragment } from 'react'
+import React, from 'react'
 import { layoutSelect } from '/imports/ui/components/layout/context';
 import { Layout } from '/imports/ui/components/layout/layoutTypes';
+import ChatBubble from '../../chat/chat-graphql/chat-bubble/component';
 
-const ChatBubble = ({
+const ScreenshareBubble = ({
   children
 }) => {
-  const fullscreen = layoutSelect((i) => i.fullscreen);
+  const fullscreen = layoutSelect((i : Layout) => i.fullscreen);
   const { element } = fullscreen;
   const isScreenshareFullScreen = (element === 'Screenshare');
 
-  console.log({isScreenshareFullScreen , fullscreen})
 
   return (
     <>
-      {isScreenshareFullScreen && <div>ChatBubble</div>}
+      {isScreenshareFullScreen && <ChatBubble/>}
       {children}
     </>
   )
 }
 
-export default ChatBubble
+export default ScreenshareBubble

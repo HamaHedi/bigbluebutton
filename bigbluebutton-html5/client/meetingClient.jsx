@@ -72,13 +72,11 @@ const Startup = () => {
 
   return (
     <ContextProviders>
-      {/* <ChatBubble> */}
         <PresenceAdapter>
           <IntlAdapter>
             <Base pluginConfig={pluginConfig} />
           </IntlAdapter>
         </PresenceAdapter>
-      {/* </ChatBubble> */}
     </ContextProviders>
   );
 };
