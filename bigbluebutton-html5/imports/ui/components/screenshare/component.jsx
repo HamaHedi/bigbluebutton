@@ -426,13 +426,14 @@ class ScreenshareComponent extends React.Component {
   }
 
   renderChatBubble() {
+    console.log("renderChatBubble")
     return (
-      <Styled.HoverToolbar
-       toolbarStyle="hoverToolbar"
-       key="hover-toolbar-screenshare"
-      >
+      // <Styled.HoverToolbar
+      //  toolbarStyle="hoverToolbar"
+      //  key="hover-toolbar-screenshare"
+      // >
         <ChatBubble />
-      </Styled.HoverToolbar>
+      // </Styled.HoverToolbar>
     )
   }
 
