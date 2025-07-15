@@ -18,25 +18,21 @@ const ChatModal = () => {
         })
     }
 
-    // Drag functionality
     const [isDragging, setIsDragging] = useState(false)
     const [position, setPosition] = useState({ x: 20, y: 20 })
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
     
-    // Resize functionality
     const [isResizing, setIsResizing] = useState(false)
     const [resizeHandle, setResizeHandle] = useState('')
     const [size, setSize] = useState({ width: 350, height: 500 })
     
     const modalRef = useRef<HTMLDivElement>(null)
 
-    // Mouse move handler for drag and resize
     const handleMouseMove = useCallback((e: MouseEvent) => {
         if (isDragging) {
             const newX = e.clientX - dragOffset.x
             const newY = e.clientY - dragOffset.y
             
-            // Constrain to window boundaries
             const maxX = window.innerWidth - size.width
             const maxY = window.innerHeight - size.height
             
@@ -76,14 +72,12 @@ const ChatModal = () => {
         }
     }, [isDragging, isResizing, dragOffset, size, position, resizeHandle])
 
-    // Mouse up handler
     const handleMouseUp = useCallback(() => {
         setIsDragging(false)
         setIsResizing(false)
         setResizeHandle('')
     }, [])
 
-    // Add/remove event listeners
     useEffect(() => {
         if (isDragging || isResizing) {
             document.addEventListener('mousemove', handleMouseMove)
@@ -96,7 +90,6 @@ const ChatModal = () => {
         }
     }, [isDragging, isResizing, handleMouseMove, handleMouseUp])
 
-    // Drag start handler
     const handleDragStart = (e: React.MouseEvent) => {
         if (!modalRef.current) return
         
@@ -108,7 +101,6 @@ const ChatModal = () => {
         setIsDragging(true)
     }
 
-    // Resize start handler
     const handleResizeStart = (e: React.MouseEvent, handle: string) => {
         e.stopPropagation()
         setResizeHandle(handle)
@@ -130,11 +122,6 @@ const ChatModal = () => {
         isResizing={isResizing}
     >
         <Styled.ChatHeader onMouseDown={handleDragStart}>
-            <Styled.WindowControls>
-                <Styled.WindowButton color="#ff5f56" onClick={closeChatModal} />
-                <Styled.WindowButton color="#ffbd2e" />
-                <Styled.WindowButton color="#27ca3f" />
-            </Styled.WindowControls>
             <Styled.HeaderTitle>Chat</Styled.HeaderTitle>
             <Styled.CloseButton onClick={closeChatModal}>
                 <Icon iconName="close" />
@@ -146,7 +133,6 @@ const ChatModal = () => {
             <ChatMessageFormContainer />
         </Styled.ChatContent>
         
-        {/* Resize handles */}
         <Styled.ResizeHandle 
             position="top" 
             onMouseDown={(e) => handleResizeStart(e, 'top')} 

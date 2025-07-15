@@ -25,7 +25,6 @@ const ChatModal = styled.div<ChatModalProps>`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
   user-select: none;
   
   ${({ isDragging }: ChatModalProps) =>
@@ -78,10 +77,9 @@ const WindowButton = styled.div<WindowButtonProps>`
 
 const HeaderTitle = styled.h3`
   color: ${colorWhite};
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   margin: 0;
-  text-align: center;
   flex: 1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 `
@@ -101,6 +99,7 @@ const CloseButton = styled.button`
   i {
     font-size: 14px;
     color: ${colorWhite};
+    margin: 0 !important;
   }
 `
 
@@ -110,6 +109,11 @@ const ChatContent = styled.div`
   flex: 1;
   overflow: hidden;
   background: ${colorWhite};
+  padding: 10px;
+
+  form {
+    padding-right: 0 !important;
+  }
 `
 
 const ResizeHandle = styled.div<ResizeHandleProps>`
