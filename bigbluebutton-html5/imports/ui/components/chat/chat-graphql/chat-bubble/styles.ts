@@ -89,7 +89,21 @@ const Icon = styled.div`
   }
 `;
 
+const UnreadBadge = styled.div`
+  position: absolute;
+  bottom: 0px;
+  right: 0;
+  background: #DF2721;
+  color: #ffffff;
+  font-size: 0.8rem;
+  line-height: calc(1px + 1rem);
+  padding: 0px 0.5rem;
+  border-radius: 0.5rem / 50%;
+  text-align: center;
+`;
+
 export default {
   Bubble,
-  Icon
+  Icon,
+  UnreadBadge
 }

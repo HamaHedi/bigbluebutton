@@ -4,11 +4,21 @@ import { Icon } from '../chat-message-list/page/chat-message/message-content/not
 import { layoutDispatch, layoutSelect } from '../../../layout/context'
 import { ACTIONS } from '../../../layout/enums'
 import { Layout } from '../../../layout/layoutTypes'
+import useChat from '/imports/ui/core/hooks/useChat'
+import Chat from '../../../user-list/user-list-content/user-messages/chat-list/chat-list-item/chatTypes'
+import { GraphqlDataHookSubscriptionResponse } from '/imports/ui/Types/hook'
 
 const ChatBubble = () => {
   const fullscreen = layoutSelect((i : Layout) => i.fullscreen);
   const { element } = fullscreen;
   const isScreenshareFullScreen = (element === 'Screenshare');
+  const CHAT_CONFIG = window.meetingClientSettings.public.chat;
+  const PUBLIC_GROUP_CHAT_ID = CHAT_CONFIG.public_group_id;
+
+  const isPublicGroupChat = (chat: Chat) => chat.chatId === PUBLIC_GROUP_CHAT_ID;
+  const { data: chats } = useChat((chat) => chat) as GraphqlDataHookSubscriptionResponse<Chat[]>;
+  const publicGroupChat = chats?.find(isPublicGroupChat);
+  const totalUnreadMessages = publicGroupChat?.totalUnread || 0;
 
   const [isDragging, setIsDragging] = useState(false)
   const layoutContextDispatch = layoutDispatch();
@@ -81,8 +91,9 @@ const ChatBubble = () => {
         })
       }
     >
+     {totalUnreadMessages > 0 && <Styled.UnreadBadge>{totalUnreadMessages}</Styled.UnreadBadge>}
       <Styled.Icon>
-        <Icon iconName="chat" />
+        <Icon iconName="group-chat" />
       </Styled.Icon>
     </Styled.Bubble>
   )
