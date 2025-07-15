@@ -170,29 +170,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const amountOfPages = Math.ceil(filteredCount / 50);
 
   // Show appropriate message when no users are found
-  if (filteredCount === 0) {
-    const message = searchQuery.trim() 
-      ? `No users found matching "${searchQuery}"`
-      : (!isModerator ? "No moderators found" : "No users found");
-    
-    return (
-      <Styled.UserListColumn
-        // @ts-ignore
-        onKeyDown={rove}
-        tabIndex={0}
-      >
-        <div style={{
-          padding: '20px',
-          textAlign: 'center',
-          color: '#666',
-          fontSize: '14px'
-        }}>
-          {message}
-        </div>
-      </Styled.UserListColumn>
-    );
-  }
-
+  
   return (
     <Styled.UserListColumn
       // @ts-ignore
