@@ -9,7 +9,7 @@ const ChatBubble = ({
   const { element } = fullscreen;
   const fullscreenContext = (element === 'ExternalVideo');
 
-  console.log({fullscreenContext})
+  console.log({fullscreenContext , fullscreen})
 
   return (
     <Fragment>
