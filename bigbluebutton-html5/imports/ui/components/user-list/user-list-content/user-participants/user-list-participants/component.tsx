@@ -48,9 +48,10 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     // First filter by moderator status
     Object.keys(visibleUsers).forEach((key) => {
       const pageUsers = visibleUsers[parseInt(key)];
+      console.log("pageUserspageUserspageUsers",pageUsers)
       let filteredPageUsers = pageUsers;
       
-      // If current user is not a moderator, only show themselves and moderators
+
       if (!isModerator) {
         filteredPageUsers = pageUsers.filter((user: User) => {
           return user.userId === currentUserId || user.isModerator;
