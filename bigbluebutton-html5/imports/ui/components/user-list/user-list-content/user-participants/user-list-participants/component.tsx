@@ -61,7 +61,8 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
     return filtered;
   }, [visibleUsers, searchQuery]);
-
+console.log("filteredVisibleUsers",filteredVisibleUsers)
+console.log("visibleUsers",visibleUsers)
 
 
   // Calculate filtered count
