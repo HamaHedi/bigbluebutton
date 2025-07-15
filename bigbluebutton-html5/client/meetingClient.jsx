@@ -68,11 +68,7 @@ const Startup = () => {
     PLUGIN_CONFIGURATION_QUERY,
   )((obj) => obj);
 
-  const fullscreen = layoutSelect((i) => i.fullscreen);
-  const { element } = fullscreen;
-  const fullscreenContext = (element === 'ExternalVideo');
 
-  console.log({fullscreenContext , fullscreen})
 
   return (
     <ContextProviders>
