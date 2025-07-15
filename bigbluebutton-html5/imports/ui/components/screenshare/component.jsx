@@ -35,6 +35,7 @@ import { getSettingsSingletonInstance } from '/imports/ui/services/settings';
 import deviceInfo from '/imports/utils/deviceInfo';
 import { uniqueId } from '/imports/utils/string-utils';
 import Session from '/imports/ui/services/storage/in-memory';
+import ChatBubble from '../chat/chat-graphql/chat-bubble/component';
 
 const MOBILE_HOVER_TIMEOUT = 5000;
 const MEDIA_FLOW_PROBE_INTERVAL = 500;
@@ -424,6 +425,17 @@ class ScreenshareComponent extends React.Component {
     );
   }
 
+  renderChatBubble() {
+    return (
+      <Styled.HoverToolbar
+       toolbarStyle="hoverToolbar"
+       key="hover-toolbar-screenshare"
+      >
+        <ChatBubble />
+      </Styled.HoverToolbar>
+    )
+  }
+
   renderVolumeSlider() {
     const { showHoverToolBar } = this.state;
 
@@ -661,6 +673,7 @@ class ScreenshareComponent extends React.Component {
             </Styled.SpinnerWrapper>
           )}
         {autoplayBlocked ? this.renderAutoplayOverlay() : null}
+        {this.renderChatBubble()}
         <Styled.ScreenshareContainer
           switched={isPresenter ? switched : true}
           key="screenshareContainer"
