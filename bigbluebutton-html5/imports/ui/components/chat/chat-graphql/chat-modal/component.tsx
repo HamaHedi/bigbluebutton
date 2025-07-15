@@ -3,10 +3,13 @@ import Styled from './styles'
 import ChatMessageListContainer from '../chat-message-list/component'
 import ChatMessageFormContainer from '../chat-message-form/component'
 import { Icon } from '../chat-message-list/page/chat-message/message-content/notification-content/styles'
-import { layoutDispatch } from '../../../layout/context'
+import { layoutDispatch, layoutSelect } from '../../../layout/context'
 import { ACTIONS } from '../../../layout/enums'
+import { Layout } from '../../../layout/layoutTypes'
 
 const ChatModal = () => {
+    const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
+
     const layoutContextDispatch = layoutDispatch();
     const closeChatModal = () => {
         layoutContextDispatch({
@@ -14,6 +17,8 @@ const ChatModal = () => {
             value: false,
         })
     }
+
+    if (!isChatBubbleOpen) return null;
 
   return (
     <Styled.ChatModal>
