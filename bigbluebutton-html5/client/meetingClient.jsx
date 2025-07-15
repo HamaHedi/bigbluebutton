@@ -34,6 +34,7 @@ import CustomUsersSettings from '/imports/ui/components/join-handler/custom-user
 import createUseSubscription from '/imports/ui/core/hooks/createUseSubscription';
 import PLUGIN_CONFIGURATION_QUERY from '/imports/ui/components/plugins-engine/query';
 import ChatBubble from '/imports/startup/client/ChatBubble';
+import { layoutSelect } from '/imports/ui/components/layout/context';
 
 // eslint-disable-next-line import/prefer-default-export
 const Startup = () => {
@@ -66,15 +67,22 @@ const Startup = () => {
   const { data: pluginConfig } = createUseSubscription(
     PLUGIN_CONFIGURATION_QUERY,
   )((obj) => obj);
+
+  const fullscreen = layoutSelect((i) => i.fullscreen);
+  const { element } = fullscreen;
+  const fullscreenContext = (element === 'ExternalVideo');
+
+  console.log({fullscreenContext , fullscreen})
+
   return (
     <ContextProviders>
-      <ChatBubble>
+      {/* <ChatBubble> */}
         <PresenceAdapter>
           <IntlAdapter>
             <Base pluginConfig={pluginConfig} />
           </IntlAdapter>
         </PresenceAdapter>
-      </ChatBubble>
+      {/* </ChatBubble> */}
     </ContextProviders>
   );
 };
