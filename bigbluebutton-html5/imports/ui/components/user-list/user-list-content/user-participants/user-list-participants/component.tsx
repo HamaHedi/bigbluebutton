@@ -21,33 +21,20 @@ interface UserListParticipantsProps {
   count: number;
   searchQuery: string;
   raiseHandUsers: User[];
-
+  isModerator: boolean;
+  currentUserId: string;
 }
 
 const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   count,
   searchQuery,
   raiseHandUsers,
-
+  isModerator,
+  currentUserId,
 }) => {
-
-  const { data: currentUserData } = useCurrentUser((user) => ({
-    away: user.away,
-    isModerator: user.isModerator,
-    userId: user.userId,
-  }));
-
-  const isModerator = currentUserData?.isModerator;
-  const currentUserId = currentUserData?.userId;
-  console.log({isModerator,currentUserId})
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
   }>({});
-  const [curentUserID, setCurretUserID] = React.useState<string>("");
-  const [isUserModerator, setIsUserModerator] = React.useState<string>("");
-useEffect(()=>{setCurretUserID(currentUserId);
-  setIsUserModerator(isModerator)
-},[currentUserId,isModerator])
   const userListRef = React.useRef<HTMLDivElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
@@ -61,9 +48,9 @@ useEffect(()=>{setCurretUserID(currentUserId);
       let filteredPageUsers = pageUsers;
       
       // If current user is not a moderator, only show themselves and moderators
-      if (!isUserModerator) {
+      if (!isModerator) {
         filteredPageUsers = pageUsers.filter((user: User) => {
-          return user.userId === curentUserID || user.isModerator;
+          return user.userId === currentUserId || user.isModerator;
         });
       }
       
@@ -226,8 +213,6 @@ useEffect(()=>{setCurretUserID(currentUserId);
                   setVisibleUsers={setVisibleUsers}
                   searchQuery={searchQuery}
                   raiseHandUsers={raiseHandUsers}
-                  isModerator={isModerator}
-                  currentUserId={currentUserId}
                 />
               )
               : (
@@ -246,8 +231,6 @@ useEffect(()=>{setCurretUserID(currentUserId);
                     setVisibleUsers={setVisibleUsers}
                     searchQuery={searchQuery}
                     raiseHandUsers={raiseHandUsers}
-                    isModerator={isModerator}
-                    currentUserId={currentUserId}
                   />
                 </IntersectionWatcher>
               );
@@ -269,7 +252,6 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
   
   const isModerator = currentUserData?.isModerator;
   const currentUserId = currentUserData?.userId;
-
 
   const {
     data: countData,
@@ -373,7 +355,8 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
         count={count ?? 0}
         searchQuery={internalSearchQuery}
         raiseHandUsers={raiseHandUsers}
-
+        isModerator={isModerator || false}
+        currentUserId={currentUserId || ''}
       />
     </>
   );
