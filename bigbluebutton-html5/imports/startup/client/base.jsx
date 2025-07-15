@@ -94,13 +94,13 @@ const BaseContainer = (props) => {
   const layoutContextDispatch = layoutDispatch();
 
   return (
-    <Base
-      {...{
-        animations,
-        layoutContextDispatch,
-        ...props,
-      }}
-    />
+      <Base
+        {...{
+          animations,
+          layoutContextDispatch,
+          ...props,
+        }}
+      />
   );
 };
 

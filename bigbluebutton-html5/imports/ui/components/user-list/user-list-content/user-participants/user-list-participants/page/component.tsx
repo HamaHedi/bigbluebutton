@@ -206,7 +206,6 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     ));
   }
 
-  console.log({users: filteredUsers})
 
   return (
     <UsersListParticipantsPage

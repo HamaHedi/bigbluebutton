@@ -284,6 +284,7 @@ interface Layout {
     fullscreen: Fullscreen;
     idChatOpen: string;
     input: Input;
+    isChatBubbleOpen: boolean;
     isRTL: boolean;
     layoutType: string;
     output: Output;

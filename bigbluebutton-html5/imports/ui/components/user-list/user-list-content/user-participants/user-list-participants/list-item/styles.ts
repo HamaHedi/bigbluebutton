@@ -350,12 +350,14 @@ const UserAdditionalInformationIcon = styled(Icon)`
 `;
 
 const pulse = (color: string) => keyframes`
-    0% {
-      box-shadow: 0 0 0 0 ${color}80;
-    }
-    100% {
-      box-shadow: 0 0 0 10px ${color}00;
-    }
+  0% {
+    box-shadow: 0 0 0 0 ${color}CC, 0 0 4px 1px ${color}99;
+  }
+  50% {
+    box-shadow: 0 0 0 12px ${color}40, 0 0 12px 2px ${color}66;
+  }
+  100% {
+    box-shadow: 0 0 0 12px ${color}00, 0 0 12px 2px ${color}00;
   }
 `;
 
@@ -435,13 +437,27 @@ const ToggleVoiceButton = styled.div`
     background-color: ${listItemBgHover};
   }
 
-  &.muted {
+  i{
+    font-size: 17px;
+  }
+
+  .muted {
     color: ${colorDanger};
   }
 
-  &.unmuted {
+  .unmuted {
     color: ${colorSuccess};
   }
+`;
+
+const MoreIcon = styled.div`
+  cursor: pointer;
+  padding: 3px;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default {
@@ -453,5 +469,6 @@ export default {
   UserNameSub,
   UserName,
   IconRightContainer,
-  ToggleVoiceButton
+  ToggleVoiceButton,
+  MoreIcon
 };
