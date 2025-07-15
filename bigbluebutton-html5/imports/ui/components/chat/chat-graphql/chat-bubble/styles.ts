@@ -1,17 +1,18 @@
 import styled, { css } from 'styled-components';
+import { colorPrimary } from '/imports/ui/stylesheets/styled-components/palette';
 
 const Bubble = styled.div<{ isDragging?: boolean }>`
   position: fixed;
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: ${colorPrimary};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 10px ${colorPrimary};
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   
@@ -65,6 +66,8 @@ const Icon = styled.div`
     font-size: 20px;
     color: #ffffff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    padding: 0;
   }
   
   &::after {

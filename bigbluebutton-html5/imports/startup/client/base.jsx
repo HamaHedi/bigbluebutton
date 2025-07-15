@@ -6,7 +6,6 @@ import { ACTIONS } from '/imports/ui/components/layout/enums';
 import useSettings from '/imports/ui/services/settings/hooks/useSettings';
 import { SETTINGS } from '/imports/ui/services/settings/enums';
 import { layoutDispatch } from '/imports/ui/components/layout/context';
-import ScreenshareBubble from '/imports/ui/components/layout/screenshare-bubble/component';
 
 const HTML = document.getElementsByTagName('html')[0];
 
@@ -95,7 +94,6 @@ const BaseContainer = (props) => {
   const layoutContextDispatch = layoutDispatch();
 
   return (
-    <ScreenshareBubble>
       <Base
         {...{
           animations,
@@ -103,7 +101,6 @@ const BaseContainer = (props) => {
           ...props,
         }}
       />
-    </ScreenshareBubble>
   );
 };
 
