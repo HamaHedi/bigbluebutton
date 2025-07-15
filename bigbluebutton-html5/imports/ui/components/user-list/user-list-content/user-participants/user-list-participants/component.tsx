@@ -21,18 +21,24 @@ interface UserListParticipantsProps {
   count: number;
   searchQuery: string;
   raiseHandUsers: User[];
-  isModerator: boolean;
-  currentUserId: string;
+
 }
 
 const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   count,
   searchQuery,
   raiseHandUsers,
-  isModerator,
-  currentUserId,
+
 }) => {
-  console.log({isModerator,currentUserId})
+
+  const { data: currentUserData } = useCurrentUser((user) => ({
+    away: user.away,
+    isModerator: user.isModerator,
+    userId: user.userId,
+  }));
+  
+  const isModerator = currentUserData?.isModerator;
+  const currentUserId = currentUserData?.userId;
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
   }>({});
@@ -258,6 +264,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
   const isModerator = currentUserData?.isModerator;
   const currentUserId = currentUserData?.userId;
 
+
   const {
     data: countData,
   } = useDeduplicatedSubscription(USER_AGGREGATE_COUNT_SUBSCRIPTION);
@@ -360,8 +367,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
         count={count ?? 0}
         searchQuery={internalSearchQuery}
         raiseHandUsers={raiseHandUsers}
-        isModerator={isModerator || false}
-        currentUserId={currentUserId || ''}
+
       />
     </>
   );
