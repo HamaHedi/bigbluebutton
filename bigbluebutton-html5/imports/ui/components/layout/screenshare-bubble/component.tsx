@@ -1,4 +1,4 @@
-import React, from 'react'
+import React from 'react'
 import { layoutSelect } from '/imports/ui/components/layout/context';
 import { Layout } from '/imports/ui/components/layout/layoutTypes';
 import ChatBubble from '../../chat/chat-graphql/chat-bubble/component';
