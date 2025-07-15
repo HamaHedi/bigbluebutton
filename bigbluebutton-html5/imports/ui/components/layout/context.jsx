@@ -51,6 +51,7 @@ const initState = {
   layoutType: DEFAULT_VALUES.layoutType,
   fontSize: DEFAULT_VALUES.fontSize,
   idChatOpen: '',
+  isChatBubbleOpen: false,
   fullscreen: {
     element: '',
     group: '',
@@ -62,6 +63,15 @@ const initState = {
 const reducer = (state, action) => {
   debugActions(action.type, action.value);
   switch (action.type) {
+    case ACTIONS.SET_IS_CHAT_BUBBLE_OPEN: {
+      const { isChatBubbleOpen } = state;
+      if (isChatBubbleOpen === action.value) return state;
+      return {
+        ...state,
+        isChatBubbleOpen: action.value,
+      };
+    }
+    
     case ACTIONS.SET_FOCUSED_CAMERA_ID: {
       const { cameraDock } = state.input;
       const { focusedId } = cameraDock;
