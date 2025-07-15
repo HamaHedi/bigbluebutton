@@ -40,6 +40,9 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
   // Filter users based on moderator status first, then search query
   const filteredVisibleUsers = useMemo(() => {
+    // Return empty if no users have been made visible yet
+    if (Object.keys(visibleUsers).length === 0) return {};
+    
     let filtered: { [key: number]: User[] } = {};
     
     // First filter by moderator status
@@ -73,7 +76,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
     return filtered;
   }, [visibleUsers, searchQuery, isModerator, currentUserId]);
-
   console.log("filteredVisibleUsers", filteredVisibleUsers);
   console.log("visibleUsers", visibleUsers);
 
