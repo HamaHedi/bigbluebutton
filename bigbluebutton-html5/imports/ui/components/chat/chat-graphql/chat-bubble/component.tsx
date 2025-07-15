@@ -4,7 +4,9 @@ import { Icon } from '../chat-message-list/page/chat-message/message-content/not
 
 const ChatBubble = () => {
   const [isDragging, setIsDragging] = useState(false)
-  const [position, setPosition] = useState({ x: 20, y: window.innerHeight - 70 }) // Bottom left initial position
+
+  //bottom right initial position
+  const [position, setPosition] = useState({ x: window.innerWidth - 70, y: window.innerHeight - 70 }) // Bottom left initial position
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const bubbleRef = useRef<HTMLDivElement>(null)
 

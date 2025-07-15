@@ -18,7 +18,6 @@ const Bubble = styled.div<{ isDragging?: boolean }>`
   
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
   }
   
   &:active {
@@ -65,9 +64,8 @@ const Icon = styled.div`
   i {
     font-size: 20px;
     color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   &::after {

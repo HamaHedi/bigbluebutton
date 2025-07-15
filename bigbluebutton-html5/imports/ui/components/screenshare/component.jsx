@@ -426,14 +426,8 @@ class ScreenshareComponent extends React.Component {
   }
 
   renderChatBubble() {
-    console.log("renderChatBubble")
     return (
-      // <Styled.HoverToolbar
-      //  toolbarStyle="hoverToolbar"
-      //  key="hover-toolbar-screenshare"
-      // >
         <ChatBubble />
-      // </Styled.HoverToolbar>
     )
   }
 
@@ -674,7 +668,7 @@ class ScreenshareComponent extends React.Component {
             </Styled.SpinnerWrapper>
           )}
         {autoplayBlocked ? this.renderAutoplayOverlay() : null}
-        {this.renderChatBubble()}
+     
         <Styled.ScreenshareContainer
           switched={isPresenter ? switched : true}
           key="screenshareContainer"
@@ -684,6 +678,7 @@ class ScreenshareComponent extends React.Component {
           id="screenshareContainer"
         >
           {this.renderScreenshareButtons()}
+          {this.renderChatBubble()}
           {isPresenter
             ? this.renderScreensharePresenter()
             : this.renderScreenshareDefault()}
