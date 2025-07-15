@@ -1,12 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Styled from './styles'
 import { Icon } from '../chat-message-list/page/chat-message/message-content/notification-content/styles'
+import { layoutDispatch, layoutSelect } from '../../../layout/context'
+import { ACTIONS } from '../../../layout/enums'
+import { Layout } from '../../../layout/layoutTypes'
 
 const ChatBubble = () => {
   const [isDragging, setIsDragging] = useState(false)
+  const layoutContextDispatch = layoutDispatch();
+  const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
 
   //bottom right initial position
-  const [position, setPosition] = useState({ x: window.innerWidth - 70, y: window.innerHeight - 70 }) // Bottom left initial position
+  const [position, setPosition] = useState({ x: window.innerWidth - 30, y: window.innerHeight - 30 }) // Bottom left initial position
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const bubbleRef = useRef<HTMLDivElement>(null)
 
@@ -63,6 +68,12 @@ const ChatBubble = () => {
       }}
       onMouseDown={handleMouseDown}
       isDragging={isDragging}
+      onClick={() => 
+        layoutContextDispatch({
+          type: ACTIONS.SET_IS_CHAT_BUBBLE_OPEN,
+          value: !isChatBubbleOpen,
+        })
+      }
     >
       <Styled.Icon>
         <Icon iconName="chat" />
