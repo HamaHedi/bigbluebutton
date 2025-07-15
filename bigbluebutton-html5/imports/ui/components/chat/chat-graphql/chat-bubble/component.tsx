@@ -6,12 +6,15 @@ import { ACTIONS } from '../../../layout/enums'
 import { Layout } from '../../../layout/layoutTypes'
 
 const ChatBubble = () => {
+  const fullscreen = layoutSelect((i : Layout) => i.fullscreen);
+  const { element } = fullscreen;
+  const isScreenshareFullScreen = (element === 'Screenshare');
+
   const [isDragging, setIsDragging] = useState(false)
   const layoutContextDispatch = layoutDispatch();
   const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
 
-  //bottom right initial position
-  const [position, setPosition] = useState({ x: window.innerWidth - 70, y: window.innerHeight - 150 }) // Bottom left initial position
+  const [position, setPosition] = useState({ x: 15, y: 15 }) // top left initial position
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const bubbleRef = useRef<HTMLDivElement>(null)
 
@@ -57,6 +60,9 @@ const ChatBubble = () => {
     })
     setIsDragging(true)
   }
+
+  if(!isScreenshareFullScreen)
+    return null;
 
   return (
     <Styled.Bubble

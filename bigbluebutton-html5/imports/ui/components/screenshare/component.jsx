@@ -434,7 +434,6 @@ class ScreenshareComponent extends React.Component {
   }
 
   renderChatModal() {
-
     return (<ChatModal />)
   }
 
