@@ -33,6 +33,7 @@ import PresenceAdapter from '../imports/ui/components/presence-adapter/component
 import CustomUsersSettings from '/imports/ui/components/join-handler/custom-users-settings/component';
 import createUseSubscription from '/imports/ui/core/hooks/createUseSubscription';
 import PLUGIN_CONFIGURATION_QUERY from '/imports/ui/components/plugins-engine/query';
+import ChatBubble from '/imports/startup/client/ChatBubble';
 
 // eslint-disable-next-line import/prefer-default-export
 const Startup = () => {
@@ -69,7 +70,9 @@ const Startup = () => {
     <ContextProviders>
       <PresenceAdapter>
         <IntlAdapter>
-          <Base pluginConfig={pluginConfig} />
+          <ChatBubble>
+            <Base pluginConfig={pluginConfig} />
+          </ChatBubble>
         </IntlAdapter>
       </PresenceAdapter>
     </ContextProviders>
