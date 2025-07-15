@@ -36,13 +36,18 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     isModerator: user.isModerator,
     userId: user.userId,
   }));
-  
+
   const isModerator = currentUserData?.isModerator;
   const currentUserId = currentUserData?.userId;
   console.log({isModerator,currentUserId})
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
   }>({});
+  const [curentUserID, setCurretUserID] = React.useState<string>("");
+  const [isUserModerator, setIsUserModerator] = React.useState<string>("");
+useEffect(()=>{setCurretUserID(currentUserId);
+  setIsUserModerator(isModerator)
+},[currentUserId,isModerator])
   const userListRef = React.useRef<HTMLDivElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
@@ -56,9 +61,9 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
       let filteredPageUsers = pageUsers;
       
       // If current user is not a moderator, only show themselves and moderators
-      if (!isModerator) {
+      if (!isUserModerator) {
         filteredPageUsers = pageUsers.filter((user: User) => {
-          return user.userId === currentUserId || user.isModerator;
+          return user.userId === curentUserID || user.isModerator;
         });
       }
       
