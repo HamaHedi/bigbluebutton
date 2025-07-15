@@ -39,6 +39,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   
   const isModerator = currentUserData?.isModerator;
   const currentUserId = currentUserData?.userId;
+  console.log({isModerator,currentUserId})
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
   }>({});
