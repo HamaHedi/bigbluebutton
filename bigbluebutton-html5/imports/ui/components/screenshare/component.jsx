@@ -434,8 +434,7 @@ class ScreenshareComponent extends React.Component {
   }
 
   renderChatModal() {
-    const isChatBubbleOpen = layoutSelect((i) => i.isChatBubbleOpen);
-    if (!isChatBubbleOpen) return null;
+
     return (<ChatModal />)
   }
 
