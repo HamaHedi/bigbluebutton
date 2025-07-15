@@ -68,13 +68,13 @@ const Startup = () => {
   )((obj) => obj);
   return (
     <ContextProviders>
-      <PresenceAdapter>
-        <IntlAdapter>
-          <ChatBubble>
+      <ChatBubble>
+        <PresenceAdapter>
+          <IntlAdapter>
             <Base pluginConfig={pluginConfig} />
-          </ChatBubble>
-        </IntlAdapter>
-      </PresenceAdapter>
+          </IntlAdapter>
+        </PresenceAdapter>
+      </ChatBubble>
     </ContextProviders>
   );
 };
