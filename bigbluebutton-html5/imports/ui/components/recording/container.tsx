@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useMutation, useReactiveVar } from '@apollo/client';
 import RecordingComponent from './component';
 import { SET_RECORDING_STATUS } from './mutations';
@@ -22,7 +22,6 @@ const RecordingContainer: React.FC<RecordingContainerProps> = (props) => {
   } = props;
   const [setRecordingStatus] = useMutation(SET_RECORDING_STATUS);
   const connected = useReactiveVar(ConnectionStatus.getConnectedStatusVar());
-  const autoStopTimerRef = useRef<any>(null);
 
   const {
     data: recordingData,
@@ -36,42 +35,8 @@ const RecordingContainer: React.FC<RecordingContainerProps> = (props) => {
   const time = recordingData?.meeting_recording[0]?.previousRecordedTimeInSeconds ?? 0;
   const allowStartStopRecording = recordingPoliciesData?.meeting_recordingPolicies[0]?.allowStartStopRecording ?? false;
 
-  // Auto-stop recording after 1 minute
-  useEffect(() => {
-    console.log("in herrrerrerererererre")
-    if (recording) {
-      // Clear any existing timer
-      if (autoStopTimerRef.current) {
-        clearTimeout(autoStopTimerRef.current);
-      }
-      
-      // Set timer to stop recording after 1 minute (60000 ms)
-      autoStopTimerRef.current = setTimeout(() => {
-        setRecordingStatus({
-          variables: {
-            recording: false,
-          },
-        });
-        setIsOpen(false);
-      }, 60000);
-    } else {
-      // Clear timer if recording is stopped manually
-      if (autoStopTimerRef.current) {
-        clearTimeout(autoStopTimerRef.current);
-        autoStopTimerRef.current = null;
-      }
-    }
-
-    // Cleanup function
-    return () => {
-      if (autoStopTimerRef.current) {
-        clearTimeout(autoStopTimerRef.current);
-        autoStopTimerRef.current = null;
-      }
-    };
-  }, [recording, setRecordingStatus, setIsOpen]);
-
   const toggleRecording = () => {
+    console.log("toggleRecording called - current recording state:", recording);
     setRecordingStatus({
       variables: {
         recording: !recording,
@@ -95,6 +60,7 @@ const RecordingContainer: React.FC<RecordingContainerProps> = (props) => {
         recordingStatus: recording,
         setIsOpen,
         toggleRecording,
+        setRecordingStatus, // Pass the mutation function to the component
       }}
     />
   );

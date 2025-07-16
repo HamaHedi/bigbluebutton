@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import ConfirmationModal from '/imports/ui/components/common/modal/confirmation/component';
 
@@ -48,12 +48,13 @@ const intlMessages = defineMessages({
 interface RecordingComponentProps {
   connected: boolean;
   isOpen: boolean;
-  recordingStatus: boolean,
+  recordingStatus: boolean;
   priority: string;
-  recordingTime: number,
+  recordingTime: number;
   onRequestClose: () => void;
-  toggleRecording: () => void,
+  toggleRecording: () => void;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setRecordingStatus: (options: { variables: { recording: boolean } }) => void;
 }
 
 const RecordingComponent: React.FC<RecordingComponentProps> = (props) => {
@@ -66,9 +67,51 @@ const RecordingComponent: React.FC<RecordingComponentProps> = (props) => {
     onRequestClose,
     toggleRecording,
     setIsOpen,
+    setRecordingStatus,
   } = props;
 
   const intl = useIntl();
+  const autoStopTimerRef = useRef<any>(null);
+
+  // Auto-stop recording after 1 minute
+  useEffect(() => {
+    console.log("RecordingComponent - useEffect triggered - recordingStatus:", recordingStatus);
+    
+    if (recordingStatus) {
+      console.log("RecordingComponent - Setting up auto-stop timer");
+      // Clear any existing timer
+      if (autoStopTimerRef.current) {
+        clearTimeout(autoStopTimerRef.current);
+      }
+      
+      // Set timer to stop recording after 1 minute (60000 ms)
+      // Using 10 seconds for testing - change back to 60000 for production
+      autoStopTimerRef.current = setTimeout(() => {
+        console.log("RecordingComponent - Auto-stopping recording after 1 minute");
+        setRecordingStatus({
+          variables: {
+            recording: false,
+          },
+        });
+        setIsOpen(false);
+      }, 10000); // 10 seconds for testing - change to 60000 for production
+    } else {
+      console.log("RecordingComponent - Recording stopped, clearing timer");
+      // Clear timer if recording is stopped manually
+      if (autoStopTimerRef.current) {
+        clearTimeout(autoStopTimerRef.current);
+        autoStopTimerRef.current = null;
+      }
+    }
+
+    // Cleanup function
+    return () => {
+      if (autoStopTimerRef.current) {
+        clearTimeout(autoStopTimerRef.current);
+        autoStopTimerRef.current = null;
+      }
+    };
+  }, [recordingStatus, setRecordingStatus, setIsOpen]);
 
   let title;
   let description;
