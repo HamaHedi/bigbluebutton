@@ -43,7 +43,9 @@ const UserTitle: React.FC<UserTitleProps> = ({
   }));
 
   const toggleMuteHandler = () => {
-      toggleMute(!!meetingInfo?.voiceSettings?.muteOnStart, true, setMuted);
+    const isMeetingMuted = meetingInfo?.voiceSettings?.muteOnStart;
+    toggleMute(!isMeetingMuted, false, setMuted);
+    toggleMute(!!isMeetingMuted, true, setMuted);
   }
 
   
