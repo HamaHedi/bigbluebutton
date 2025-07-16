@@ -38,6 +38,7 @@ const RecordingContainer: React.FC<RecordingContainerProps> = (props) => {
 
   // Auto-stop recording after 1 minute
   useEffect(() => {
+    console.log("in herrrerrerererererre")
     if (recording) {
       // Clear any existing timer
       if (autoStopTimerRef.current) {
