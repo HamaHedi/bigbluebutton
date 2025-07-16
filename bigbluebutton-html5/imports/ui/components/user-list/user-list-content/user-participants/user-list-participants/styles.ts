@@ -279,13 +279,12 @@ const UserListItem = styled.div`
 const LowerHnads = styled.div`
   display: flex;
   align-items: center;
-  margin: 8px 0;
-  padding-inline-start: 0.75rem;
   cursor: pointer;
-  padding: 5px 8px;
-  &:hover {
-    background-color: var(--list-item-bg-hover, #DCE4ED);
-  }
+  padding: 8px 5px;
+  background: #0F70D7;
+  border-radius: 5px;
+  margin: auto;
+  width: fit-content;
 `;
 
 const HandIcon = styled(Icon)`
@@ -298,7 +297,7 @@ const LowerHnadsTitle = styled.div`
   font-weight: 600;
   text-transform: uppercase;
   padding: 0px 0.2rem;
-  color: var(--color-gray, #4E5A66);
+  color: #fff;
   flex: 1 1 0%;
   margin: 0px;
   flex: 1;
