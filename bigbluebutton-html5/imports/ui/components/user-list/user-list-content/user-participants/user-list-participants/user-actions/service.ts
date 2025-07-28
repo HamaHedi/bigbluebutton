@@ -114,6 +114,7 @@ export const isVideoPinEnabledForCurrentUser = (
 
 export const toggleVoice = (userId: string, muted: boolean, voiceToggle: (userId: string, muted: boolean) => void) => {
   if (userId === Auth.userID) {
+    console.log({muted , userId})
     toggleMuteMicrophone(!muted, voiceToggle);
   } else {
     voiceToggle(userId, muted);
