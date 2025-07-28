@@ -123,35 +123,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   }, []);
   // --- End of plugin related code ---
 
-  const rove = (ev: KeyboardEvent) => {
-    if (ev.code === 'Enter' || ev.code === 'Space' || (ev.code === 'ArrowDown' && selectedUserRef.current !== document.activeElement)) {
-      if (selectedUserRef.current && (selectedUserRef.current === document.activeElement)) {
-        selectedUserRef.current.click();
-      } else {
-        const userItem = document.getElementById('user-index-0');
-        selectedUserRef.current = userItem;
-
-        if (selectedUserRef.current) {
-          selectedUserRef.current.focus();
-        }
-      }
-      return;
-    }
-
-    if (ev.code === 'ArrowDown' || ev.code === 'ArrowUp') {
-      const sum = ev.code === 'ArrowDown' ? 1 : -1;
-      const el = selectedUserRef.current;
-      if (el) {
-        const nextId = Number.parseInt(el.id.split('-')[2], 10) + sum;
-        const nextEl = document.getElementById(`user-index-${nextId}`);
-        if (nextEl) {
-          selectedUserRef.current = nextEl;
-          nextEl.focus();
-        }
-      }
-    }
-  };
-
   const amountOfPages = Math.ceil((searchQuery.trim() ? filteredCount : count) / 50);
 
   // Show "No users found" message when searching with no results
