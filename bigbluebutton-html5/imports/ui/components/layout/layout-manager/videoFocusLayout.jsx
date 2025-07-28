@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { throttle } from '/imports/utils/throttle';
-import { 
+import {
   layoutDispatch,
   layoutSelect,
   layoutSelectInput,
@@ -8,7 +8,7 @@ import {
 } from '/imports/ui/components/layout/context';
 import DEFAULT_VALUES from '/imports/ui/components/layout/defaultValues';
 import { INITIAL_INPUT_STATE } from '/imports/ui/components/layout/initState';
-import { ACTIONS, PANELS } from '/imports/ui/components/layout/enums';
+import { ACTIONS, PANELS, LAYOUT_TYPE } from '/imports/ui/components/layout/enums';
 import { defaultsDeep } from '/imports/utils/array-utils';
 import Session from '/imports/ui/services/storage/in-memory';
 
@@ -16,7 +16,9 @@ const windowWidth = () => window.document.documentElement.clientWidth;
 const windowHeight = () => window.document.documentElement.clientHeight;
 
 const VideoFocusLayout = (props) => {
-  const { bannerAreaHeight, isMobile, calculatesNavbarHeight } = props;
+  const {
+    prevLayout, bannerAreaHeight, isMobile, calculatesNavbarHeight,
+  } = props;
 
   function usePrevious(value) {
     const ref = useRef();
@@ -41,7 +43,6 @@ const VideoFocusLayout = (props) => {
 
   const sidebarNavigationInput = layoutSelectInput((i) => i.sidebarNavigation);
   const sidebarContentInput = layoutSelectInput((i) => i.sidebarContent);
-  const cameraDockInput = layoutSelectInput((i) => i.cameraDock);
   const actionbarInput = layoutSelectInput((i) => i.actionBar);
   const navbarInput = layoutSelectInput((i) => i.navBar);
   const layoutContextDispatch = layoutDispatch();
@@ -81,6 +82,7 @@ const VideoFocusLayout = (props) => {
   }, [input, deviceType, isRTL, fontSize, fullscreen, isPresentationEnabled]);
 
   const init = () => {
+    const hasLayoutEngineLoadedOnce = Session.getItem('hasLayoutEngineLoadedOnce');
     layoutContextDispatch({
       type: ACTIONS.SET_LAYOUT_INPUT,
       value: (prevInput) => {
@@ -89,18 +91,26 @@ const VideoFocusLayout = (props) => {
           externalVideo, genericMainContent, screenShare,
         } = prevInput;
         const { sidebarContentPanel } = sidebarContent;
+        let sidebarContentPanelOverride = sidebarContentPanel;
+        let overrideOpenSidebarPanel = sidebarContentPanel !== PANELS.NONE;
+        let overrideOpenSidebarNavigation = sidebarNavigation.isOpen
+          || sidebarContentPanel !== PANELS.NONE || false;
+        if (prevLayout === LAYOUT_TYPE.CAMERAS_ONLY
+          || prevLayout === LAYOUT_TYPE.PRESENTATION_ONLY
+          || prevLayout === LAYOUT_TYPE.MEDIA_ONLY
+        ) {
+          overrideOpenSidebarNavigation = true;
+          overrideOpenSidebarPanel = true;
+          sidebarContentPanelOverride = PANELS.CHAT;
+        }
         return defaultsDeep(
           {
             sidebarNavigation: {
-              isOpen:
-                sidebarNavigation.isOpen || sidebarContentPanel !== PANELS.NONE || false,
+              isOpen: overrideOpenSidebarNavigation,
             },
             sidebarContent: {
-              isOpen: sidebarContentPanel !== PANELS.NONE,
-              sidebarContentPanel,
-            },
-            SidebarContentHorizontalResizer: {
-              isOpen: false,
+              isOpen: overrideOpenSidebarPanel,
+              sidebarContentPanel: sidebarContentPanelOverride,
             },
             presentation: {
               isOpen: presentation.isOpen,
@@ -124,7 +134,7 @@ const VideoFocusLayout = (props) => {
               height: screenShare.height,
             },
           },
-          INITIAL_INPUT_STATE,
+          hasLayoutEngineLoadedOnce ? prevInput : INITIAL_INPUT_STATE,
         );
       },
     });
@@ -226,16 +236,16 @@ const VideoFocusLayout = (props) => {
     cameraDockBounds,
     sidebarNavWidth,
     sidebarContentWidth,
-    sidebarContentHeight
+    sidebarContentHeight,
   ) => {
     const mediaBounds = {};
     const { element: fullscreenElement } = fullscreen;
 
     if (
-      fullscreenElement === 'Presentation' ||
-      fullscreenElement === 'Screenshare' ||
-      fullscreenElement === 'ExternalVideo' ||
-      fullscreenElement === 'GenericContent'
+      fullscreenElement === 'Presentation'
+      || fullscreenElement === 'Screenshare'
+      || fullscreenElement === 'ExternalVideo'
+      || fullscreenElement === 'GenericContent'
     ) {
       mediaBounds.width = windowWidth();
       mediaBounds.height = windowHeight();
@@ -289,7 +299,7 @@ const VideoFocusLayout = (props) => {
     const sidebarContentBounds = calculatesSidebarContentBounds(sidebarNavWidth.width);
     const mediaAreaBounds = calculatesMediaAreaBounds(
       sidebarNavWidth.width,
-      sidebarContentWidth.width
+      sidebarContentWidth.width,
     );
     const navbarBounds = calculatesNavbarBounds(mediaAreaBounds);
     const actionbarBounds = calculatesActionbarBounds(mediaAreaBounds);
@@ -301,7 +311,7 @@ const VideoFocusLayout = (props) => {
       cameraDockBounds,
       sidebarNavWidth.width,
       sidebarContentWidth.width,
-      sidebarContentHeight.height
+      sidebarContentHeight.height,
     );
 
     layoutContextDispatch({
@@ -472,6 +482,7 @@ const VideoFocusLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_EXTERNAL_VIDEO_OUTPUT,
       value: {
+        display: externalVideoInput.hasExternalVideo,
         width: mediaBounds.width,
         height: mediaBounds.height,
         top: mediaBounds.top,

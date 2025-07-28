@@ -15,13 +15,15 @@ trait VoiceApp2x extends UserJoinedVoiceConfEvtMsgHdlr
   with UserLeftVoiceConfEvtMsgHdlr
   with UserMutedInVoiceConfEvtMsgHdlr
   with UserTalkingInVoiceConfEvtMsgHdlr
+  with SetUserTalkingReqMsgHdlr
   with RecordingStartedVoiceConfEvtMsgHdlr
   with VoiceConfRunningEvtMsgHdlr
   with AudioFloorChangedVoiceConfEvtMsgHdlr
   with VoiceConfCallStateEvtMsgHdlr
   with UserStatusVoiceConfEvtMsgHdlr
   with ChannelHoldChangedVoiceConfEvtMsgHdlr
-  with ListenOnlyModeToggledInSfuEvtMsgHdlr {
+  with ListenOnlyModeToggledInSfuEvtMsgHdlr
+  with DeafenUserCmdMsgHdlr {
 
   this: MeetingActor =>
 }

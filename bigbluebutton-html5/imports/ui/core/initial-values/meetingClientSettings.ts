@@ -1,3 +1,4 @@
+import { AudioPresets, LogLevel } from 'livekit-client';
 import { MeetingClientSettings } from '../../Types/meetingClientSettings';
 
 export const meetingClientSettingsInitialValues: MeetingClientSettings = {
@@ -36,12 +37,12 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       darkTheme: {
         enabled: true,
       },
-      askForFeedbackOnLogout: false,
       askForConfirmationOnLeave: false,
       wakeLock: {
         enabled: true,
       },
       allowDefaultLogoutUrl: true,
+      skipMeetingEnded: false,
       dynamicGuestPolicy: true,
       enableGuestLobbyMessage: true,
       guestPolicyExtraAllowOptions: false,
@@ -90,13 +91,14 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       enableDebugWindow: true,
       breakouts: {
         allowUserChooseRoomByDefault: false,
+        offerRecordingForBreakouts: false,
+        recordRoomByDefault: false,
         captureWhiteboardByDefault: false,
         captureSharedNotesByDefault: false,
         sendInvitationToAssignedModeratorsByDefault: false,
         breakoutRoomLimit: 16,
         allowPresentationManagementInBreakouts: true,
       },
-      customHeartbeat: false,
       showAllAvailableLocales: true,
       showAudioFilters: true,
       reactionsButton: {
@@ -156,6 +158,10 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
           accesskey: 'U',
           descId: 'toggleUserList',
         },
+        openLeaveMenu: {
+          accesskey: 'X',
+          descId: 'openLeaveMenu',
+        },
         toggleMute: {
           accesskey: 'M',
           descId: 'toggleMute',
@@ -206,6 +212,7 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       fallbackOnEmptyLocaleString: true,
       disableWebsocketFallback: true,
       maxMutationPayloadSize: 10485760, // 10MB
+      timeoutBeforeRedirectOnMeetingEnd: 20000,
     },
     externalVideoPlayer: {
       enabled: true,
@@ -474,6 +481,11 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       maxCustom: 5,
       maxTypedAnswerLength: 45,
       chatMessage: true,
+      quickPollConfirmationStep: false,
+      quiz: {
+        enabled: false,
+        quickPollCorrectAnswerSuffix: '__',
+      },
     },
     captions: {
       enabled: true,
@@ -612,6 +624,7 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       showParticipantsOnLogin: true,
       showPushLayoutButton: true,
       showPushLayoutToggle: true,
+      showScreenshareQuickSwapButton: true,
     },
     pads: {
       url: 'ETHERPAD_HOST',
@@ -620,16 +633,6 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       audio: {
         defaultFullAudioBridge: 'fullaudio',
         defaultListenOnlyBridge: 'fullaudio',
-        bridges: [
-          {
-            name: 'sipjs',
-            path: 'bridge/sip',
-          },
-          {
-            name: 'fullaudio',
-            path: 'bridge/sfu-audio-bridge',
-          },
-        ],
         retryThroughRelay: false,
         allowAudioJoinCancel: true,
       },
@@ -669,9 +672,43 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
           maxDelayTime: 2,
         },
       },
+      networkPriorities: {
+        audio: 'high',
+        webcam: 'medium',
+        screenshare: 'medium',
+      },
       muteAudioOutputWhenAway: false,
       screenshare: {
         showButtonForNonPresenters: false,
+      },
+      livekit: {
+        url: `wss://${window.location.hostname}/livekit`,
+        selectiveSubscription: false,
+        logLevel: LogLevel.warn,
+        roomOptions: {
+          adaptiveStream: true,
+          dynacast: true,
+          stopLocalTrackOnUnpublish: false,
+        },
+        audio: {
+          publishOptions: {
+            audioPreset: AudioPresets.speech,
+            dtx: true,
+            red: false,
+            forceStereo: false,
+          },
+          unpublishOnMute: false,
+        },
+        camera: {
+          publishOptions: {
+            videoCodec: 'vp8',
+          },
+        },
+        screenshare: {
+          publishOptions: {
+            videoCodec: 'vp8',
+          },
+        },
       },
     },
     stats: {
@@ -808,6 +845,7 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       maxStickyNoteLength: 1000,
       maxNumberOfAnnotations: 300,
       maxNumberOfActiveUsers: 25,
+      lockToolbarTools: false,
       allowInfiniteWhiteboard: false,
       allowInfiniteWhiteboardInBreakouts: false,
       annotations: {
@@ -824,6 +862,7 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       },
       toolbar: {
         multiUserPenOnly: false,
+        initialSelectedTool: 'draw',
         presenterTools: [
           'select',
           'hand',
@@ -833,7 +872,27 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
           'text',
           'note',
           'rectangle',
+          'delete-selected-items',
+          'highlight',
           'more',
+          'actions',
+          'ellipse',
+          'diamond',
+          'triangle',
+          'trapezoid',
+          'rhombus',
+          'hexagon',
+          'cloud',
+          'star',
+          'oval',
+          'x-box',
+          'check-box',
+          'arrow-left',
+          'arrow-up',
+          'arrow-down',
+          'arrow-right',
+          'line',
+          'frame',
         ],
         multiUserTools: [
           'select',
@@ -844,7 +903,27 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
           'text',
           'note',
           'rectangle',
+          'delete-selected-items',
+          'highlight',
           'more',
+          'actions',
+          'ellipse',
+          'diamond',
+          'triangle',
+          'trapezoid',
+          'rhombus',
+          'hexagon',
+          'cloud',
+          'star',
+          'oval',
+          'x-box',
+          'check-box',
+          'arrow-left',
+          'arrow-up',
+          'arrow-down',
+          'arrow-right',
+          'line',
+          'frame',
         ],
       },
     },
@@ -876,6 +955,16 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
         'board.jpg',
       ],
     },
+    minBrowserVersions: {
+      safari: '>=14',
+      chrome: '>=87',
+      firefox: '>=80',
+      edge: '>=85',
+      mobile: {
+        safari: '>=14',
+        chrome: '>=87',
+      },
+    },
   },
   private: {
     analytics: {
@@ -887,65 +976,6 @@ export const meetingClientSettingsInitialValues: MeetingClientSettings = {
       pencilChunkLength: 100,
       loadSlidesFromHttpAlways: false,
     },
-    minBrowserVersions: [
-      {
-        browser: 'chrome',
-        version: 72,
-      },
-      {
-        browser: 'chromeMobileIOS',
-        version: 94,
-      },
-      {
-        browser: 'firefox',
-        version: 68,
-      },
-      {
-        browser: 'firefoxMobile',
-        version: 68,
-      },
-      {
-        browser: 'edge',
-        version: 79,
-      },
-      {
-        browser: 'ie',
-        version: 'Infinity',
-      },
-      {
-        browser: 'safari',
-        version: [
-          12,
-          1,
-        ],
-      },
-      {
-        browser: 'mobileSafari',
-        version: [
-          12,
-          1,
-        ],
-      },
-      {
-        browser: 'opera',
-        version: 50,
-      },
-      {
-        browser: 'electron',
-        version: [
-          0,
-          36,
-        ],
-      },
-      {
-        browser: 'SamsungInternet',
-        version: 10,
-      },
-      {
-        browser: 'YandexBrowser',
-        version: 19,
-      },
-    ],
     prometheus: {
       enabled: false,
       path: '/metrics',

@@ -4,17 +4,18 @@ import {
 import React from 'react';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface HookWithArgumentsContainerProps {
-  key: string;
+export interface SubscriptionHookWithArgumentsContainerProps {
+  numberOfUses: number;
   hookArguments: CustomSubscriptionArguments;
 }
 
-export interface ObjectToCustomHookContainerMap {
+export interface ObjectToCustomSubscriptionHookContainerMap {
   count: number;
   hookArguments: CustomSubscriptionArguments;
 }
 
-export interface HookWithArgumentContainerToRender{
-  componentToRender: React.FunctionComponent<HookWithArgumentsContainerProps>;
+export interface SubscriptionHookWithArgumentContainerToRender {
+  componentToRender: React.FunctionComponent<SubscriptionHookWithArgumentsContainerProps>;
   hookArguments: CustomSubscriptionArguments;
+  numberOfUses: number;
 }

@@ -16,6 +16,15 @@ object_relationships:
         remote_table:
           name: v_meeting_breakoutPolicies
           schema: public
+  - name: breakoutRoomsCommonProperties
+    using:
+      manual_configuration:
+        column_mapping:
+          meetingId: meetingId
+        insertion_order: null
+        remote_table:
+          name: v_breakoutRoom_commonProperties
+          schema: public
   - name: clientSettings
     using:
       manual_configuration:
@@ -134,15 +143,6 @@ array_relationships:
         remote_table:
           name: v_meeting_group
           schema: public
-  - name: metadata
-    using:
-      manual_configuration:
-        column_mapping:
-          meetingId: meetingId
-        insertion_order: null
-        remote_table:
-          name: v_meeting_metadata
-          schema: public
   - name: polls
     using:
       manual_configuration:
@@ -177,6 +177,9 @@ select_permissions:
         - logoutUrl
         - maxPinnedCameras
         - meetingCameraCap
+        - cameraBridge
+        - screenShareBridge
+        - audioBridge
         - meetingId
         - name
         - notifyRecordingIsOn

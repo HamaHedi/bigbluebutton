@@ -89,7 +89,7 @@ trait HandlerHelpers extends SystemConfiguration {
               "user",
               "app.notification.userJoinPushAlert",
               "Notification for a user joins the meeting",
-              Vector(s"${newUser.name}")
+              Map("userName"->s"${newUser.name}")
             )
             outGW.send(notifyEvent)
             NotificationDAO.insert(notifyEvent)
@@ -346,4 +346,58 @@ trait HandlerHelpers extends SystemConfiguration {
     BbbCommonEnvCoreMsg(envelope, event)
   }
 
+  def isUsingLiveKit(liveMeeting: LiveMeeting): Boolean = {
+    isUsingLiveKitAudio(liveMeeting) ||
+    liveMeeting.props.meetingProp.cameraBridge == "livekit" ||
+    liveMeeting.props.meetingProp.screenShareBridge == "livekit"
+  }
+
+  def isUsingLiveKitAudio(liveMeeting: LiveMeeting): Boolean = {
+    liveMeeting.props.meetingProp.audioBridge == "livekit"
+  }
+
+  def buildLiveKitTokenGrant(
+    room: String,
+    canPublish: Boolean,
+    canSubscribe: Boolean,
+    agent: Boolean = false,
+    canPublishData: Boolean = false,
+    canPublishSources: List[TrackSource] = List(),
+    canUpdateOwnMetadata: Boolean = false,
+    hidden: Boolean = false,
+    ingressAdmin: Boolean = false,
+    recorder: Boolean = false,
+    roomAdmin: Boolean = false,
+    roomCreate: Boolean = false,
+    roomJoin: Boolean = true,
+    roomList: Boolean = false,
+    roomRecord: Boolean = false
+  ): LiveKitGrant = {
+    LiveKitGrant(
+      agent = agent,
+      canPublish = canPublish,
+      canPublishData = canPublishData,
+      canPublishSources = canPublishSources,
+      canSubscribe = canSubscribe,
+      canUpdateOwnMetadata = canUpdateOwnMetadata,
+      hidden = hidden,
+      ingressAdmin = ingressAdmin,
+      recorder = recorder,
+      room = room,
+      roomAdmin = roomAdmin,
+      roomCreate = roomCreate,
+      roomJoin = roomJoin,
+      roomList = roomList,
+      roomRecord = roomRecord,
+    )
+  }
+
+  def buildLiveKitParticipantMetadata(
+    liveMeeting: LiveMeeting,
+  ): LiveKitParticipantMetadata = {
+    LiveKitParticipantMetadata(
+      meetingId = liveMeeting.props.meetingProp.intId,
+      voiceConf = liveMeeting.props.voiceProp.voiceConf
+    )
+  }
 }

@@ -39,7 +39,6 @@ import {
   GridUsersResponse,
   OwnVideoStreamsResponse,
   StreamSubscriptionData,
-  Stream,
 } from '/imports/ui/components/video-provider/types';
 import { DesktopPageSizes, MobilePageSizes } from '/imports/ui/Types/meetingClientSettings';
 import logger from '/imports/startup/client/logger';
@@ -60,9 +59,8 @@ const useVideoStreamsSubscription = createUseSubscription(
 
 export const useStreams = () => {
   const { data, loading, errors } = useVideoStreamsSubscription();
-  const streams = useRef<Stream[]>([]);
 
-  if (loading) return streams.current;
+  if (loading) return [];
 
   if (errors) {
     errors.forEach((error) => {
@@ -75,27 +73,33 @@ export const useStreams = () => {
     });
   }
 
-  if (!data) {
-    streams.current = [];
-    return streams.current;
-  }
+  const mappedStreams = (data as StreamSubscriptionData[]).map(({ streamId, user, voice }) => {
+    if (!streamId) {
+      logger.warn({
+        logCode: 'missing_stream_id',
+        extraInfo: {
+          userId: user?.userId || '',
+          role: user?.role || '',
+          clientType: user?.clientType || '',
+        },
+      }, 'Stream entry has no streamId.');
+    }
 
-  const mappedStreams = (data as StreamSubscriptionData[]).map(({ streamId, user, voice }) => ({
-    stream: streamId,
-    deviceId: streamId.split('_')[3],
-    name: user.name,
-    nameSortable: user.nameSortable,
-    userId: user.userId,
-    user,
-    floor: voice?.floor ?? false,
-    lastFloorTime: voice?.lastFloorTime ?? '0',
-    voice,
-    type: VIDEO_TYPES.STREAM,
-  }));
+    return {
+      stream: streamId ?? '',
+      deviceId: streamId?.split?.('_')?.[3] ?? '',
+      name: user?.name || '',
+      nameSortable: user?.nameSortable || '',
+      userId: user?.userId || '',
+      user,
+      floor: voice?.floor ?? false,
+      lastFloorTime: voice?.lastFloorTime ?? '0',
+      voice,
+      type: VIDEO_TYPES.STREAM,
+    };
+  });
 
-  streams.current = mappedStreams;
-
-  return streams.current;
+  return mappedStreams.length > 0 ? mappedStreams : [];
 };
 
 export const useStatus = () => {
@@ -209,6 +213,7 @@ export const usePageSizeDictionary = () => {
     desktopPageSizes: DESKTOP_PAGE_SIZES,
     mobilePageSizes: MOBILE_PAGE_SIZES,
   } = window.meetingClientSettings.public.kurento.pagination;
+  const userCount = getCountData();
 
   const PAGINATION_THRESHOLDS_CONF = window.meetingClientSettings.public.kurento.paginationThresholds;
   const PAGINATION_THRESHOLDS_ENABLED = PAGINATION_THRESHOLDS_CONF.enabled;
@@ -244,7 +249,7 @@ export const usePageSizeDictionary = () => {
   };
 
   // Short-circuit: no threshold yet, return stock values (processThreshold has a default arg)
-  if (getCountData() < PAGINATION_THRESHOLDS[0].users) return processThreshold();
+  if (userCount < PAGINATION_THRESHOLDS[0].users) return processThreshold();
 
   // Reverse search for the threshold where our participant count is directly equal or great
   // The PAGINATION_THRESHOLDS config is sorted when imported.
@@ -254,7 +259,7 @@ export const usePageSizeDictionary = () => {
     mapIndex -= 1
   ) {
     targetThreshold = PAGINATION_THRESHOLDS[mapIndex];
-    if (targetThreshold.users <= getCountData()) {
+    if (targetThreshold.users <= userCount) {
       return processThreshold(targetThreshold);
     }
   }
@@ -452,6 +457,11 @@ const useOwnVideoStreamsQuery = () => useLazyQuery<OwnVideoStreamsResponse>(
       userId: Auth.userID,
       streamIdPrefix: `${videoService.getPrefix()}%`,
     },
+    // UID and prefix are stable, so for now we need to bust the cache. If we don't,
+    // users will hit issues where cannot unshare their webcam or unsharing deals
+    // with unexpected behavior. E.g.: a camera was first ejected server side (empty
+    // stream list), or multiple cameras were shared (just the first one is cached).
+    fetchPolicy: 'no-cache',
   },
 );
 
@@ -471,14 +481,18 @@ export const useExitVideo = (forceExit = false) => {
         if (data) {
           const streams = data.user_camera || [];
           const results = streams.map((s) => sendUserUnshareWebcam(s.streamId));
+
           return Promise.all(results).then(() => {
             videoService.exitedVideo();
             return true;
           }).catch((e) => {
             logger.warn({
-              logCode: 'exit_audio',
-              extraInfo: e,
-            }, 'Exiting audio');
+              logCode: 'exit_video_error',
+              extraInfo: {
+                errorMessage: e.message,
+                errorStack: e.stack,
+              },
+            }, `Failed to exit video: ${e.message}`);
             return false;
           });
         }

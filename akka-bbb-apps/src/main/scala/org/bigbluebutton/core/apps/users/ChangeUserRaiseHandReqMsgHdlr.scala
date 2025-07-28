@@ -4,7 +4,6 @@ import org.bigbluebutton.common2.msgs._
 import org.bigbluebutton.core.apps.{ PermissionCheck, RightsManagementTrait }
 import org.bigbluebutton.core.models.{ UserState, Users2x }
 import org.bigbluebutton.core.running.{ LiveMeeting, OutMsgRouter }
-import org.bigbluebutton.core2.message.senders.MsgBuilder
 
 trait ChangeUserRaiseHandReqMsgHdlr extends RightsManagementTrait {
   this: UsersApp =>
@@ -46,7 +45,11 @@ trait ChangeUserRaiseHandReqMsgHdlr extends RightsManagementTrait {
       msg.header.userId
     )
 
-    if (isUserSettingOwnProps || isUserModerator || isUserPresenter) {
+    if (liveMeeting.props.meetingProp.disabledFeatures.contains("raiseHand")) {
+      val meetingId = liveMeeting.props.meetingProp.intId
+      val reason = "Raise hand is disabled for this meeting."
+      PermissionCheck.ejectUserForFailedPermission(meetingId, msg.header.userId, reason, outGW, liveMeeting)
+    } else if (isUserSettingOwnProps || isUserModerator || isUserPresenter) {
       for {
         user <- Users2x.findWithIntId(liveMeeting.users2x, msg.body.userId)
         newUserState <- Users2x.setUserRaiseHand(liveMeeting.users2x, user.intId, msg.body.raiseHand)

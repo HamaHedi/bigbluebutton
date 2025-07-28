@@ -6,7 +6,8 @@ import org.bigbluebutton.core.bus.MessageBus
 import org.bigbluebutton.core.db.{ MeetingUsersPoliciesDAO, NotificationDAO }
 import org.bigbluebutton.core.models.{ RegisteredUsers, Roles, Users2x }
 import org.bigbluebutton.core.running.LiveMeeting
-import org.bigbluebutton.core2.message.senders.{ MsgBuilder, Sender }
+import org.bigbluebutton.core2.message.senders.MsgBuilder
+import org.bigbluebutton.core.graphql.GraphqlMiddleware
 
 trait UpdateWebcamsOnlyForModeratorCmdMsgHdlr {
   this: WebcamApp2x =>
@@ -61,7 +62,7 @@ trait UpdateWebcamsOnlyForModeratorCmdMsgHdlr {
                 "lock",
                 "app.userList.userOptions.webcamsOnlyForModerator",
                 "Label to disable all webcams except for the moderators cam",
-                Vector()
+                Map()
               )
               bus.outGW.send(notifyEvent)
               NotificationDAO.insert(notifyEvent)
@@ -72,7 +73,7 @@ trait UpdateWebcamsOnlyForModeratorCmdMsgHdlr {
                 "lock",
                 "app.userList.userOptions.enableOnlyModeratorWebcam",
                 "Label to enable all webcams except for the moderators cam",
-                Vector()
+                Map()
               )
               bus.outGW.send(notifyEvent)
               NotificationDAO.insert(notifyEvent)
@@ -87,7 +88,7 @@ trait UpdateWebcamsOnlyForModeratorCmdMsgHdlr {
               if user.role == Roles.VIEWER_ROLE
               regUser <- RegisteredUsers.findWithUserId(user.intId, liveMeeting.registeredUsers)
             } yield {
-              Sender.sendForceUserGraphqlReconnectionSysMsg(liveMeeting.props.meetingProp.intId, regUser.id, regUser.sessionToken, "webcamOnlyForMod_changed", bus.outGW)
+              GraphqlMiddleware.requestGraphqlReconnection(regUser.sessionToken, "webcamOnlyForMod_changed")
             }
           }
           case _ =>

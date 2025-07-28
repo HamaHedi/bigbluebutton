@@ -6,6 +6,7 @@ import org.apache.pekko.event.Logging
 import org.bigbluebutton.api.domain.{BreakoutRoomsParams, Group, LockSettingsParams}
 import org.bigbluebutton.api.messaging.converters.messages._
 import org.bigbluebutton.api.messaging.messages.{ChatMessageFromApi, RegisterUserSessionToken}
+import org.bigbluebutton.api.service.ServiceUtils;
 import org.bigbluebutton.api2.bus._
 import org.bigbluebutton.api2.endpoint.redis.WebRedisSubscriberActor
 import org.bigbluebutton.common2.redis.MessageSender
@@ -129,6 +130,9 @@ class BbbWebApiGWApp(
                     meetingCameraCap: java.lang.Integer,
                     userCameraCap:    java.lang.Integer,
                     maxPinnedCameras: java.lang.Integer,
+                    cameraBridge:       String,
+                    screenShareBridge:  String,
+                    audioBridge:    String,
                     moderatorPass:    String, viewerPass: String, learningDashboardAccessToken: String,
                     createTime: java.lang.Long, createDate: String, isBreakout: java.lang.Boolean,
                     sequence: java.lang.Integer,
@@ -168,6 +172,7 @@ class BbbWebApiGWApp(
                     presentationUploadExternalDescription:  String,
                     presentationUploadExternalUrl:          String,
                     plugins:                                util.Map[String, AnyRef],
+                    html5PluginSdkVersion:                   String,
                     overrideClientSettings:                 String): Unit = {
 
     val disabledFeaturesAsVector: Vector[String] = disabledFeatures.asScala.toVector
@@ -178,6 +183,9 @@ class BbbWebApiGWApp(
       intId = meetingId,
       meetingCameraCap = meetingCameraCap.intValue(),
       maxPinnedCameras = maxPinnedCameras.intValue(),
+      cameraBridge,
+      screenShareBridge,
+      audioBridge,
       isBreakout = isBreakout.booleanValue(),
       disabledFeaturesAsVector,
       notifyRecordingIsOn,
@@ -260,6 +268,7 @@ class BbbWebApiGWApp(
         case c: String => c
         case _ => ""
       },
+      html5PluginSdkVersion,
     )
 
     val groupsAsVector: Vector[GroupProps] = groups.asScala.toVector.map(g => GroupProps(g.getGroupId(), g.getName(), g.getUsersExtId().asScala.toVector))
@@ -278,7 +287,7 @@ class BbbWebApiGWApp(
       lockSettingsProps,
       systemProps,
       groupsAsVector,
-      overrideClientSettings
+      overrideClientSettings,
     )
 
     //meetingManagerActorRef ! new CreateMeetingMsg(defaultProps)
@@ -288,30 +297,41 @@ class BbbWebApiGWApp(
 
   }
 
-  def registerUser(meetingId: String, intUserId: String, name: String,
+  def registerUser(meetingId: String, intUserId: String, name: String, firstName: String, lastName: String,
                    role: String, extUserId: String, authToken: String, sessionToken: String,
                    avatarURL: String, webcamBackgroundURL: String, bot: java.lang.Boolean, guest: java.lang.Boolean,
                    authed: java.lang.Boolean, guestStatus: String, excludeFromDashboard: java.lang.Boolean,
-                   enforceLayout: String, userMetadata: java.util.Map[String, String]): Unit = {
+                   enforceLayout: String, logoutUrl: String, userMetadata: java.util.Map[String, String]): Unit = {
 
     //    meetingManagerActorRef ! new RegisterUser(meetingId = meetingId, intUserId = intUserId, name = name,
     //      role = role, extUserId = extUserId, authToken = authToken, avatarURL = avatarURL,
     //     guest = guest, authed = authed)
 
-    val regUser = new RegisterUser(meetingId = meetingId, intUserId = intUserId, name = name,
+    // Check whether the logout Url is either empty or a valid url.
+    require(logoutUrl.isEmpty || ServiceUtils.getValidationService().isValidURL(logoutUrl), "Invalid logout URL provided")
+
+    val regUser = new RegisterUser(meetingId = meetingId, intUserId = intUserId, name = name, firstName = firstName, lastName = lastName,
       role = role, extUserId = extUserId, authToken = authToken, sessionToken = sessionToken,
       avatarURL = avatarURL, webcamBackgroundURL = webcamBackgroundURL, bot = bot.booleanValue(), guest = guest.booleanValue(),
       authed = authed.booleanValue(), guestStatus = guestStatus, excludeFromDashboard = excludeFromDashboard,
-      enforceLayout = enforceLayout, userMetadata = (userMetadata).asScala.toMap)
+      enforceLayout = enforceLayout, logoutUrl = logoutUrl, userMetadata = (userMetadata).asScala.toMap)
 
     val event = MsgBuilder.buildRegisterUserRequestToAkkaApps(regUser)
     msgToAkkaAppsEventBus.publish(MsgToAkkaApps(toAkkaAppsChannel, event))
   }
 
-  def registerUserSessionToken(meetingId: String, intUserId: String, sessionToken: String, replaceSessionToken: String,
-                               enforceLayout: String, userSessionMetadata: java.util.Map[String, String]): Unit = {
-    val regUserSessionToken = new RegisterUserSessionToken(meetingId, intUserId, sessionToken, replaceSessionToken,
-                                                            enforceLayout, userSessionMetadata)
+  def registerUserSessionToken(meetingId: String, intUserId: String, sessionToken: String, sessionName: String,
+                               replaceSessionToken: String, enforceLayout: String,
+                               userSessionMetadata: java.util.Map[String, String]): Unit = {
+    val regUserSessionToken = new RegisterUserSessionToken(
+      meetingId,
+      intUserId,
+      sessionToken,
+      sessionName,
+      replaceSessionToken,
+      enforceLayout,
+      userSessionMetadata
+    )
 
     val event = MsgBuilder.buildRegisterUserSessionTokenRequestToAkkaApps(regUserSessionToken)
     msgToAkkaAppsEventBus.publish(MsgToAkkaApps(toAkkaAppsChannel, event))
@@ -360,6 +380,9 @@ class BbbWebApiGWApp(
       msgToAkkaAppsEventBus.publish(MsgToAkkaApps(toAkkaAppsChannel, newEvent))
     } else if (msg.isInstanceOf[DocConversionProgress]) {
       val event = MsgBuilder.buildPresentationConversionUpdateSysPubMsg(msg.asInstanceOf[DocConversionProgress])
+      msgToAkkaAppsEventBus.publish(MsgToAkkaApps(toAkkaAppsChannel, event))
+    } else if (msg.isInstanceOf[OfficeToPdfConversionFailed]) {
+      val event = MsgBuilder.buildOfficeToPdfConversionFailedMsg(msg.asInstanceOf[OfficeToPdfConversionFailed])
       msgToAkkaAppsEventBus.publish(MsgToAkkaApps(toAkkaAppsChannel, event))
     } else if (msg.isInstanceOf[DocPageCompletedProgress]) {
       val event = MsgBuilder.buildPresentationConversionCompletedSysPubMsg(msg.asInstanceOf[DocPageCompletedProgress])

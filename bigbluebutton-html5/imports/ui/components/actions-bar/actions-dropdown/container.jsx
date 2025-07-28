@@ -20,6 +20,7 @@ import Auth from '/imports/ui/services/auth';
 import { PRESENTATION_SET_CURRENT } from '../../presentation/mutations';
 import { useStorageKey } from '/imports/ui/services/storage/hooks';
 import { useMeetingIsBreakout } from '/imports/ui/components/app/service';
+import { useIsQuizEnabled } from '../../../services/features';
 
 const ActionsDropdownContainer = (props) => {
   const sidebarContent = layoutSelectInput((i) => i.sidebarContent);
@@ -90,6 +91,7 @@ const ActionsDropdownContainer = (props) => {
   const isPresentationEnabled = useIsPresentationEnabled();
   const isTimerFeatureEnabled = useIsTimerFeatureEnabled();
   const isCameraAsContentEnabled = useIsCameraAsContentEnabled();
+  const isQuizEnabled = useIsQuizEnabled();
 
   return (
     <ActionsDropdown
@@ -111,6 +113,7 @@ const ActionsDropdownContainer = (props) => {
         shortcuts: openActions,
         isPresentationEnabled,
         isPresentationManagementDisabled,
+        isQuizEnabled,
         ...props,
       }}
     />

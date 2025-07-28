@@ -35,20 +35,25 @@ func BrowserConnectionReader(
 
 	for {
 		messageType, message, err := browserConnection.Websocket.Read(browserConnection.Context)
-
 		if err != nil {
 			if errors.Is(err, context.Canceled) {
 				browserConnection.Logger.Debugf("Closing Browser ws connection as Context was cancelled!")
-			} else {
-				browserConnection.Logger.Debugf("Browser is disconnected, skipping reading of ws message: %v", err)
+			} else if websocket.CloseStatus(err) != -1 {
+				if websocket.CloseStatus(err) == websocket.StatusGoingAway {
+					browserConnection.Logger.Infof("Browser disconnected voluntarily with status: %v (closed by the browser as the window was closed)", websocket.CloseStatus(err))
+				} else {
+					browserConnection.Logger.Infof("Browser disconnected voluntarily with status: %v", websocket.CloseStatus(err))
+				}
 			}
+
+			browserConnection.Logger.Debugf("Browser is disconnected, skipping reading of ws message: %v", err)
 			return
 		}
 
 		browserConnection.Logger.Tracef("received from browser: %s", string(message))
-		browserConnection.LastBrowserMessageTimeMutex.Lock()
+		browserConnection.Lock()
 		browserConnection.LastBrowserMessageTime = time.Now()
-		browserConnection.LastBrowserMessageTimeMutex.Unlock()
+		browserConnection.Unlock()
 
 		if messageType != websocket.MessageText {
 			browserConnection.Logger.Warnf("received non-text message: %v", messageType)

@@ -312,14 +312,14 @@ async function processPresentationAnnotations() {
         `slide${currentSlide.page}.svg`);
 
     let backgroundFormat = '';
-    if (fs.existsSync(svgBackgroundSlide)) {
-      backgroundFormat = 'svg';
-    } else if (fs.existsSync(`${bgImagePath}.png`)) {
+    if (fs.existsSync(`${bgImagePath}.png`)) {
       backgroundFormat = 'png';
     } else if (fs.existsSync(`${bgImagePath}.jpg`)) {
       backgroundFormat = 'jpg';
     } else if (fs.existsSync(`${bgImagePath}.jpeg`)) {
       backgroundFormat = 'jpeg';
+    } else if (fs.existsSync(svgBackgroundSlide)) {
+      backgroundFormat = 'svg';
     } else {
       logger.error(`Skipping slide ${currentSlide.page} (${jobId}): unknown extension`);
       continue;
@@ -439,7 +439,7 @@ async function processPresentationAnnotations() {
 
   // Launch Notifier Worker depending on job type
   logger.info('Saved PDF at ',
-      `${outputDir}/${jobId}/${serverFilenameWithExtension}`);
+      `${outputDir}/${serverFilenameWithExtension}`);
 
   const notifier = new WorkerStarter({
     jobType: exportJob.jobType, jobId,

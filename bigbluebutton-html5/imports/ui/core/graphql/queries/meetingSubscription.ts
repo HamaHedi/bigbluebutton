@@ -24,12 +24,11 @@ const MEETING_SUBSCRIPTION = gql`
           lockOnJoin
           lockOnJoinConfigurable
         }
-        metadata {
-          name
-          value
-        }
         maxPinnedCameras
         meetingCameraCap
+        cameraBridge
+        screenShareBridge
+        audioBridge
         meetingId
         name
         notifyRecordingIsOn
@@ -97,6 +96,12 @@ const MEETING_SUBSCRIPTION = gql`
           record
           sequence
         }
+        breakoutRoomsCommonProperties {
+          durationInSeconds
+          freeJoin
+          sendInvitationToModerators
+          startedAt
+        }
         voiceSettings {
           dialNumber
           muteOnStart
@@ -122,6 +127,7 @@ const MEETING_SUBSCRIPTION = gql`
           hasTimer
           showRemainingTime
           hasCameraAsContent
+          hasScreenshareAsContent
         }
       }
   }

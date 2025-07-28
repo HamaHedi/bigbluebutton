@@ -69,6 +69,7 @@ public class Meeting {
 	private boolean record;
 	private boolean autoStartRecording = false;
 	private boolean allowStartStopRecording = false;
+	private boolean presentationConversionCacheEnabled = false;
 	private boolean recordFullDurationMedia = false;
 	private boolean haveRecordingMarks = false;
 	private boolean webcamsOnlyForModerator = false;
@@ -81,6 +82,7 @@ public class Meeting {
 	private String defaultWebcamBackgroundURL;
 	private Map<String, Object> plugins;
 	private  ArrayList<PluginManifest> pluginManifests;
+	private String html5PluginSdkVersion;
 	private String guestPolicy = GuestPolicy.ASK_MODERATOR;
 	private String guestLobbyMessage = "";
 	private Map<String,String> usersWithGuestLobbyMessages;
@@ -91,6 +93,7 @@ public class Meeting {
 	private boolean userHasJoined = false;
 	private Map<String, String> guestUsersWithPositionInWaitingLine;
 	private Map<String, String> metadata;
+	private final Map<String, String> pluginMetadataParametersMap;
 	private Map<String, Object> userCustomData;
 	private final ConcurrentMap<String, User> users;
 	private final ConcurrentMap<String, RegisteredUser> registeredUsers;
@@ -102,6 +105,9 @@ public class Meeting {
 	private String customDarkLogoURL = "";
 	private String customCopyright = "";
 	private Boolean muteOnStart = false;
+	private String cameraBridge = "bbb-webrtc-sfu";
+	private String screenShareBridge = "bbb-webrtc-sfu";
+	private String audioBridge = "bbb-webrtc-sfu";
 	private Boolean allowModsToUnmuteUsers = false;
 	private Boolean allowRequestsWithoutSession = false;
 	private Boolean allowModsToEjectCameras = false;
@@ -126,12 +132,15 @@ public class Meeting {
 
 	private String overrideClientSettings = "";
 
+	private int maxNumPages;
+
     public Meeting(Meeting.Builder builder) {
         name = builder.name;
         extMeetingId = builder.externalId;
         intMeetingId = builder.internalId;
 		disabledFeatures = builder.disabledFeatures;
 		pluginManifests = builder.pluginManifests;
+		html5PluginSdkVersion = builder.html5PluginSdkVersion;
 		notifyRecordingIsOn = builder.notifyRecordingIsOn;
 		presentationUploadExternalDescription = builder.presentationUploadExternalDescription;
 		presentationUploadExternalUrl = builder.presentationUploadExternalUrl;
@@ -159,6 +168,7 @@ public class Meeting {
         record = builder.record;
         autoStartRecording = builder.autoStartRecording;
         allowStartStopRecording = builder.allowStartStopRecording;
+		presentationConversionCacheEnabled = builder.presentationConversionCacheEnabled;
         recordFullDurationMedia = builder.recordFullDurationMedia;
         webcamsOnlyForModerator = builder.webcamsOnlyForModerator;
         meetingCameraCap = builder.meetingCameraCap;
@@ -171,6 +181,9 @@ public class Meeting {
         welcomeMsg = builder.welcomeMsg;
         dialNumber = builder.dialNumber;
         metadata = builder.metadata;
+		pluginMetadataParametersMap = builder.pluginMetadataParametersMap != null
+			? new HashMap<>(builder.pluginMetadataParametersMap)
+			: new HashMap<>();
         createdTime = builder.createdTime;
         isBreakout = builder.isBreakout;
         guestPolicy = builder.guestPolicy;
@@ -185,6 +198,9 @@ public class Meeting {
         endWhenNoModerator = builder.endWhenNoModerator;
         endWhenNoModeratorDelayInMinutes = builder.endWhenNoModeratorDelayInMinutes;
 		groups = builder.groups;
+				cameraBridge = builder.cameraBridge;
+				screenShareBridge = builder.screenShareBridge;
+				audioBridge = builder.audioBridge;
 		guestUsersWithPositionInWaitingLine = new HashMap<>();
         userCustomData = new HashMap<>();
 		usersWithGuestLobbyMessages = new HashMap<>();
@@ -446,8 +462,13 @@ public class Meeting {
 	public ArrayList<String> getDisabledFeatures() {
 		return disabledFeatures;
 	}
+
 	public Map<String, Object> getPlugins() {
 		return plugins;
+	}
+
+	public String getHtml5PluginSdkVersion() {
+		return html5PluginSdkVersion;
 	}
 
 	public void setPlugins(Map<String, Object> p) {
@@ -646,6 +667,10 @@ public class Meeting {
 		return allowStartStopRecording;
 	}
 
+	public boolean isPresentationConversionCacheEnabled() {
+		return presentationConversionCacheEnabled;
+	}
+
 	public boolean getRecordFullDurationMedia() {
 		return recordFullDurationMedia;
 	}
@@ -665,6 +690,18 @@ public class Meeting {
     public Integer getMaxPinnedCameras() {
         return maxPinnedCameras;
     }
+
+		public String getCameraBridge() {
+			return cameraBridge;
+		}
+
+		public String getScreenShareBridge() {
+			return screenShareBridge;
+		}
+
+		public String getAudioBridge() {
+			return audioBridge;
+		}
 
 	public boolean hasUserJoined() {
 		return userHasJoined;
@@ -780,7 +817,7 @@ public class Meeting {
         int sum = 0;
         for (Map.Entry<String, User> entry : users.entrySet()) {
             User u = entry.getValue();
-            if (u.isModerator())
+            if (!u.hasLeft() && u.isModerator())
                 sum++;
         }
         return sum;
@@ -927,6 +964,13 @@ public class Meeting {
         return this.enteredUsers.get(userId);
     }
 
+	public void setMaxNumPages(int maxNumPages) { this.maxNumPages = maxNumPages; }
+	public int getMaxNumPages() { return maxNumPages; }
+
+    public Map<String, String> getPluginMetadataParametersMap() {
+        return pluginMetadataParametersMap;
+    }
+
     /***
 	 * Meeting Builder
 	 *
@@ -940,6 +984,7 @@ public class Meeting {
     	private boolean autoStartRecording;
     	private boolean recordFullDurationMedia;
         private boolean allowStartStopRecording;
+        private boolean presentationConversionCacheEnabled;
         private boolean webcamsOnlyForModerator;
         private Integer meetingCameraCap;
         private Integer userCameraCap;
@@ -950,6 +995,7 @@ public class Meeting {
     	private String learningDashboardAccessToken;
 		private ArrayList<String> disabledFeatures;
 		private ArrayList<PluginManifest> pluginManifests;
+		private String html5PluginSdkVersion;
 		private Boolean notifyRecordingIsOn;
 		private String presentationUploadExternalDescription;
 		private String presentationUploadExternalUrl;
@@ -962,8 +1008,12 @@ public class Meeting {
     	private String logoutUrl;
     	private String bannerColor;
     	private String bannerText;
+			private String cameraBridge;
+			private String screenShareBridge;
+			private String audioBridge;
     	private int logoutTimer;
     	private Map<String, String> metadata;
+    	private Map<String, String> pluginMetadataParametersMap;
     	private String dialNumber;
     	private String defaultAvatarURL;
     	private String defaultBotAvatarURL;
@@ -1020,6 +1070,11 @@ public class Meeting {
     		return this;
     	}
 
+		public Builder withPresentationConversionCacheEnabled(boolean cacheEnabled) {
+    		this.presentationConversionCacheEnabled = cacheEnabled;
+    		return this;
+    	}
+
 			public Builder withRecordFullDurationMedia(boolean recordFullDurationMedia) {
 				this.recordFullDurationMedia = recordFullDurationMedia;
 				return this;
@@ -1044,6 +1099,21 @@ public class Meeting {
             this.maxPinnedCameras = pins;
             return this;
         }
+
+				public Builder withCameraBridge(String bridge) {
+					this.cameraBridge = bridge;
+					return this;
+				}
+
+				public Builder withScreenShareBridge(String bridge) {
+					this.screenShareBridge = bridge;
+					return this;
+				}
+
+				public Builder withAudioBridge(String bridge) {
+					this.audioBridge = bridge;
+					return this;
+				}
 
     	public Builder withWebVoice(String w) {
     		this.webVoice = w;
@@ -1087,6 +1157,11 @@ public class Meeting {
 
 		public Builder withPluginManifests(ArrayList<PluginManifest> map) {
 			this.pluginManifests = map;
+			return this;
+		}
+
+		public Builder withHtml5PluginSdkVersion(String version) {
+			this.html5PluginSdkVersion = version;
 			return this;
 		}
 
@@ -1162,6 +1237,11 @@ public class Meeting {
 
     	public Builder withMetadata(Map<String, String> m) {
     		metadata = m;
+    		return this;
+    	}
+
+		public Builder withPluginMetadataParameters(Map<String, String> m) {
+			pluginMetadataParametersMap = m;
     		return this;
     	}
 

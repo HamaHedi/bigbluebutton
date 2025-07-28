@@ -8,6 +8,7 @@ import {
 import * as PluginSdk from 'bigbluebutton-html-plugin-sdk';
 import * as uuidLib from 'uuid';
 import PluginDataConsumptionManager from './data-consumption/manager';
+import PluginDataCreationManager from './data-creation/manager';
 import PluginsEngineComponent from './component';
 import { EffectivePluginConfig, PluginsEngineManagerProps } from './types';
 import PluginLoaderManager from './loader/manager';
@@ -17,6 +18,7 @@ import PluginUiCommandsHandler from './ui-commands/handler';
 import PluginDomElementManipulationManager from './dom-element-manipulation/manager';
 import PluginServerCommandsHandler from './server-commands/handler';
 import PluginLearningAnalyticsDashboardManager from './learning-analytics-dashboard/manager';
+import PluginEventPersistenceManager from './event-persistence/manager';
 
 const PluginsEngineManager = (props: PluginsEngineManagerProps) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -36,6 +38,7 @@ const PluginsEngineManager = (props: PluginsEngineManagerProps) => {
         ...p,
         name: p.name,
         url: p.javascriptEntrypointUrl,
+        localesBaseUrl: p.localesBaseUrl,
         uuid: uuidLib.v4(),
       } as EffectivePluginConfig)),
     );
@@ -58,14 +61,15 @@ const PluginsEngineManager = (props: PluginsEngineManagerProps) => {
           containerRef,
         }}
       />
+      <PluginDataCreationManager />
       <PluginDataConsumptionManager />
       <PluginServerCommandsHandler />
       <PluginUiCommandsHandler />
       <PluginDomElementManipulationManager />
       {
         effectivePluginsConfig?.map((effectivePluginConfig: EffectivePluginConfig) => {
-          const { uuid, name: pluginName } = effectivePluginConfig;
-          const pluginApi: PluginSdk.PluginApi = BbbPluginSdk.getPluginApi(uuid, pluginName);
+          const { uuid, name: pluginName, localesBaseUrl } = effectivePluginConfig;
+          const pluginApi: PluginSdk.PluginApi = BbbPluginSdk.getPluginApi(uuid, pluginName, localesBaseUrl);
           return (
             <div key={uuid}>
               <PluginLoaderManager
@@ -78,6 +82,9 @@ const PluginsEngineManager = (props: PluginsEngineManagerProps) => {
                 }}
               />
               <PluginLearningAnalyticsDashboardManager
+                pluginName={pluginName}
+              />
+              <PluginEventPersistenceManager
                 pluginName={pluginName}
               />
               <PluginDataChannelManager

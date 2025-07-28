@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 
-import { UI_DATA_LISTENER_SUBSCRIBED } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data-hooks/consts';
-import { UserListUiDataPayloads } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data-hooks/user-list/types';
+import { UI_DATA_LISTENER_SUBSCRIBED } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data/hooks/consts';
+import { UserListUiDataPayloads } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data/domain/user-list/types';
 import * as PluginSdk from 'bigbluebutton-html-plugin-sdk';
 import { User } from '/imports/ui/Types/user';
 import Styled from './styles';
@@ -13,6 +13,7 @@ import UserListParticipantsPageContainer from './page/component';
 import IntersectionWatcher from './intersection-watcher/intersectionWatcher';
 import { setLocalUserList } from '/imports/ui/core/hooks/useLoadedUserList';
 import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
+import roveBuilder from '/imports/ui/core/utils/keyboardRove';
 
 interface UserListParticipantsProps {
   count: number;
@@ -26,7 +27,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
   }>({});
-  const userListRef = React.useRef<HTMLDivElement | null>(null);
+  const userListRef = React.useRef<HTMLUListElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
   // Filter users based on search query
@@ -86,6 +87,8 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
       setLocalUserList([]);
     }
   }, [filteredVisibleUsers, searchQuery]);
+
+  const rove = useMemo(() => roveBuilder(selectedUserRef, 'user-index'), []);
 
   // --- Plugin related code ---
   useEffect(() => {
@@ -174,11 +177,11 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   return (
     (
       <Styled.UserListColumn
-      // @ts-ignore
         onKeyDown={rove}
         tabIndex={0}
+        role="list"
       >
-        <Styled.VirtualizedList ref={userListRef}>
+        <Styled.VirtualizedList as="ul" ref={userListRef}>
           {
             Array.from({ length: amountOfPages }).map((_, i) => {
               const isLastItem = amountOfPages === (i + 1);

@@ -5,6 +5,7 @@ import TabUnstyled from '@mui/base/TabUnstyled';
 import TabsListUnstyled from '@mui/base/TabsListUnstyled';
 import TabPanelUnstyled from '@mui/base/TabPanelUnstyled';
 import TabsUnstyled from '@mui/base/TabsUnstyled';
+import { Stack } from '@mui/material';
 import './App.css';
 import {
   FormattedMessage, FormattedDate, injectIntl, FormattedTime,
@@ -18,12 +19,15 @@ import PollsTable from './components/PollsTable';
 import PluginsTable from './components/PluginsTable';
 import ErrorMessage from './components/ErrorMessage';
 import { makeUserCSVData, tsToHHmmss } from './services/UserService';
+import QuizzesTable from './components/QuizzesTable';
+import QuizzesChart from './components/QuizzesChart';
 
 const TABS = {
   OVERVIEW: 0,
   OVERVIEW_ACTIVITY_SCORE: 1,
   TIMELINE: 2,
   POLLING: 3,
+  QUIZZES: 4,
 };
 const LEARNING_DASHBOARD_LEARN_MORE_LINK = 'learning-dashboard-learn-more-link';
 const LEARNING_DASHBOARD_FEEDBACK_LINK = 'learning-dashboard-feedback-link';
@@ -360,6 +364,16 @@ class App extends React.Component {
         || Object.values(u.intIds)[Object.values(u.intIds).length - 1].leftOn === 0)
       .length;
 
+    const polls = Object.fromEntries(Object
+      .values(activitiesJson.polls || {})
+      .filter((p) => !p.quiz)
+      .map((p) => ([p.pollId, p])));
+
+    const quizzes = Object.fromEntries(Object
+      .values(activitiesJson.polls || {})
+      .filter((p) => p.quiz)
+      .map((p) => ([p.pollId, p])));
+
     return (
       <div className="mx-10">
         <div className="flex flex-col sm:flex-row items-start justify-between pb-3">
@@ -380,8 +394,8 @@ class App extends React.Component {
               && (
                 <>
                   <span className="text-sm font-light font-base mt-0">
-                    {intl.formatMessage({ id: 'app.learningDashboard.learnMore', defaultMessage: 'Learn more about the use of the Dashboard in {0} from our Knowledge Base.' }, {
-                      0: (
+                    {intl.formatMessage({ id: 'app.learningDashboard.learnMore', defaultMessage: 'Learn more about the use of the Dashboard in {learnMoreLink} from our Knowledge Base.' }, {
+                      learnMoreLink: (
                         <a
                           target="_blank"
                           rel="noreferrer"
@@ -529,7 +543,7 @@ class App extends React.Component {
                 <CardContent classes={{ root: '!p-0' }}>
                   <CardBody
                     name={intl.formatMessage({ id: 'app.learningDashboard.indicators.polls', defaultMessage: 'Polls' })}
-                    number={Object.values(activitiesJson.polls || {}).length}
+                    number={Object.keys(polls).length}
                     cardClass={tab === TABS.POLLING ? 'border-blue-500' : 'hover:border-blue-500 border-white'}
                     iconClass="bg-blue-100 text-blue-500"
                   >
@@ -546,6 +560,22 @@ class App extends React.Component {
                         strokeWidth="2"
                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                       />
+                    </svg>
+                  </CardBody>
+                </CardContent>
+              </Card>
+            </TabUnstyled>
+            <TabUnstyled className="rounded focus:outline-none focus:ring focus:ring-orange-500 ring-offset-2" data-test="quizzesPanelDashboard">
+              <Card>
+                <CardContent classes={{ root: '!p-0' }}>
+                  <CardBody
+                    name={intl.formatMessage({ id: 'app.learningDashboard.indicators.quizzes', defaultMessage: 'Quizzes' })}
+                    number={Object.keys(quizzes).length}
+                    cardClass={tab === TABS.QUIZZES ? 'border-orange-500' : 'hover:border-orange-500 border-white'}
+                    iconClass="bg-orange-100 text-orange-500"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
                   </CardBody>
                 </CardContent>
@@ -631,11 +661,27 @@ class App extends React.Component {
             </h2>
             <div className="w-full overflow-hidden rounded-md shadow-xs border-2 border-gray-100">
               <div className="w-full overflow-x-auto">
-                <PollsTable polls={activitiesJson.polls} allUsers={activitiesJson.users} />
+                <PollsTable polls={polls} allUsers={activitiesJson.users} />
               </div>
             </div>
           </TabPanelUnstyled>
           <TabPanelUnstyled value={4}>
+            <h2 className="block my-2 pr-2 text-xl font-semibold">
+              <FormattedMessage id="app.learningDashboard.quizzes.title" defaultMessage="Quiz Results" />
+            </h2>
+            <Stack spacing={2}>
+              <QuizzesChart
+                quizzes={quizzes}
+                allUsers={activitiesJson.users}
+                totalOfPolls={Object.values(activitiesJson.polls || {}).length}
+              />
+              <QuizzesTable
+                quizzes={quizzes}
+                allUsers={activitiesJson.users}
+              />
+            </Stack>
+          </TabPanelUnstyled>
+          <TabPanelUnstyled value={5}>
             <h2 className="block my-2 pr-2 text-xl font-semibold">
               {genericDataCardTitle}
             </h2>
@@ -657,8 +703,8 @@ class App extends React.Component {
           && (
             <>
               <div className="mt-6 mb-4 text-sm font-light font-base text-gray-500">
-                { intl.formatMessage({ id: 'app.learningDashboard.feedback', defaultMessage: 'How has your experience been with this feature? We would love to hear your opinion and even suggestions on how we can improve it. Share with us by clicking {0}.' }, {
-                  0: (
+                { intl.formatMessage({ id: 'app.learningDashboard.feedback', defaultMessage: 'How has your experience been with this feature? We would love to hear your opinion and even suggestions on how we can improve it. Share with us by clicking {feedbackLink}.' }, {
+                  feedbackLink: (
                     <a
                       target="_blank"
                       rel="noreferrer"

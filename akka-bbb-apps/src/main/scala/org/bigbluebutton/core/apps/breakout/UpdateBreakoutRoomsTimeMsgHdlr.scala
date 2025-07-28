@@ -7,7 +7,7 @@ import org.bigbluebutton.core.bus.BigBlueButtonEvent
 import org.bigbluebutton.core.db.{ BreakoutRoomDAO, MeetingDAO, NotificationDAO }
 import org.bigbluebutton.core.domain.MeetingState2x
 import org.bigbluebutton.core.running.{ MeetingActor, OutMsgRouter }
-import org.bigbluebutton.core2.message.senders.{ MsgBuilder, Sender }
+import org.bigbluebutton.core2.message.senders.MsgBuilder
 import org.bigbluebutton.core.util.TimeUtil
 
 trait UpdateBreakoutRoomsTimeMsgHdlr extends RightsManagementTrait {
@@ -60,7 +60,7 @@ trait UpdateBreakoutRoomsTimeMsgHdlr extends RightsManagementTrait {
               "about",
               "app.chat.breakoutDurationUpdated",
               "Used when the breakout duration is updated",
-              Vector(s"${msg.body.timeInMinutes}")
+              Map("timeInMinutes" -> s"${msg.body.timeInMinutes}")
             )
             outGW.send(notifyEvent)
             NotificationDAO.insert(notifyEvent)
@@ -73,7 +73,7 @@ trait UpdateBreakoutRoomsTimeMsgHdlr extends RightsManagementTrait {
             "promote",
             "app.chat.breakoutDurationUpdatedModerator",
             "Sent to the moderator that requested breakout duration change",
-            Vector(s"${msg.body.timeInMinutes}")
+            Map("timeInMinutes" -> s"${msg.body.timeInMinutes}")
           )
           outGW.send(notifyUserEvent)
           NotificationDAO.insert(notifyUserEvent)

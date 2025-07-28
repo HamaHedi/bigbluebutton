@@ -100,6 +100,7 @@ class ApiController {
             bbbVersion paramsProcessorUtil.getBbbVersion()
             graphqlWebsocketUrl paramsProcessorUtil.getGraphqlWebsocketUrl()
             graphqlApiUrl paramsProcessorUtil.getGraphqlApiUrl()
+            html5PluginSdkVersion paramsProcessorUtil.getHtml5PluginSdkVersion()
           }
           render(contentType: "application/json", text: builder.toPrettyString())
         }
@@ -111,6 +112,7 @@ class ApiController {
                   paramsProcessorUtil.getApiVersion(),
                   paramsProcessorUtil.getBbbVersion(),
                   paramsProcessorUtil.getGraphqlWebsocketUrl(),
+                  paramsProcessorUtil.getHtml5PluginSdkVersion(),
                   paramsProcessorUtil.getGraphqlApiUrl(),
                   RESP_CODE_SUCCESS),
                   contentType: "text/xml")
@@ -264,9 +266,14 @@ class ApiController {
             request
     )
 
+    String errorRedirectUrl = ""
+    if(!StringUtils.isEmpty(params.errorRedirectUrl)) {
+      errorRedirectUrl = params.errorRedirectUrl
+    }
+
     boolean redirectClient = REDIRECT_RESPONSE
     if(!(validationResponse == null)) {
-      invalid(validationResponse.getKey(), validationResponse.getValue(), redirectClient)
+      invalid(validationResponse.getKey(), validationResponse.getValue(), redirectClient, errorRedirectUrl);
       return
     }
 
@@ -316,11 +323,6 @@ class ApiController {
     String attPW = params.password
 
     Meeting meeting = ServiceUtils.findMeetingFromMeetingID(params.meetingID);
-
-    String errorRedirectUrl = ""
-    if(!StringUtils.isEmpty(params.errorRedirectUrl)) {
-      errorRedirectUrl = params.errorRedirectUrl
-    }
 
     // the createTime mismatch with meeting's createTime, complain
     // In the future, the createTime param will be required
@@ -416,6 +418,21 @@ class ApiController {
       externUserID = internalUserID
     }
 
+    // Get the logoutUrl, either from the meeting or from the join api.
+    // Also replace the tokens.
+    String logoutUrl = meeting.getLogoutUrl()
+    if(!StringUtils.isEmpty(params.get(ApiParams.LOGOUT_URL))) {
+      String userProvidedUrl = params.get(ApiParams.LOGOUT_URL)
+      if(!ServiceUtils.getValidationService().isValidURL(userProvidedUrl)) {
+        log.warn("Invalid logout URL provided: " + userProvidedUrl)
+        // Use default URL from meeting
+      } else {
+        logoutUrl = params.get(ApiParams.LOGOUT_URL)
+        log.debug "The following logout URL is present: " + logoutUrl
+      }
+    }
+    logoutUrl = subLogoutParams(logoutUrl, meeting.getInternalId(), internalUserID, fullName);
+
     //Return a Map with the user custom data
     Map<String, String> userCustomData = meetingService.getUserCustomData(meeting, externUserID, params);
 
@@ -444,7 +461,7 @@ class ApiController {
     us.guest = guest
     us.authed = authenticated
     us.guestStatus = guestStatusVal
-    us.logoutUrl = meeting.getLogoutUrl()
+    us.logoutUrl = logoutUrl
     us.defaultLayout = meeting.getMeetingLayout()
     us.leftGuestLobby = false
 
@@ -478,6 +495,14 @@ class ApiController {
       }
     }
 
+    if (!StringUtils.isEmpty(params.firstName)) {
+      us.firstName = params.firstName;
+    }
+
+    if (!StringUtils.isEmpty(params.lastName)) {
+      us.lastName = params.lastName;
+    }
+
     String meetingId = meeting.getInternalId()
 
     if (hasReachedMaxParticipants(meeting, us)) {
@@ -496,6 +521,8 @@ class ApiController {
         us.meetingID,
         us.internalUserId,
         us.fullname,
+        us.firstName,
+        us.lastName,
         us.role,
         us.externUserID,
         us.authToken,
@@ -509,6 +536,7 @@ class ApiController {
         us.excludeFromDashboard,
         us.leftGuestLobby,
         us.enforceLayout,
+        us.logoutUrl,
         meeting.getUserCustomData(us.externUserID)
     )
 
@@ -592,6 +620,8 @@ class ApiController {
     us.externMeetingID = meeting.getExternalId()
     us.externUserID = existingUserSession.externUserID
     us.fullname = existingUserSession.fullname
+    us.firstName = existingUserSession.firstName
+    us.lastName = existingUserSession.lastName
     us.role = existingUserSession.role
     us.conference = meeting.getInternalId()
     us.room = meeting.getInternalId()
@@ -617,20 +647,24 @@ class ApiController {
       us.enforceLayout = params.enforceLayout;
     }
 
+    if (!StringUtils.isEmpty(params.sessionName)) {
+      us.sessionName = params.sessionName;
+    }
+
     //used to drop the previous session of the user
     String replaceSessionToken = ""
     if (!StringUtils.isEmpty(params.replaceSessionToken)) {
       replaceSessionToken = params.replaceSessionToken;
     }
 
-    //TODO parse user-session-metadata
-    Map<String, String> userSessionCustomData = new LinkedHashMap<String, String>()
+    Map<String, String> userSessionCustomData = paramsProcessorUtil.getUserCustomData(params)
 
     // Register a new session token to the user
     meetingService.registerUserSession(
             us.meetingID,
             us.internalUserId,
             sessionToken,
+            us.sessionName,
             replaceSessionToken,
             us.enforceLayout,
             userSessionCustomData
@@ -1038,7 +1072,7 @@ class ApiController {
                     , contentType: "text/xml")
           }
         }
-      } else if (meetingService.isMeetingWithDisabledPresentation(meetingId)) {
+      } else if (meetingService.isMeetingWithDisabledPresentation(meeting.getInternalId())) {
         withFormat {
           xml {
             render(text: responseBuilder.buildInsertDocumentResponse("Presentation feature is disabled, ignoring.",
@@ -1180,12 +1214,36 @@ class ApiController {
         queryParameters.put("redirect", "true");
         queryParameters.put("existingUserID", us.getInternalUserId());
 
-        // revokePreviousSession: If this link is intended to replace the previous session of the user
+        // replaceSession: If this link is intended to replace the previous session of the user
         if (!StringUtils.isEmpty(params.replaceSession) && Boolean.parseBoolean(params.replaceSession)) {
           queryParameters.put("replaceSessionToken", sessionToken);
         }
 
-        // TODO allow to specify enforceLayout and user-session-data
+        if (!StringUtils.isEmpty(params.sessionName)) {
+          queryParameters.put("sessionName", params.sessionName);
+        }
+
+        List<String> userdataBlocklistForViewers=Arrays.asList(paramsProcessorUtil.getGetJoinUrlUserdataBlocklist().split(","));
+
+        boolean isModerator = us.role?.equals(ROLE_MODERATOR);
+        boolean blockAllUserdataForViewers = userdataBlocklistForViewers.any { it.equalsIgnoreCase("all") };
+
+        request.getParameterMap()
+                .findAll { key, value ->
+                  // always allow `enforceLayout`
+                  if (key == "enforceLayout") return true
+
+                  // For prefix userdata-
+                  if (key.startsWith("userdata-")) {
+                    if (isModerator && !meeting.isBreakout()) return true
+                    if (blockAllUserdataForViewers) return false
+                    return !userdataBlocklistForViewers.contains(key - "userdata-")
+                  }
+
+                  return false
+                }
+                .findAll { key, value -> !StringUtils.isEmpty(value[-1]) }
+                .each { key, value -> queryParameters.put(key, value[-1]) }
 
         String httpQueryString = "";
         for(String parameterName : queryParameters.keySet()) {
@@ -1209,87 +1267,6 @@ class ApiController {
       }
     }
   }
-
-  def feedback = {
-    String API_CALL = 'feedback'
-    log.debug CONTROLLER_NAME + "#${API_CALL}"
-
-    if (!params.sessionToken) {
-      invalid("missingSession", "Invalid session token")
-      return
-    }
-
-    if (!session[params.sessionToken]) {
-      log.info("Session for token ${params.sessionToken} not found")
-      invalid("missingSession", "Invalid session token")
-      return
-    }
-
-    String requestBody = request.inputStream == null ? null : request.inputStream.text
-    Gson gson = new Gson()
-    JsonObject body = gson.fromJson(requestBody, JsonObject.class)
-
-    if (!body
-            || !body.has("userName")
-            || !body.has("authToken")
-            || !body.has("comment")
-            || !body.has("rating")) {
-      invalid("missingParameters", "One or more required parameters are missing")
-      return
-    }
-
-    String userName = "[unconfirmed] " + body.get("userName").getAsString()
-    String meetingId = ""
-    String userId = ""
-    String authToken = body.get("authToken").getAsString()
-    String comment = body.get("comment").getAsString()
-    int rating = body.get("rating").getAsInt()
-
-    String sessionToken = sanitizeSessionToken(params.sessionToken)
-    UserSession userSession = meetingService.getUserSessionWithSessionToken(sessionToken)
-
-    if(userSession) {
-      userName = userSession.fullname
-      userId = userSession.internalUserId
-      meetingId = userSession.meetingID
-    } else {
-      //Usually the session was already removed when the user send the feedback
-      UserSessionBasicData removedUserSession = meetingService.getRemovedUserSessionWithSessionToken(sessionToken)
-      if(removedUserSession) {
-        userId = removedUserSession.userId
-        meetingId = removedUserSession.meetingId
-      }
-    }
-
-    if(userId == "") {
-      invalid("invalidSession", "Invalid Session")
-      return
-    }
-
-    response.contentType = 'application/json'
-    response.setStatus(200)
-    withFormat {
-      json {
-        def builder = new JsonBuilder()
-        builder {
-          "status" "ok"
-        }
-        render(contentType: "application/json", text: builder.toPrettyString())
-      }
-    }
-
-    def feedback = [
-            meetingId: meetingId,
-            userId: userId,
-            authToken: authToken,
-            userName: userName,
-            comment: comment,
-            rating: rating
-    ]
-
-    log.info("FEEDBACK LOG: ${feedback}")
-  }
-
 
   /***********************************************
    * LEARNING DASHBOARD DATA
@@ -1970,24 +1947,39 @@ class ApiController {
     }
   }
 
+  private String subLogoutParams(logoutUrl, meetingID, userID, fullName) {
+    String newURL = logoutUrl;
+    String userName = fullName != null ? validationService.encodeString(fullName) : "";
+
+    newURL = newURL.replace('%%MEETINGID%%', meetingID != null ? meetingID : "");
+    newURL = newURL.replace('%%USERID%%', userID != null ? userID : "");
+    newURL = newURL.replace('%%USERNAME%%', userName);
+
+    return newURL;
+  }
+
   private void respondWithRedirect(errorsJSONArray, redirectUrl = "") {
-    String logoutUrl = paramsProcessorUtil.getDefaultLogoutUrl()
-    URI oldUri = URI.create(logoutUrl)
+    String uriString = paramsProcessorUtil.getDefaultLogoutUrl();
 
     if (!StringUtils.isEmpty(params.logoutURL)) {
       try {
-        oldUri = URI.create(params.logoutURL)
+        uriString = params.logoutURL;
       } catch (Exception e) {
         // Do nothing, the variable oldUri was already initialized
       }
     }
 
+    // If logoutUrl strings get here with %%FIELDS%% we don't
+    // have enough info to construct them, so just clear the fields
+    uriString = subLogoutParams(uriString, "", "", "");
+
     if(!StringUtils.isEmpty(redirectUrl)) {
       try {
-        oldUri = URI.create(redirectUrl)
+        uriString = redirectUrl;
       } catch(Exception ignored) {}
     }
 
+    URI oldUri = URI.create(uriString);
     String newQuery = oldUri.getQuery();
 
     if (newQuery == null) {
