@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { FormattedTime, defineMessages, injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import UserAvatar from '/imports/ui/components/user-avatar/component';
-import CommonIcon from '/imports/ui/components/common/icon/component';
 import TooltipContainer from '/imports/ui/components/common/tooltip/container';
 import Icon from '/imports/ui/components/connection-status/icon/component';
 import { getHelp } from '../service';
@@ -138,6 +137,10 @@ const intlMessages = defineMessages({
   noEvent: {
     id: 'app.connection-status.connectionStatusNoEvent',
     description: 'Text for inform on status without event ot time of occurrence',
+  },
+  lastTimeActive: {
+    id: 'app.connection-status.lastTimeActive',
+    description: 'Last time the client confirmed its connection was alive (sent a connection-alive message)',
   },
 });
 
@@ -292,6 +295,8 @@ class ConnectionStatusComponent extends PureComponent {
 
     return connections.map((conn, index) => {
       const dateTime = new Date(conn.lastUnstableStatusAt);
+      const lastActiveConnection = conn.connectionAliveAt
+        ? new Date(conn.connectionAliveAt) : new Date();
       return (
         <Styled.Item
           key={`${conn.user.name}-${conn.user.userId}`}
@@ -306,7 +311,7 @@ class ConnectionStatusComponent extends PureComponent {
                 moderator={conn.user.isModerator}
                 color={conn.user.color}
               >
-                {conn.user.name.toLowerCase().slice(0, 2)}
+                {(conn.user.name?.toLowerCase()?.slice(0, 2)) || ''}
               </UserAvatar>
             </Styled.Avatar>
 
@@ -340,7 +345,7 @@ class ConnectionStatusComponent extends PureComponent {
           <Styled.Right>
             <Styled.Time>
               {
-                conn.lastUnstableStatusAt
+                !conn.clientNotResponding
                   ? (
                     <time dateTime={dateTime}>
                       <FormattedTime value={dateTime} />
@@ -349,9 +354,11 @@ class ConnectionStatusComponent extends PureComponent {
                   : (
                     <TooltipContainer
                       placement="top"
-                      title={intl.formatMessage(intlMessages.noEvent)}
+                      title={intl.formatMessage(intlMessages.lastTimeActive)}
                     >
-                      <CommonIcon iconName="close" rotate={false} />
+                      <Styled.TimeActive dateTime={lastActiveConnection}>
+                        <FormattedTime value={lastActiveConnection} />
+                      </Styled.TimeActive>
                     </TooltipContainer>
                   )
               }

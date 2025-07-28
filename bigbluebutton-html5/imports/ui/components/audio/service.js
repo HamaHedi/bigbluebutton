@@ -13,8 +13,27 @@ import {
 } from '/imports/ui/components/audio/audio-graphql/audio-controls/input-stream-live-selector/service';
 import apolloContextHolder from '/imports/ui/core/graphql/apolloContextHolder/apolloContextHolder';
 import { MEETING_IS_BREAKOUT } from '/imports/ui/components/audio/audio-graphql/audio-controls/queries';
+import useIsAudioConnected from '/imports/ui/components/audio/audio-graphql/hooks/useIsAudioConnected';
 
 const MUTED_KEY = 'muted';
+export const CLIENT_DID_USER_SELECT_MICROPHONE_KEY = 'clientUserSelectedMicrophone';
+export const CLIENT_DID_USER_SELECT_LISTEN_ONLY_KEY = 'clientUserSelectedListenOnly';
+
+export const setUserSelectedMicrophone = (value) => (
+  Storage.setItem(CLIENT_DID_USER_SELECT_MICROPHONE_KEY, !!value)
+);
+
+export const setUserSelectedListenOnly = (value) => (
+  Storage.setItem(CLIENT_DID_USER_SELECT_LISTEN_ONLY_KEY, !!value)
+);
+
+export const didUserSelectMicrophone = () => (
+  !!Storage.getItem(CLIENT_DID_USER_SELECT_MICROPHONE_KEY)
+);
+
+export const didUserSelectListenOnly = () => (
+  !!Storage.getItem(CLIENT_DID_USER_SELECT_LISTEN_ONLY_KEY)
+);
 
 const recoverMicState = (toggleVoice) => {
   const recover = (storageKey) => {
@@ -62,7 +81,15 @@ const audioEventHandler = (toggleVoice) => (event) => {
   }
 };
 
-const init = (messages, intl, toggleVoice, speechLocale, voiceConf, username) => {
+const init = (
+  messages,
+  intl,
+  toggleVoice,
+  speechLocale,
+  voiceConf,
+  username,
+  bridges,
+) => {
   AudioManager.setAudioMessages(messages, intl);
   if (AudioManager.initialized) return Promise.resolve(false);
   const meetingId = Auth.meetingID;
@@ -70,24 +97,23 @@ const init = (messages, intl, toggleVoice, speechLocale, voiceConf, username) =>
   const { sessionToken } = Auth;
   const voiceBridge = voiceConf;
 
-  // FIX ME
-  const microphoneLockEnforced = false;
-
   const userData = {
     meetingId,
     userId,
     sessionToken,
     username,
     voiceBridge,
-    microphoneLockEnforced,
     speechLocale,
   };
 
-  return AudioManager.init(userData, audioEventHandler(toggleVoice));
+  return AudioManager.init(userData, audioEventHandler(toggleVoice), bridges);
 };
 
-const useIsUsingAudio = () => {
-  const isConnected = useReactiveVar(AudioManager._isConnected.value);
+// This hooks should only be used to determine whether there's a system audio
+// connection underway. It should not be used to determine whether the user is
+// connected to audio UI-wise (i.e.: it ignores the deafened state).
+const useIsAudioConnectionUnderway = () => {
+  const isConnected = useIsAudioConnected({ ignoreDeafened: true });
   const isConnecting = useReactiveVar(AudioManager._isConnecting.value);
   const isHangingUp = useReactiveVar(AudioManager._isHangingUp.value);
 
@@ -172,6 +198,8 @@ const hasMicrophonePermission = async ({
 };
 
 export default {
+  CLIENT_DID_USER_SELECT_MICROPHONE_KEY,
+  CLIENT_DID_USER_SELECT_LISTEN_ONLY_KEY,
   init,
   exitAudio: () => AudioManager.exitAudio(),
   forceExitAudio: () => AudioManager.forceExitAudio(),
@@ -200,7 +228,7 @@ export default {
     const transferStatus = AudioManager.getBreakoutAudioTransferStatus();
     if (!!transferStatus.breakoutMeetingId
       && transferStatus.breakoutMeetingId !== Auth.meetingID) return false;
-    return AudioManager.isConnected;
+    return AudioManager.isAudioConnected();
   },
   isUsingAudio: () => AudioManager.isUsingAudio(),
   isConnecting: () => AudioManager.isConnecting,
@@ -225,5 +253,9 @@ export default {
   supportsTransparentListenOnly: () => AudioManager.supportsTransparentListenOnly(),
   hasMicrophonePermission,
   notify: (message, error, icon) => { AudioManager.notify(message, error, icon); },
-  useIsUsingAudio,
+  useIsAudioConnectionUnderway,
+  didUserSelectMicrophone,
+  didUserSelectListenOnly,
+  setUserSelectedMicrophone,
+  setUserSelectedListenOnly,
 };

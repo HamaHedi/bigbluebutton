@@ -2,8 +2,9 @@ package org.bigbluebutton.core.apps.users
 
 import org.bigbluebutton.common2.msgs.UserJoinMeetingReqMsg
 import org.bigbluebutton.core.apps.breakout.BreakoutHdlrHelpers
-import org.bigbluebutton.core.db.{ NotificationDAO, UserDAO, UserStateDAO }
+import org.bigbluebutton.core.db.{BreakoutRoomDAO, NotificationDAO, UserDAO, UserStateDAO}
 import org.bigbluebutton.core.domain.MeetingState2x
+import org.bigbluebutton.core.graphql.GraphqlMiddleware
 import org.bigbluebutton.core.models._
 import org.bigbluebutton.core.running._
 import org.bigbluebutton.core2.message.senders._
@@ -41,19 +42,22 @@ trait UserJoinMeetingReqMsgHdlr extends HandlerHelpers {
 
       validationResult.fold(
         reason => handleFailedUserJoin(msg, reason._1, reason._2),
-        validUser => handleSuccessfulUserJoin(msg, validUser)
+        validUser => handleSuccessfulUserJoin(msg, validUser, state)
       )
     }
   }
 
-  private def handleSuccessfulUserJoin(msg: UserJoinMeetingReqMsg, regUser: RegisteredUser) = {
+  private def handleSuccessfulUserJoin(msg: UserJoinMeetingReqMsg, regUser: RegisteredUser, state: MeetingState2x) = {
     val newState = userJoinMeeting(outGW, msg.body.authToken, msg.body.clientType, msg.body.clientIsMobile, liveMeeting, state)
     updateParentMeetingWithNewListOfUsers()
     notifyPreviousUsersWithSameExtId(regUser)
     clearCachedVoiceUser(regUser)
     clearExpiredUserState(regUser)
-    forceUserGraphqlReconnection(regUser)
-    updateGraphqlDatabase(regUser)
+    val newRegUser = RegisteredUsers.updateUserJoin(liveMeeting.registeredUsers, regUser, joined = true)
+    forceUserGraphqlReconnection(newRegUser)
+    updateGraphqlDatabase(newRegUser)
+    generateLivekitToken(newRegUser, liveMeeting)
+    addBreakoutRoomsForLateUser(newRegUser, liveMeeting, state)
 
     newState
   }
@@ -144,10 +148,38 @@ trait UserJoinMeetingReqMsgHdlr extends HandlerHelpers {
       "promote",
       "app.mobileAppModal.userConnectedWithSameId",
       "Notification to warn that user connect again from other browser/device",
-      Vector(newUser.name)
+      Map("userName" -> newUser.name)
     )
     outGW.send(notifyUserEvent)
     NotificationDAO.insert(notifyUserEvent)
+  }
+
+  private def generateLivekitToken(regUser: RegisteredUser, liveMeeting: LiveMeeting) = {
+    if (isUsingLiveKit(liveMeeting)) {
+      val grant = buildLiveKitTokenGrant(
+        room = liveMeeting.props.meetingProp.intId,
+        canPublish = true,
+        canSubscribe = true,
+        )
+      val metadata = buildLiveKitParticipantMetadata(liveMeeting)
+
+      val generateLiveKitTokenReqMsg = MsgBuilder.buildGenerateLiveKitTokenReqMsg(
+        liveMeeting.props.meetingProp.intId,
+        regUser.id,
+        regUser.name,
+        grant,
+        metadata
+      )
+      outGW.send(generateLiveKitTokenReqMsg)
+    }
+  }
+
+  private def addBreakoutRoomsForLateUser(regUser: RegisteredUser, liveMeeting: LiveMeeting, state: MeetingState2x): Unit = {
+    for {
+      breakoutModel <- state.breakout
+    } yield {
+      BreakoutRoomDAO.assignUserToRandomRoom(regUser, breakoutModel, liveMeeting)
+    }
   }
 
   private def clearCachedVoiceUser(regUser: RegisteredUser) =
@@ -158,13 +190,11 @@ trait UserJoinMeetingReqMsgHdlr extends HandlerHelpers {
     UserStateDAO.updateExpired(regUser.meetingId, regUser.id, expired = false)
 
   private def forceUserGraphqlReconnection(regUser: RegisteredUser) = {
-    Sender.sendForceUserGraphqlReconnectionSysMsg(liveMeeting.props.meetingProp.intId, regUser.id, regUser.sessionToken, "user_joined", outGW)
+    GraphqlMiddleware.requestGraphqlReconnection(regUser.sessionToken, "user_joined")
   }
 
   private def updateGraphqlDatabase(regUser: RegisteredUser) = {
-    if (!regUser.joined) {
-      RegisteredUsers.updateUserJoin(liveMeeting.registeredUsers, regUser, joined = true)
-    }
+      UserDAO.update(regUser)
   }
 
 }

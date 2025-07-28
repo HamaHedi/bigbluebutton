@@ -1,23 +1,9 @@
-import React from 'react';
-import { defineMessages, useIntl } from 'react-intl';
+import React, { KeyboardEventHandler, useRef } from 'react';
+import emojiData from '@emoji-mart/data';
 import Styled from './styles';
 import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
-import TooltipContainer from '/imports/ui/components/common/tooltip/container';
-
-const intlMessages = defineMessages({
-  reactedBy: {
-    id: 'app.chat.toolbar.reactions.reactedByLabel',
-  },
-  you: {
-    id: 'app.chat.toolbar.reactions.youLabel',
-  },
-  and: {
-    id: 'app.chat.toolbar.reactions.andLabel',
-  },
-  findAReaction: {
-    id: 'app.chat.toolbar.reactions.findReactionButtonLabel',
-  },
-});
+import ReactionItem from './reaction-item/component';
+import KEY_CODES from '/imports/utils/keyCodes';
 
 interface ChatMessageReactionsProps {
   reactions: {
@@ -33,6 +19,7 @@ interface ChatMessageReactionsProps {
   deleteReaction(reactionEmoji: string, reactionEmojiId: string, chatId: string, messageId: string): void;
   chatId: string;
   messageId: string;
+  keyboardFocused: boolean;
 }
 
 type ReactionItem = {
@@ -42,18 +29,49 @@ type ReactionItem = {
   reactionEmoji: string;
   reactionEmojiId: string;
   leastRecent: number;
+  shortcodes: string;
 }
 
 const sortByCount = (r1: ReactionItem, r2: ReactionItem) => r2.count - r1.count;
 const sortByLeastRecent = (r1: ReactionItem, r2: ReactionItem) => r1.leastRecent - r2.leastRecent;
 
+const roving = (
+  event: React.KeyboardEvent<HTMLElement>,
+  changeState: (el: HTMLElement | null) => void,
+  elementsList: HTMLElement,
+  element?: HTMLElement | null,
+) => {
+  if ([KEY_CODES.ESCAPE, KEY_CODES.TAB].includes(event.keyCode)) {
+    changeState(null);
+  }
+
+  if (event.keyCode === KEY_CODES.ARROW_RIGHT) {
+    event.preventDefault();
+    const firstElement = elementsList.firstChild as HTMLElement;
+    const elRef = element && element.nextSibling ? (element.nextSibling as HTMLElement) : firstElement;
+
+    elRef.focus();
+    changeState(elRef);
+  }
+
+  if (event.keyCode === KEY_CODES.ARROW_LEFT) {
+    event.preventDefault();
+    const lastElement = elementsList.lastChild as HTMLElement;
+    const elRef = element && element.previousSibling ? (element.previousSibling as HTMLElement) : lastElement;
+
+    elRef.focus();
+    changeState(elRef);
+  }
+};
+
 const ChatMessageReactions: React.FC<ChatMessageReactionsProps> = (props) => {
   const {
-    reactions, sendReaction, deleteReaction, chatId, messageId,
+    reactions, sendReaction, deleteReaction, chatId, messageId, keyboardFocused,
   } = props;
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const selectedElementRef = useRef<HTMLElement | null>();
 
   const { data: currentUser } = useCurrentUser((u) => ({ userId: u.userId }));
-  const intl = useIntl();
 
   if (reactions.length === 0) return null;
 
@@ -75,6 +93,8 @@ const ChatMessageReactions: React.FC<ChatMessageReactionsProps> = (props) => {
         reactionEmoji,
         reactionEmojiId,
         leastRecent: new Date(createdAt).getTime(),
+        // @ts-ignore
+        shortcodes: emojiData.emojis[reactionEmojiId].skins[0].shortcodes,
       };
       return newValue;
     }
@@ -89,55 +109,45 @@ const ChatMessageReactions: React.FC<ChatMessageReactionsProps> = (props) => {
     return newValue;
   }, {} as Record<string, ReactionItem>);
 
+  const rove: KeyboardEventHandler<HTMLElement> = (e) => {
+    if (wrapperRef.current) {
+      roving(
+        e,
+        (el) => { selectedElementRef.current = el; },
+        wrapperRef.current,
+        selectedElementRef.current,
+      );
+    }
+  };
+
   return (
-    <Styled.ReactionsWrapper>
-      {Object.values(reactionItems).sort(sortByLeastRecent).sort(sortByCount).map((details) => {
-        const {
-          count,
-          reactedByMe,
-          reactionEmoji,
-          reactionEmojiId,
-          userNames,
-        } = details;
-        let label = intl.formatMessage(intlMessages.reactedBy);
-        if (userNames.length) {
-          const users = userNames.join(', ');
-          label += ` ${users}`;
-
-          if (reactedByMe) {
-            label += ` ${intl.formatMessage(intlMessages.and)} ${intl.formatMessage(intlMessages.you)}`;
-          }
-        } else if (reactedByMe) {
-          label += ` ${intl.formatMessage(intlMessages.you)}`;
+    <Styled.ReactionsWrapper
+      tabIndex={keyboardFocused ? 0 : -1}
+      ref={wrapperRef}
+      onKeyDown={rove}
+      onFocus={(e) => {
+        const { firstChild } = wrapperRef.current || {};
+        if (firstChild instanceof HTMLElement && Object.is(e.target, wrapperRef.current)) {
+          firstChild.focus();
+          selectedElementRef.current = firstChild;
         }
-
-        return (
-          <TooltipContainer title={label} key={reactionEmojiId}>
-            <Styled.EmojiWrapper
-              highlighted={reactedByMe}
-              onClick={() => {
-                if (reactedByMe) {
-                  deleteReaction(reactionEmoji, reactionEmojiId, chatId, messageId);
-                } else {
-                  sendReaction(reactionEmoji, reactionEmojiId, chatId, messageId);
-                }
-              }}
-            >
-              <em-emoji
-                size={parseFloat(
-                  window.getComputedStyle(document.documentElement).fontSize,
-                )}
-                emoji={{
-                  id: reactionEmojiId,
-                  native: reactionEmoji,
-                }}
-                native={reactionEmoji}
-              />
-              <span>{count}</span>
-            </Styled.EmojiWrapper>
-          </TooltipContainer>
-        );
-      })}
+      }}
+    >
+      {Object.values(reactionItems).sort(sortByLeastRecent).sort(sortByCount).map((details) => (
+        <ReactionItem
+          chatId={chatId}
+          count={details.count}
+          deleteReaction={deleteReaction}
+          messageId={messageId}
+          reactedByMe={details.reactedByMe}
+          reactionEmoji={details.reactionEmoji}
+          reactionEmojiId={details.reactionEmojiId}
+          sendReaction={sendReaction}
+          shortcodes={details.shortcodes}
+          userNames={details.userNames}
+          key={details.reactionEmojiId}
+        />
+      ))}
     </Styled.ReactionsWrapper>
   );
 };

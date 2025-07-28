@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 
-import { UI_DATA_LISTENER_SUBSCRIBED } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data-hooks/consts';
-import { UserListUiDataPayloads } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data-hooks/user-list/types';
+import { UI_DATA_LISTENER_SUBSCRIBED } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data/hooks/consts';
+import { UserListUiDataPayloads } from 'bigbluebutton-html-plugin-sdk/dist/cjs/ui-data/domain/user-list/types';
 import * as PluginSdk from 'bigbluebutton-html-plugin-sdk';
 import { useMutation } from '@apollo/client';
 import { User } from '/imports/ui/Types/user';
@@ -16,6 +16,7 @@ import { setLocalUserList } from '/imports/ui/core/hooks/useLoadedUserList';
 import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
 import { SET_RAISE_HAND } from '/imports/ui/core/graphql/mutations/userMutations';
 import { RAISED_HAND_USERS } from '/imports/ui/components/raisehand-notifier/queries';
+import roveBuilder from '/imports/ui/core/utils/keyboardRove';
 
 interface UserListParticipantsProps {
   count: number;
@@ -31,7 +32,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const [visibleUsers, setVisibleUsers] = React.useState<{
     [key: number]: User[];
   }>({});
-  const userListRef = React.useRef<HTMLDivElement | null>(null);
+  const userListRef = React.useRef<HTMLUListElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
   // Filter users based on search query
@@ -94,8 +95,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     }
   }, [filteredVisibleUsers, searchQuery]);
 
-
-
+  const rove = useMemo(() => roveBuilder(selectedUserRef, 'user-index'), []);
 
   // --- Plugin related code ---
   useEffect(() => {
@@ -130,35 +130,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   }, []);
   // --- End of plugin related code ---
 
-  const rove = (ev: KeyboardEvent) => {
-    if (ev.code === 'Enter' || ev.code === 'Space' || (ev.code === 'ArrowDown' && selectedUserRef.current !== document.activeElement)) {
-      if (selectedUserRef.current && (selectedUserRef.current === document.activeElement)) {
-        selectedUserRef.current.click();
-      } else {
-        const userItem = document.getElementById('user-index-0');
-        selectedUserRef.current = userItem;
-
-        if (selectedUserRef.current) {
-          selectedUserRef.current.focus();
-        }
-      }
-      return;
-    }
-
-    if (ev.code === 'ArrowDown' || ev.code === 'ArrowUp') {
-      const sum = ev.code === 'ArrowDown' ? 1 : -1;
-      const el = selectedUserRef.current;
-      if (el) {
-        const nextId = Number.parseInt(el.id.split('-')[2], 10) + sum;
-        const nextEl = document.getElementById(`user-index-${nextId}`);
-        if (nextEl) {
-          selectedUserRef.current = nextEl;
-          nextEl.focus();
-        }
-      }
-    }
-  };
-
   const amountOfPages = Math.ceil((searchQuery.trim() ? filteredCount : count) / 50);
 
   // Show "No users found" message when searching with no results
@@ -184,11 +155,11 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   return (
     (
       <Styled.UserListColumn
-      // @ts-ignore
         onKeyDown={rove}
         tabIndex={0}
+        role="list"
       >
-        <Styled.VirtualizedList ref={userListRef}>
+        <Styled.VirtualizedList as="ul" ref={userListRef}>
           {
             Array.from({ length: amountOfPages }).map((_, i) => {
               const isLastItem = amountOfPages === (i + 1);

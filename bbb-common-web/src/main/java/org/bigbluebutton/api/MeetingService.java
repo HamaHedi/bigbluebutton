@@ -20,6 +20,7 @@ package org.bigbluebutton.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.MalformedParametersException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -43,6 +44,7 @@ import org.bigbluebutton.api.messaging.converters.messages.PublishedRecordingMes
 import org.bigbluebutton.api.messaging.converters.messages.UnpublishedRecordingMessage;
 import org.bigbluebutton.api.messaging.converters.messages.DeletedRecordingMessage;
 import org.bigbluebutton.api.messaging.messages.*;
+import org.bigbluebutton.api.util.PluginUtils;
 import org.bigbluebutton.api2.IBbbWebApiGWApp;
 import org.bigbluebutton.api2.domain.UploadedTrack;
 import org.bigbluebutton.common2.redis.RedisStorageService;
@@ -60,8 +62,6 @@ import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.*;
@@ -131,21 +131,21 @@ public class MeetingService implements MessageListener {
   }
 
   public void registerUser(String meetingID, String internalUserId,
-                           String fullname, String role, String externUserID,
+                           String fullname, String firstName, String lastName, String role, String externUserID,
                            String authToken, String sessionToken, String avatarURL, String webcamBackgroundURL, Boolean bot,
                            Boolean guest, Boolean authed, String guestStatus, Boolean excludeFromDashboard, Boolean leftGuestLobby,
-                           String enforceLayout, Map<String, String> userMetadata) {
+                           String enforceLayout, String logoutUrl, Map<String, String> userMetadata) {
     handle(
-            new RegisterUser(meetingID, internalUserId, fullname, role,
+            new RegisterUser(meetingID, internalUserId, fullname, firstName, lastName, role,
                             externUserID, authToken, sessionToken, avatarURL, webcamBackgroundURL, bot, guest, authed, guestStatus,
-                            excludeFromDashboard, leftGuestLobby, enforceLayout, userMetadata
+                            excludeFromDashboard, leftGuestLobby, enforceLayout, logoutUrl, userMetadata
             )
     );
 
     Meeting m = getMeeting(meetingID);
     if (m != null) {
       RegisteredUser ruser = new RegisteredUser(authToken, internalUserId, guestStatus,
-                                                excludeFromDashboard, leftGuestLobby, enforceLayout);
+                                                excludeFromDashboard, leftGuestLobby, enforceLayout, logoutUrl);
       m.userRegistered(ruser);
     }
   }
@@ -154,12 +154,14 @@ public class MeetingService implements MessageListener {
           String meetingID,
           String internalUserId,
           String sessionToken,
+          String sessionName,
           String replaceSessionToken,
           String enforceLayout,
           Map<String, String> userSessionMetadata
   ) {
     handle(
-            new RegisterUserSessionToken(meetingID, internalUserId, sessionToken, replaceSessionToken, enforceLayout, userSessionMetadata)
+            new RegisterUserSessionToken(meetingID, internalUserId, sessionToken, sessionName,
+                    replaceSessionToken, enforceLayout, userSessionMetadata)
     );
   }
 
@@ -365,49 +367,19 @@ public class MeetingService implements MessageListener {
       : Collections.unmodifiableCollection(sessions.values());
   }
 
-  public String replaceMetaParametersIntoManifestTemplate(String manifestContent, Map<String, String> metadata)
-          throws NoSuchFieldException {
-    // Pattern to match ${variable} in the input string
-    Pattern pattern = Pattern.compile("\\$\\{([\\w\\-]+)\\}");
-
-    Matcher matcher = pattern.matcher(manifestContent);
-
-    StringBuilder result = new StringBuilder();
-
-    // Iterate over all matches
-    while (matcher.find()) {
-
-      String variableName = matcher.group(1);
-      if (variableName.startsWith("meta_") && variableName.length() > 5) {
-        // Remove "meta_" and convert to lower case
-        variableName = variableName.substring(5).toLowerCase();
-      } else {
-        throw new NoSuchFieldException("Metadata " + variableName + " is malformed, please provide a valid one");
-      }
-
-      String replacement;
-      if (metadata.containsKey(variableName))
-        replacement = metadata.get(variableName);
-      else throw new NoSuchFieldException("Metadata " + variableName + " not found in URL parameters");
-
-      // Replace the placeholder with the value from the map
-      matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
-    }
-    matcher.appendTail(result);
-
-    return result.toString();
-  }
   public Map<String, Object> requestPluginManifests(Meeting m) {
     Map<String, Object> urlContents = new ConcurrentHashMap<>();
     Map<String, String> metadata = m.getMetadata();
+    Map<String, String> pluginMetadataParameter = m.getPluginMetadataParametersMap();
     List<CompletableFuture<Void>> futures = new ArrayList<>();
     // The maximum number of threads can be adjusted later on
     ExecutorService executorService = Executors.newFixedThreadPool(numPluginManifestsFetchingThreads);
     for (PluginManifest pluginManifest : m.getPluginManifests()) {
+      String pluginManifestUrlString = pluginManifest.getUrl();
+      log.info("Fetching plugin [{}].", pluginManifestUrlString);
       CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
         try {
-          String urlString = pluginManifest.getUrl();
-          URL url = new URL(urlString);
+          URL url = new URL(pluginManifestUrlString);
           String content;
           try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
             content = in.lines().collect(Collectors.joining("\n"));
@@ -421,25 +393,25 @@ public class MeetingService implements MessageListener {
           if (!StringUtils.isEmpty(paramChecksum)) {
             String hash = DigestUtils.sha256Hex(content);
             if (!paramChecksum.equals(hash)) {
-              log.info("Plugin's manifest.json checksum mismatch with that of the URL parameter for {}.",
-                      pluginManifest.getUrl());
-              log.info("Plugin {} is not going to be loaded", pluginManifest.getUrl());
+              log.info("Plugin's manifest.json checksum mismatch with that of the URL parameter for {}.", pluginManifestUrlString);
+              log.info("Plugin {} is not going to be loaded", pluginManifestUrlString);
               return;
             }
           }
 
           // Get the "name" field
-          String name;
+          String pluginName;
           if (jsonNode.has("name")) {
-            name = jsonNode.get("name").asText();
+            pluginName = jsonNode.get("name").asText();
           } else {
-            throw new NoSuchFieldException("For url " + urlString + " there is no name field configured.");
+            throw new NoSuchFieldException("For url " + pluginManifestUrlString + " there is no name field configured.");
           }
 
-          String pluginKey = name;
+          String pluginKey = pluginName;
           HashMap<String, Object> manifestObject = new HashMap<>();
-          manifestObject.put("url", urlString);
-          String manifestContent = replaceMetaParametersIntoManifestTemplate(content, metadata);
+          manifestObject.put("url", pluginManifestUrlString);
+          String manifestContent = PluginUtils.replaceMetadataParametersIntoManifestTemplate(
+                  pluginName, content, metadata, pluginMetadataParameter);
 
           Map<String, Object> mappedManifestContent = objectMapper.readValue(manifestContent, new TypeReference<Map<String, Object>>() {});
           manifestObject.put("content", mappedManifestContent);
@@ -448,20 +420,24 @@ public class MeetingService implements MessageListener {
           manifestWrapper.put("manifest", manifestObject);
           urlContents.put(pluginKey, manifestWrapper);
         } catch (MalformedURLException e) {
-          log.error("Invalid URL: {}", pluginManifest.getUrl(), e);
+          log.error("Invalid URL: {}", pluginManifestUrlString, e);
         } catch (JsonProcessingException e) {
-          log.error("Failed to parse JSON from URL: {}", pluginManifest.getUrl(), e);
+          log.error("Failed to parse JSON from URL: {}", pluginManifestUrlString, e);
         } catch (IOException e) {
-          log.error("I/O error when fetching URL: {}", pluginManifest.getUrl(), e);
+          log.error("I/O error when fetching URL: {}", pluginManifestUrlString, e);
+        } catch (NoSuchFieldException e) {
+          log.error("Missing required metadata (meta_ or plugin_ parameter) in plugin manifest URL [{}]. Plugin not loaded.", pluginManifestUrlString, e);
+        } catch (MalformedParametersException e) {
+          log.error("Malformed metadata parameter for plugin manifest URL [{}]. Plugin not loaded.", pluginManifestUrlString, e);
         } catch (Exception e) {
-          log.error("Unexpected error processing plugin manifest from URL: {}", pluginManifest.getUrl(), e);
+          log.error("Unexpected error processing plugin manifest from URL: {}", pluginManifestUrlString, e);
         }
       }, executorService).orTimeout(pluginManifestFetchTimeout, TimeUnit.SECONDS)
       .exceptionally(ex -> {
         if (ex instanceof TimeoutException) {
-          log.warn("Timeout occurred when fetching URL: {}", pluginManifest.getUrl());
+          log.warn("Timeout occurred when fetching URL: {}", pluginManifestUrlString);
         } else {
-          log.error("Unexpected error for plugin {}: {}", pluginManifest.getUrl(), ex);
+          log.error("Unexpected error for plugin {}: {}", pluginManifestUrlString, ex);
         }
         return null;
       });
@@ -552,6 +528,9 @@ public class MeetingService implements MessageListener {
     logData.put("meetingCameraCap", m.getMeetingCameraCap());
     logData.put("userCameraCap", m.getUserCameraCap());
     logData.put("maxPinnedCameras", m.getMaxPinnedCameras());
+    logData.put("cameraBridge", m.getCameraBridge());
+    logData.put("screenShareBridge", m.getScreenShareBridge());
+    logData.put("audioBridge", m.getAudioBridge());
     logData.put("record", m.isRecord());
     logData.put("logCode", "create_meeting");
     logData.put("description", "Create meeting.");
@@ -567,7 +546,11 @@ public class MeetingService implements MessageListener {
     gw.createMeeting(m.getInternalId(), m.getExternalId(), m.getParentMeetingId(), m.getName(), m.isRecord(),
             m.getTelVoice(), m.getDuration(), m.getAutoStartRecording(), m.getAllowStartStopRecording(),
             m.getRecordFullDurationMedia(),
-            m.getWebcamsOnlyForModerator(), m.getMeetingCameraCap(), m.getUserCameraCap(), m.getMaxPinnedCameras(), m.getModeratorPassword(), m.getViewerPassword(),
+            m.getWebcamsOnlyForModerator(), m.getMeetingCameraCap(), m.getUserCameraCap(), m.getMaxPinnedCameras(),
+            m.getCameraBridge(),
+            m.getScreenShareBridge(),
+            m.getAudioBridge(),
+            m.getModeratorPassword(), m.getViewerPassword(),
             m.getLearningDashboardAccessToken(), m.getCreateTime(),
             formatPrettyDate(m.getCreateTime()), m.isBreakout(), m.getSequence(), m.isFreeJoin(), m.getMetadata(),
             m.getGuestPolicy(), m.getAuthenticatedGuest(), m.getAllowPromoteGuestToModerator(), m.getWaitingGuestUsersTimeout(), m.getMeetingLayout(), m.getWelcomeMessageTemplate(), m.getWelcomeMessage(),
@@ -579,7 +562,7 @@ public class MeetingService implements MessageListener {
             m.breakoutRoomsParams, m.lockSettingsParams, m.getLoginUrl(), m.getLogoutUrl(), m.getCustomLogoURL(), m.getCustomDarkLogoURL(),
             m.getBannerText(), m.getBannerColor(), m.getGroups(), m.getDisabledFeatures(), m.getNotifyRecordingIsOn(),
             m.getPresentationUploadExternalDescription(), m.getPresentationUploadExternalUrl(), m.getPlugins(),
-            m.getOverrideClientSettings());
+            m.getHtml5PluginSdkVersion(), m.getOverrideClientSettings());
   }
 
   private String formatPrettyDate(Long timestamp) {
@@ -592,13 +575,13 @@ public class MeetingService implements MessageListener {
 
   private void processRegisterUser(RegisterUser message) {
     gw.registerUser(message.meetingID,
-      message.internalUserId, message.fullname, message.role,
+      message.internalUserId, message.fullname, message.firstName, message.lastName, message.role,
       message.externUserID, message.authToken, message.sessionToken, message.avatarURL, message.webcamBackgroundURL, message.bot,
-      message.guest, message.authed, message.guestStatus, message.excludeFromDashboard, message.enforceLayout, message.userMetadata);
+      message.guest, message.authed, message.guestStatus, message.excludeFromDashboard, message.enforceLayout, message.logoutUrl, message.userMetadata);
   }
 
   private void processRegisterUserSessionToken(RegisterUserSessionToken message) {
-    gw.registerUserSessionToken(message.meetingID, message.internalUserId, message.sessionToken,
+    gw.registerUserSessionToken(message.meetingID, message.internalUserId, message.sessionToken, message.sessionName,
             message.replaceSessionToken, message.enforceLayout, message.userSessionMetadata);
   }
 
@@ -815,7 +798,11 @@ public class MeetingService implements MessageListener {
       params.put(ApiParams.DURATION, message.durationInMinutes.toString());
       params.put(ApiParams.RECORD, message.record.toString());
       params.put(ApiParams.WELCOME, getMeeting(message.parentMeetingId).getWelcomeMessageTemplate());
+      params.put(ApiParams.AUDIO_BRIDGE, message.audioBridge);
+      params.put(ApiParams.CAMERA_BRIDGE, message.cameraBridge);
+      params.put(ApiParams.SCREEN_SHARE_BRIDGE, message.screenShareBridge);
       params.put(ApiParams.NOTIFY_RECORDING_IS_ON,parentMeeting.getNotifyRecordingIsOn().toString());
+      params.put(ApiParams.DISABLED_FEATURES,String.join(",", message.disabledFeatures));
 
       Map<String, String> parentMeetingMetadata = parentMeeting.getMetadata();
 
@@ -1459,6 +1446,7 @@ public class MeetingService implements MessageListener {
       String apiVersionFromFile = reader.readLine();
 
       paramsProcessorUtil.setBbbVersion(apiVersionFromFile);
+      PluginUtils.setBbbVersion(apiVersionFromFile);
       Runnable messageReceiver = new Runnable() {
         public void run() {
           while (processMessage) {

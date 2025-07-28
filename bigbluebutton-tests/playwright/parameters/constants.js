@@ -7,7 +7,7 @@ exports.color = color;
 exports.bannerColor = `bannerColor=${color}`;
 exports.maxParticipants = 'maxParticipants=2';
 exports.duration = 'duration=2';
-const messageModerator = 'Test';
+const messageModerator = 'This is a moderator only message';
 exports.messageModerator = messageModerator;
 exports.moderatorOnlyMessage = `moderatorOnlyMessage=${messageModerator}`;
 exports.webcamsOnlyForModerator = 'webcamsOnlyForModerator=true';
@@ -19,6 +19,25 @@ exports.lockSettingsDisablePublicChat = 'lockSettingsDisablePublicChat=true';
 exports.lockSettingsHideUserList = 'lockSettingsHideUserList=true';
 exports.allowModsToEjectCameras = 'allowModsToEjectCameras=true';
 exports.notifyRecordingIsOn = 'notifyRecordingIsOn=true&notifyRecordingIsOn=true';
+exports.preUploadedPresentation = 'preUploadedPresentation=https://dagrs.berkeley.edu/sites/default/files/2020-01/sample.pdf';
+exports.preUploadedPresentationOverrideDefault = 'preUploadedPresentationOverrideDefault=true';
+exports.preUploadedPresentationName = 'preUploadedPresentationName=ScientificPaper.pdf';
+exports.customLayout = 'meetingLayout=CUSTOM_LAYOUT';
+exports.smartLayout = 'meetingLayout=SMART_LAYOUT';
+exports.presentationFocus = 'meetingLayout=PRESENTATION_FOCUS';
+exports.videoFocus = 'meetingLayout=VIDEO_FOCUS';
+exports.camerasOnly = 'meetingLayout=CAMERAS_ONLY';
+exports.presentationOnly = 'meetingLayout=PRESENTATION_ONLY';
+exports.participantsAndChatOnly = 'meetingLayout=PARTICIPANTS_AND_CHAT_ONLY';
+exports.mediaOnly = 'meetingLayout=MEDIA_ONLY';
+exports.enforceCustomLayout = 'enforceLayout=CUSTOM_LAYOUT';
+exports.enforcePresentationFocus = 'enforceLayout=PRESENTATION_FOCUS';
+exports.enforceSmartLayout = 'enforceLayout=SMART_LAYOUT';
+exports.enforceVideoFocus = 'enforceLayout=VIDEO_FOCUS';
+exports.enforceCamerasOnly = 'enforceLayout=CAMERAS_ONLY';
+exports.enforcePresentationOnly = 'enforceLayout=PRESENTATION_ONLY';
+exports.enforceParticipantsAndChatOnly = 'enforceLayout=PARTICIPANTS_AND_CHAT_ONLY';
+exports.enforceMediaOnly = 'enforceLayout=MEDIA_ONLY';
 
 // Custom Parameters
 exports.autoJoin = 'userdata-bbb_auto_join_audio=false';
@@ -30,7 +49,6 @@ exports.skipEchoTestIfPreviousDevice = 'userdata-bbb_skip_echotest_if_previous_d
 const docTitle = 'playwright';
 exports.docTitle = docTitle;
 exports.clientTitle = `userdata-bbb_client_title=${docTitle}`;
-exports.askForFeedbackOnLogout = 'userdata-bbb_ask_for_feedback_on_logout=true';
 exports.displayBrandingArea = 'userdata-bbb_display_branding_area=true';
 exports.logo = 'logo=https://bigbluebutton.org/wp-content/uploads/2021/01/BigBlueButton_icon.svg.png';
 exports.enableVideo = 'userdata-bbb_enable_video=false';
@@ -40,7 +58,7 @@ exports.presenterTools = 'userdata-bbb_presenter_tools=["select","draw", "arrow"
 exports.multiUserTools = 'userdata-bbb_multi_user_tools=["arrow","text"]';
 const cssCode = `${e.presentationTitle}{display: none;}`;
 exports.customStyle = `userdata-bbb_custom_style=${cssCode}`;
-exports.customStyleUrl = 'userdata-bbb_custom_style_url=https://develop.bigbluebutton.org/css-test-file.css';
+exports.customStyleUrl = 'userdata-bbb_custom_style_url=https://dev30.bigbluebutton.org/css-test-file.css';
 exports.autoSwapLayout = 'userdata-bbb_auto_swap_layout=true';
 exports.hidePresentationOnJoin = 'userdata-bbb_hide_presentation_on_join=true';
 exports.outsideToggleSelfVoice = 'userdata-bbb_outside_toggle_self_voice=true';
@@ -53,10 +71,13 @@ exports.skipVideoPreviewOnFirstJoin = 'userdata-bbb_skip_video_preview_on_first_
 exports.skipVideoPreviewIfPreviousDevice = 'userdata-bbb_skip_video_preview_if_previous_device=true';
 exports.mirrorOwnWebcam = 'userdata-bbb_mirror_own_webcam=true';
 exports.showParticipantsOnLogin = 'userdata-bbb_show_participants_on_login=false';
+exports.showSessionDetailsOnJoin = 'bbb_show_session_details_on_join=true';
 exports.hideActionsBar = 'userdata-bbb_hide_actions_bar=true';
 exports.overrideDefaultLocale = 'userdata-bbb_override_default_locale=pt-br';
 exports.hideNavBar = 'userdata-bbb_hide_nav_bar=true';
 exports.preferredCameraProfile = 'userdata-bbb_preferred_camera_profile=low';
+exports.webcamBackgroundPassingURL = 'webcamBackgroundURL=https://upload.wikimedia.org/wikipedia/commons/3/35/Spartan_apple.jpg'
+exports.logoutURL = 'logoutURL=https://www.google.com';
 
 // Disabled Features
 exports.breakoutRoomsDisabled = 'disabledFeatures=breakoutRooms';

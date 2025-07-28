@@ -49,6 +49,8 @@ class ErrorBoundary extends Component {
     const { error, errorInfo } = this.state;
     const { logMetadata: { logCode, logMessage } } = this.props;
     if (error || errorInfo) {
+      console.log('%cErrorBoundary caught an error: ', 'color: red', error);
+      console.log('ErrorInfo: ', errorInfo);
       logger.error({
         logCode,
         extraInfo: {
@@ -98,7 +100,7 @@ class ErrorBoundary extends Component {
   }
 
   render() {
-    const { error, errorInfo } = this.state;
+    const { error } = this.state;
     const { children, Fallback, errorMessage } = this.props;
 
     const fallbackElement = Fallback && error

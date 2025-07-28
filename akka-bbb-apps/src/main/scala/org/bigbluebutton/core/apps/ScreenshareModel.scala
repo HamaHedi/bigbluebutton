@@ -1,10 +1,10 @@
 package org.bigbluebutton.core.apps
 
 import org.bigbluebutton.core.running.{ LiveMeeting, OutMsgRouter }
-import org.bigbluebutton.core2.message.senders.MsgBuilder
 
 object ScreenshareModel {
   def resetDesktopSharingParams(status: ScreenshareModel) = {
+    status.userId = ""
     status.broadcastingRTMP = false
     status.screenshareStarted = false
     status.rtmpBroadcastingUrl = ""
@@ -14,6 +14,14 @@ object ScreenshareModel {
     status.screenshareConf = ""
     status.timestamp = ""
     status.hasAudio = false
+  }
+
+  def getUserId(status: ScreenshareModel): String = {
+    status.userId
+  }
+
+  def setUserId(status: ScreenshareModel, userId: String) = {
+    status.userId = userId
   }
 
   def getScreenshareStarted(status: ScreenshareModel): Boolean = {
@@ -102,6 +110,7 @@ object ScreenshareModel {
 }
 
 class ScreenshareModel {
+  private var userId: String = ""
   private var rtmpBroadcastingUrl: String = ""
   private var screenshareStarted = false
   private var screenshareVideoWidth = 0

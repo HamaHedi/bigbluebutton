@@ -26,7 +26,7 @@ import {
   isVoiceOnlyUser,
 } from './service';
 
-import { useIsChatEnabled } from '/imports/ui/services/features';
+import { useIsChatEnabled, useIsPrivateChatEnabled } from '/imports/ui/services/features';
 import { layoutDispatch } from '/imports/ui/components/layout/context';
 import { PANELS, ACTIONS } from '/imports/ui/components/layout/enums';
 
@@ -151,6 +151,10 @@ const messages = defineMessages({
     id: 'app.whiteboard.toolbar.multiUserLimitHasBeenReachedNotification',
     description: 'message for when the maximum number of whiteboard writers has been reached',
   },
+  removeUserConfirmation: {
+    id: 'app.userList.menu.removeConfirmation.label',
+    description: 'Confirmation message for removing a user from the meeting',
+  },
 });
 const makeDropdownPluginItem: (
   userDropdownItems: PluginSdk.UserListDropdownInterface[]) => DropdownItem[] = (
@@ -212,7 +216,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   usersPolicies,
   isBreakout,
   children,
-  pageId,
+  pageId = '',
   userListDropdownItems,
   open,
   setOpenUserAction,
@@ -231,8 +235,11 @@ const UserActions: React.FC<UserActionsProps> = ({
   );
   const voiceToggle = useToggleVoice();
   const isChatEnabled = useIsChatEnabled();
+  const isPrivateChatEnabled = useIsPrivateChatEnabled();
 
   const handleWhiteboardAccessChange = async () => {
+    // There is no presentation available, so access cannot be granted.
+    if (!pageId) return;
     try {
       // Fetch the writers data
       const { data } = await getWriters();
@@ -258,7 +265,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         notify(
           intl.formatMessage(
             messages.multiUserLimitHasBeenReachedNotification,
-            { 0: WHITEBOARD_CONFIG.maxNumberOfActiveUsers },
+            { numberOfUsers: WHITEBOARD_CONFIG.maxNumberOfActiveUsers },
           ),
           'info',
           'pen_tool',
@@ -366,7 +373,7 @@ const UserActions: React.FC<UserActionsProps> = ({
           === PluginSdk.UserListDropdownSeparatorPosition.BEFORE)),
     )),
     {
-      allowed: user.cameras.length > 0
+      allowed: user?.cameras?.length > 0
         && isVideoPinEnabledForCurrentUser(currentUser, isBreakout),
       key: 'pinVideo',
       label: user.pinned
@@ -384,17 +391,22 @@ const UserActions: React.FC<UserActionsProps> = ({
       icon: user.pinned ? 'pin-video_off' : 'pin-video_on',
     },
     {
-      allowed: isChatEnabled
-        && (
-          currentUser.isModerator ? allowedToChatPrivately
-            : allowedToChatPrivately && (
-              !(currentUser.locked && lockSettings?.disablePrivateChat)
-              // TODO: Add check for hasPrivateChat between users
-              || user.isModerator
-            )
-        )
-        && !isVoiceOnlyUser(user.userId)
-        && !isBreakout,
+      allowed: (() => {
+        const preventSelfChat = user.userId !== currentUser.userId;
+        const moderatorOverride = currentUser.isModerator
+          && allowedToChatPrivately;
+        const regularUserCondition = (isPrivateChatEnabled
+          && isChatEnabled
+          && !lockSettings?.disablePrivateChat
+          && !isVoiceOnlyUser(user.userId)
+          && !isBreakout)
+          || user.isModerator;
+
+        const isAllowed = preventSelfChat
+          && (moderatorOverride || regularUserCondition || !currentUser.locked);
+
+        return isAllowed;
+      })(),
       key: 'activeChat',
       label: intl.formatMessage(messages.StartPrivateChat),
       onClick: () => {
@@ -468,7 +480,8 @@ const UserActions: React.FC<UserActionsProps> = ({
     {
       allowed: allowedToChangeWhiteboardAccess
         && !user.presenter
-        && !isVoiceOnlyUser(user.userId),
+        && !isVoiceOnlyUser(user.userId)
+        && pageId,
       key: 'changeWhiteboardAccess',
       label: hasWhiteboardAccess
         ? intl.formatMessage(messages.removeWhiteboardAccess)
@@ -532,8 +545,8 @@ const UserActions: React.FC<UserActionsProps> = ({
     {
       allowed: allowedToChangeUserLockStatus,
       key: 'unlockUser',
-      label: userLocked ? intl.formatMessage(messages.UnlockUserLabel, { 0: user.name })
-        : intl.formatMessage(messages.LockUserLabel, { 0: user.name }),
+      label: userLocked ? intl.formatMessage(messages.UnlockUserLabel, { userName: user.name })
+        : intl.formatMessage(messages.LockUserLabel, { userName: user.name }),
       onClick: () => {
         setLocked({
           variables: {
@@ -559,7 +572,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     },
     {
       allowed: allowedToEjectCameras
-        && user.cameras.length > 0
+        && user?.cameras?.length > 0
         && !isBreakout,
       key: 'ejectUserCameras',
       label: intl.formatMessage(messages.ejectUserCamerasLabel),
@@ -611,7 +624,6 @@ const UserActions: React.FC<UserActionsProps> = ({
                   setOpenUserAction(user.userId);
                 }
               }}
-              role="button"
             >
                 {children}
             </Styled.UserActionsTrigger>
@@ -626,8 +638,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       {isConfirmationModalOpen ? (
         <ConfirmationModal
           intl={intl}
-          titleMessageId="app.userList.menu.removeConfirmation.label"
-          titleMessageExtra={user.name}
+          title={intl.formatMessage(messages.removeUserConfirmation, { userName: user.name })}
           checkboxMessageId="app.userlist.menu.removeConfirmation.desc"
           confirmParam={user.userId}
           onConfirm={removeUser}

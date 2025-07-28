@@ -51,6 +51,10 @@ const intlMessages = defineMessages({
     id: 'app.actionsBar.actionsDropdown.lockedDesktopShareDesc',
     description: 'Desktop locked Share option desc',
   },
+  lockedDesktopShareLabel: {
+    id: 'app.actionsBar.actionsDropdown.lockedDesktopShareLabel',
+    description: 'Desktop locked Share option label',
+  },
   notPresenterDesktopShareLabel: {
     id: 'app.actionsBar.actionsDropdown.notPresenterDesktopShareLabel',
     description: 'You are not the presenter label',
@@ -173,7 +177,7 @@ const ScreenshareButton = ({
     const toastType = getToastType(errorCode);
 
     if (localizedError) {
-      notify(intl.formatMessage(localizedError, { 0: errorCode }), toastType, 'desktop', { ...helpInfo });
+      notify(intl.formatMessage(localizedError, { errorCode }), toastType, 'desktop', { ...helpInfo });
       logger.error({
         logCode: 'screenshare_failed',
         extraInfo: { errorCode, errorMessage },

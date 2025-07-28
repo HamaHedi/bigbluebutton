@@ -16,6 +16,9 @@ export const isModerator = (sessionVariables: Record<string, unknown>) => {
     return (sessionVariables['x-hasura-moderatorinmeeting'] !== "");
 };
 
+export const isPresenter = (sessionVariables: Record<string, unknown>) => {
+    return (sessionVariables['x-hasura-presenterinmeeting'] !== "");
+};
 
 export type InputParam = {
     name: string;
@@ -59,7 +62,7 @@ export const throwErrorIfInvalidInput = (input: Record<string, unknown>, expecte
                     }
                     break;
                 case 'json':
-                    if (typeof value !== 'object') {
+                    if (typeof value !== 'object' || value === null) {
                         throw new ValidationError(`Parameter '${param.name}' should be of type ${param.type}`, 400);
                     }
                     try {

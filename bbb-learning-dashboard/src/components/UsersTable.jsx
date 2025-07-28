@@ -447,7 +447,7 @@ class UsersTable extends React.Component {
                       }
                     </td>
                     <td className={`px-4 py-3 text-sm text-center ${opacity}`} data-test="userRaiseHandDashboard">
-                      { user.raiseHand.length > 0
+                      { user.raiseHand?.length > 0
                         ? (
                           <span>
                             ✋

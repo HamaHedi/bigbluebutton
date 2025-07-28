@@ -56,15 +56,21 @@ object FakeUserGenerator {
     val webcamBackgroundURL = "https://www." + RandomStringGenerator.randomAlphanumericString(32) + ".com/" +
       RandomStringGenerator.randomAlphanumericString(10) + ".jpg"
     val color = "#ff6242"
+    val logoutUrlFormats = Seq(
+      s"https://www.${RandomStringGenerator.randomAlphanumericString(32)}.com/logout?user=${RandomStringGenerator.randomAlphanumericString(8)}#section",
+      s"http://localhost:8080/logout/${RandomStringGenerator.randomAlphanumericString(8)}",
+      s"https://example.com/logout?redirect=${java.net.URLEncoder.encode("https://another-site.com", "UTF-8")}"
+    )
+    val logoutUrl = logoutUrlFormats(random.nextInt(logoutUrlFormats.length))
 
-    val ru = RegisteredUsers.create(meetingId, userId = id, extId, name, role,
+    val ru = RegisteredUsers.create(meetingId, userId = id, extId, name, "", "", role,
       authToken, Vector(sessionToken), avatarURL, webcamBackgroundURL, color, bot,
-      guest, authed, guestStatus = GuestStatus.ALLOW, false, "", Map(), false)
+      guest, authed, guestStatus = GuestStatus.ALLOW, false, "", logoutUrl, Map(), false)
     RegisteredUsers.add(users, ru, meetingId)
     ru
   }
 
-  def createFakeVoiceUser(user: RegisteredUser, callingWith: String, muted: Boolean, talking: Boolean,
+  def createFakeVoiceUser(user: RegisteredUser, callingWith: String, muted: Boolean, deafened: Boolean, talking: Boolean,
                           listenOnly: Boolean, floor: Boolean = false): VoiceUserState = {
     val voiceUserId = RandomStringGenerator.randomAlphanumericString(8)
     val lastFloorTime = System.currentTimeMillis().toString();
@@ -77,6 +83,7 @@ object FakeUserGenerator {
       callerNum = user.name,
       "#ff6242",
       muted,
+      deafened,
       talking,
       listenOnly,
       "freeswitch",
@@ -88,7 +95,7 @@ object FakeUserGenerator {
     )
   }
 
-  def createFakeVoiceOnlyUser(meetingId: String, callingWith: String, muted: Boolean, talking: Boolean,
+  def createFakeVoiceOnlyUser(meetingId: String, callingWith: String, muted: Boolean, deafened: Boolean, talking: Boolean,
                               listenOnly: Boolean, floor: Boolean = false): VoiceUserState = {
     val voiceUserId = RandomStringGenerator.randomAlphanumericString(8)
     val intId = "v_" + RandomStringGenerator.randomAlphanumericString(16)
@@ -103,6 +110,7 @@ object FakeUserGenerator {
       callerNum = name,
       "#ff6242",
       muted,
+      deafened,
       talking,
       listenOnly,
       "freeswitch",

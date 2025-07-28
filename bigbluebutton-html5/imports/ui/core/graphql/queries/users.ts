@@ -37,6 +37,7 @@ subscription UserListSubscription($offset: Int!, $limit: Int!) {
     loggedOut
     voice {
       joined
+      deafened
       listenOnly
       voiceUserId
     }
@@ -82,6 +83,9 @@ export const GET_USER_NAMES = gql`
   query Users {
     user(where: { bot: { _eq: false } } ) {
       name
+      nameSortable
+      firstNameSortable
+      lastNameSortable
     }
   }
 `;

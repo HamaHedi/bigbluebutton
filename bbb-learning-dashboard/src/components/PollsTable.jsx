@@ -298,7 +298,7 @@ const PollsTable = (props) => {
   const anonGridRow = [];
   const gridRows = [];
 
-  Object.values(polls).map((v, i) => {
+  Object.values(polls).sort((a, b) => b.createdOn - a.createdOn).map((v, i) => {
     initPollData[`${v?.pollId}`] = '';
     const headerName = v?.question?.length > 0 ? v?.question : `Poll ${i + 1}`;
     if (v?.anonymous) {

@@ -9,14 +9,16 @@ import { Icon } from '../../../chat/chat-graphql/chat-message-list/page/chat-mes
 import useWhoIsUnmuted from '/imports/ui/core/hooks/useWhoIsUnmuted';
 import { SET_MUTED } from './user-options-dropdown/mutations';
 import { useMutation } from '@apollo/client';
-import useMeeting from '/imports/ui/core/hooks/useMeeting';
-import { Meeting } from '/imports/ui/Types/meeting';
 import Tooltip from '../../../common/tooltip/component';
 import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
+import useMeeting from '/imports/ui/core/hooks/useMeeting';
+import { User } from '/imports/ui/Types/user';
+import { Meeting } from '/imports/ui/Types/meeting';
 
 interface UserTitleProps {
   count: number;
   countWithAudio: number;
+  hideUserList?: boolean;
 }
 
 const messages = defineMessages({
@@ -24,11 +26,16 @@ const messages = defineMessages({
     id: 'app.userList.usersTitle',
     description: 'Title for the Header',
   },
+  lockedUsersTitle: {
+    id: 'app.userList.lockedUsersTitle',
+    description: 'Title for the locked users',
+  },
 });
 
 const UserTitle: React.FC<UserTitleProps> = ({
   count,
   countWithAudio,
+  hideUserList,
 }) => {
   const { data: currentUserData } = useCurrentUser((user) => ({
     presenter: user.presenter,
@@ -50,15 +57,21 @@ const UserTitle: React.FC<UserTitleProps> = ({
 
   
  
+  const userListLabel = hideUserList ? messages.lockedUsersTitle : messages.usersTitle;
+
   return (
     <Styled.Container>
       <Styled.SmallTitle>
-        {intl.formatMessage(messages.usersTitle)}
         <span
           data-test-users-count={count}
           data-test-users-with-audio-count={countWithAudio}
         >
-          {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
+          {intl.formatMessage(
+            userListLabel,
+            {
+              userCount: count.toLocaleString('en-US', { notation: 'standard' }),
+            },
+          )}
         </span>
       </Styled.SmallTitle>
       {currentUserData?.isModerator && 
@@ -84,10 +97,22 @@ const UserTitleContainer: React.FC = () => {
   } = useDeduplicatedSubscription(USER_WITH_AUDIO_AGGREGATE_COUNT_SUBSCRIPTION);
 
   const countWithAudio = audioUsersCountData?.user_aggregate?.aggregate?.count || 0;
+
+  const { data: currentUser } = useCurrentUser((u: Partial<User>) => ({
+    locked: u?.locked ?? false,
+  }));
+
+  const { data: currentMeeting } = useMeeting((m: Partial<Meeting>) => ({
+    lockSettings: m.lockSettings,
+  }));
+
+  const hideUserList = currentUser?.locked && currentMeeting?.lockSettings?.hideUserList;
+
   return (
     <UserTitle
       count={getCountData() as number}
       countWithAudio={countWithAudio}
+      hideUserList={hideUserList}
     />
   );
 };

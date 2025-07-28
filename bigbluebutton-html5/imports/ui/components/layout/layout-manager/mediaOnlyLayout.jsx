@@ -3,7 +3,9 @@ import { throttle } from '/imports/utils/throttle';
 import { layoutDispatch, layoutSelect, layoutSelectInput } from '/imports/ui/components/layout/context';
 import DEFAULT_VALUES from '/imports/ui/components/layout/defaultValues';
 import { INITIAL_INPUT_STATE } from '/imports/ui/components/layout/initState';
-import { ACTIONS, CAMERADOCK_POSITION, MEDIA_ONLY_LAYOUT_MARGIN } from '/imports/ui/components/layout/enums';
+import {
+  ACTIONS, CAMERADOCK_POSITION, MEDIA_ONLY_LAYOUT_MARGIN, PANELS,
+} from '/imports/ui/components/layout/enums';
 import { defaultsDeep } from '/imports/utils/array-utils';
 import Session from '/imports/ui/services/storage/in-memory';
 
@@ -116,6 +118,7 @@ const MediaOnlyLayout = (props) => {
     const cameraDockBounds = {};
 
     cameraDockBounds.isCameraHorizontal = false;
+    cameraDockBounds.position = CAMERADOCK_POSITION.CONTENT_TOP;
 
     const mediaBoundsWidth = mediaBounds.width > presentationToolbarMinWidth
       && !isMobile
@@ -414,6 +417,7 @@ const MediaOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_EXTERNAL_VIDEO_OUTPUT,
       value: {
+        display: externalVideoInput.hasExternalVideo,
         width: mediaBounds.width,
         height: mediaBounds.height,
         top: mediaBounds.top,
@@ -451,14 +455,14 @@ const MediaOnlyLayout = (props) => {
   });
 
   const init = () => {
+    const hasLayoutEngineLoadedOnce = Session.getItem('hasLayoutEngineLoadedOnce');
     layoutContextDispatch({
       type: ACTIONS.SET_LAYOUT_INPUT,
       value: (prevInput) => {
         const {
-          sidebarContent, presentation, cameraDock,
+          presentation, cameraDock,
           externalVideo, genericMainContent, screenShare, sharedNotes,
         } = prevInput;
-        const { sidebarContentPanel } = sidebarContent;
         return defaultsDeep(
           {
             sidebarNavigation: {
@@ -466,10 +470,7 @@ const MediaOnlyLayout = (props) => {
             },
             sidebarContent: {
               isOpen: false,
-              sidebarContentPanel,
-            },
-            SidebarContentHorizontalResizer: {
-              isOpen: false,
+              sidebarContentPanel: PANELS.NONE,
             },
             presentation: {
               isOpen: presentation.isOpen,
@@ -479,6 +480,7 @@ const MediaOnlyLayout = (props) => {
               },
             },
             cameraDock: {
+              position: cameraDock.position || CAMERADOCK_POSITION.CONTENT_LEFT,
               numCameras: cameraDock.numCameras,
             },
             externalVideo: {
@@ -496,7 +498,7 @@ const MediaOnlyLayout = (props) => {
               isPinned: sharedNotes.isPinned,
             },
           },
-          INITIAL_INPUT_STATE,
+          hasLayoutEngineLoadedOnce ? prevInput : INITIAL_INPUT_STATE,
         );
       },
     });

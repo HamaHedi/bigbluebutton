@@ -1,3 +1,5 @@
+#!/bin/bash
+
 declare -A DEBNAME_TO_SOURCEDIR
 
 DEBNAME_TO_SOURCEDIR[bbb-apps-akka]="akka-bbb-apps bbb-common-message"
@@ -13,6 +15,7 @@ DEBNAME_TO_SOURCEDIR[bbb-graphql-server]="bbb-graphql-server"
 DEBNAME_TO_SOURCEDIR[bbb-html5]="bigbluebutton-html5"
 DEBNAME_TO_SOURCEDIR[bbb-learning-dashboard]="bbb-learning-dashboard"
 DEBNAME_TO_SOURCEDIR[bbb-libreoffice-docker]="bbb-libreoffice"
+DEBNAME_TO_SOURCEDIR[bbb-livekit]="bbb-livekit"
 DEBNAME_TO_SOURCEDIR[bbb-mkclean]="do_not_copy_anything"
 DEBNAME_TO_SOURCEDIR[bbb-pads]="bbb-pads"
 DEBNAME_TO_SOURCEDIR[bbb-playback]="bbb-playback"

@@ -6,19 +6,12 @@ async function openPublicChat(testPage) {
   const { chatEnabled } = getSettings();
 
   if(!chatEnabled) {
-    return testPage.wasRemoved(e.chatButton, 'public chat should not be desplayed');
+    return testPage.wasRemoved(e.chatButton, 'public chat should not be displayed');
   }
 
   await testPage.hasElement(e.chatBox, 'should display the chat box for messaging');
   await testPage.hasElement(e.chatMessages, 'should display the chat messages');
-  try {
-    await testPage.hasElement(e.chatWelcomeMessageText, 'should display the chat welcome message');
-  } catch {
-    await testPage.waitAndClick(e.chatMessages);
-    await testPage.down('Home');
-    await testPage.hasElement(e.chatWelcomeMessageText, 'should display the chat welcome message');
-    await testPage.down('End');
-  }
+  await testPage.hasElement(e.chatOptions, 'should display the chat options menu button');
 }
 
 async function openPrivateChat(testPage) {
@@ -28,14 +21,26 @@ async function openPrivateChat(testPage) {
   if(!chatEnabled) {
     return await testPage.wasRemoved(e.startPrivateChat, 'should not display the private chat');
   }
-  await testPage.waitAndClick(e.startPrivateChat);
+  const lastUserStartPrivateChat = await testPage.getLocator(e.startPrivateChat).last();
+  await testPage.clickOnLocator(lastUserStartPrivateChat);
+}
+
+async function getLastMessageSent(testPage) {
+  return testPage.getLocator(e.chatUserMessageText).last();
 }
 
 async function checkLastMessageSent(testPage, expectedMessage) {
-  const lastMessageSent = await testPage.getLocator(e.chatUserMessageText).last();
-  await expect(lastMessageSent, 'should display the last message sent on the chat').toHaveText(expectedMessage);
+  const lastMessageSentLocator = await getLastMessageSent(testPage);
+  await expect(lastMessageSentLocator, 'should display the last message sent on the chat').toHaveText(expectedMessage);
+}
+
+async function hoverLastMessage(testPage) {
+  const lastMessageSentLocator = await getLastMessageSent(testPage);
+  await lastMessageSentLocator.hover();
 }
 
 exports.openPublicChat = openPublicChat;
 exports.openPrivateChat = openPrivateChat;
+exports.getLastMessageSent = getLastMessageSent;
 exports.checkLastMessageSent = checkLastMessageSent;
+exports.hoverLastMessage = hoverLastMessage;

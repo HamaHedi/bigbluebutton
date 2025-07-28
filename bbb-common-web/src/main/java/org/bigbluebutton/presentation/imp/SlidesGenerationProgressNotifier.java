@@ -41,6 +41,7 @@ public class SlidesGenerationProgressNotifier {
 
   public void sendUploadFileTooLargeMessage(PresentationUploadToken pres, int uploadedFileSize, int maxUploadFileSize) {
     UploadFileTooLargeMessage progress = new UploadFileTooLargeMessage(
+            pres.presentationId,
             pres.podId,
             pres.meetingId,
             pres.filename,
@@ -100,6 +101,7 @@ public class SlidesGenerationProgressNotifier {
   }
 
   public void sendConversionUpdateMessage(int slidesCompleted, UploadedPresentation pres, int pageGenerated) {
+    log.info("Sending conversion update message for page {} of presentation [{}] in meeting [{}]", pageGenerated, pres.getId(), pres.getMeetingId());
     DocPageGeneratedProgress progress = new DocPageGeneratedProgress(pres.getPodId(),
             pres.getMeetingId(),
             pres.getId(),
@@ -128,6 +130,7 @@ public class SlidesGenerationProgressNotifier {
   }
 
   public void sendConversionCompletedMessage(UploadedPresentation pres) {
+    log.info("Sending conversion completed message for presentation [{}] in meeting [{}]", pres.getId(), pres.getMeetingId());
     if (generatedSlidesInfoHelper == null) {
       log.error("GeneratedSlidesInfoHelper was not set. Could not notify interested listeners.");
       return;

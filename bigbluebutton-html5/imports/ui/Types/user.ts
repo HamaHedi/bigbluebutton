@@ -21,11 +21,19 @@ export interface LastBreakoutRoom {
     userId: string;
 }
 
+export interface BreakoutRoomsSummary {
+  totalOfBreakoutRooms: number;
+  totalOfIsUserCurrentlyInRoom: number;
+  totalOfShowInvitation: number;
+  totalOfJoinURL: number;
+}
+
 export interface Voice {
   joined: boolean;
   listenOnly: boolean;
   talking: boolean;
   muted: boolean;
+  deafened: boolean;
   voiceUserId: string;
   callerName: string;
   callerNum: string;
@@ -39,33 +47,16 @@ export interface Voice {
   startTime: number;
 }
 
-export interface UserMetadata {
-  parameter: string;
-  value: string;
-}
-
-export interface BreakoutRooms {
-  hasJoined: boolean;
-  assignedAt: string;
-  breakoutRoomId: string;
-  isUserCurrentlyInRoom: boolean | null;
-  isLastAssignedRoom: boolean | null;
-  durationInSeconds: number;
-  endedAt: string | null;
-  freeJoin: boolean;
-  inviteDismissedAt: string | null;
-  isDefaultName: boolean;
-  joinURL: string;
-  name: string;
-  sendInvitationToModerators: boolean;
-  sequence: number;
-  shortName: string;
-  showInvitation: boolean;
-  startedAt: string;
-}
-
 export interface userLockSettings {
   disablePublicChat: boolean;
+}
+
+export interface sessionCurrent {
+  enforceLayout: boolean;
+}
+
+export interface Livekit {
+  livekitToken: string;
 }
 
 export interface User {
@@ -81,7 +72,6 @@ export interface User {
   ejectReason: string;
   ejectReasonCode: string;
   ejected: boolean;
-  enforceLayout: boolean;
   role: string;
   color: string;
   avatar: string;
@@ -105,6 +95,7 @@ export interface User {
   registeredAt: string;
   hasDrawPermissionOnCurrentPage: boolean;
   lastBreakoutRoom?: LastBreakoutRoom;
+  breakoutRoomsSummary?: BreakoutRoomsSummary;
   cameras: Array<Cameras>;
   presPagesWritable: Array<PresPagesWritable>;
   speechLocale: string;
@@ -113,6 +104,7 @@ export interface User {
   size: number;
   away: boolean;
   raiseHand: boolean;
-  breakoutRooms: BreakoutRooms;
   userLockSettings: userLockSettings;
+  sessionCurrent: sessionCurrent;
+  livekit?: Livekit;
 }

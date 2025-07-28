@@ -22,13 +22,9 @@ const Left = styled.div`
   display: inherit;
   flex: 0;
   > *:not(span) {
-    margin: 0 ${smPaddingX};
     @media ${smallOnly} {
       margin: 0 ${smPaddingY};
     }
-  }
-  > span {
-    margin: 0;
   }
   @media ${smallOnly} {
     bottom: ${smPaddingX};
@@ -44,16 +40,13 @@ const Left = styled.div`
 const Center = styled.div`
   display: flex;
   flex-direction: row;
+  gap: ${smPaddingX};
   flex: 1;
   justify-content: center;
   > *:not(span):not(:last-child) {
-    margin: 0 ${smPaddingX};
     @media ${smallOnly} {
       margin: 0 ${smPaddingY};
     }
-  }
-  > span {
-    margin: 0;
   }
 `;
 
@@ -72,13 +65,9 @@ const Right = styled.div`
     display: contents;
   }
   > *:not(span) {
-    margin: 0 ${smPaddingX};
     @media ${smallOnly} {
       margin: 0 ${smPaddingY};
     }
-  }
-  > span {
-    margin: 0;
   }
 `;
 
@@ -124,6 +113,11 @@ const Separator = styled.div`
   opacity: .75;
 `;
 
+const Gap = styled.div`
+  display: flex;
+  gap: .5rem;
+`;
+
 export default {
   ActionsBar,
   Left,
@@ -133,6 +127,7 @@ export default {
   ButtonContainer,
   ReactionsDropdown,
   Wrapper,
-  Separator,
   ActionsBarWrapper,
+  Gap,
+  Separator,
 };

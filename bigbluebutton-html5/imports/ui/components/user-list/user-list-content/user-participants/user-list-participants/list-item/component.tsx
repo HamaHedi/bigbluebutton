@@ -145,12 +145,12 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
         <Icon iconName="rooms" />
         &nbsp;
         {user.lastBreakoutRoom?.shortName
-          ? intl.formatMessage(messages.breakoutRoom, { 0: user.lastBreakoutRoom?.sequence })
+          ? intl.formatMessage(messages.breakoutRoom, { roomNumber: user.lastBreakoutRoom?.sequence })
           : user.lastBreakoutRoom?.shortName}
       </span>,
     );
   }
-  if (user.cameras.length > 0 && LABEL.sharingWebcam) {
+  if (user?.cameras?.length > 0 && LABEL.sharingWebcam) {
     subs.push(
       <span key={uniqueId('breakout-')}>
         {user.pinned === true
@@ -268,7 +268,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
   const animations = Settings?.application?.animations;
 
   return (
-    <Styled.UserItemContents id={`user-index-${index}`} tabIndex={-1} data-test={(user.userId === Auth.userID) ? 'userListItemCurrent' : 'userListItem'}>
+    <Styled.UserItemContents id={`user-index-${index}`} tabIndex={-1} data-test={(user.userId === Auth.userID) ? 'userListItemCurrent' : 'userListItem'} role="listitem">
       <Styled.Avatar
         data-test={user.isModerator ? 'moderatorAvatar' : 'viewerAvatar'}
         data-test-presenter={user.presenter ? '' : undefined}
@@ -292,7 +292,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
       </Styled.Avatar>
       <Styled.UserNameContainer>
         <Styled.UserName>
-          <TooltipContainer title={user.name}>
+          <TooltipContainer title={user.name} role="button">
             <span>{user.name}</span>
           </TooltipContainer>
           &nbsp;
