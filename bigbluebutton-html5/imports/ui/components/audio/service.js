@@ -46,7 +46,7 @@ const recoverMicState = (toggleVoice) => {
     logger.debug({
       logCode: 'audio_recover_mic_state',
     }, `Audio recover previous mic state: muted = ${muted}`);
-    toggleVoice(Auth.userID, muted);
+    toggleVoice(Auth.userID, muted);  
   };
 
   apolloContextHolder.getClient().query({

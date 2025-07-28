@@ -245,7 +245,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
   );
 
   const {
-    allowedToUnmuteAudio
+    allowedToUnmuteAudio,
   } = actionsnPermitions
 
   const canToggleVoice =  currentUser?.isModerator
@@ -255,7 +255,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
     if (canToggleVoice) {
       return <Styled.ToggleVoiceButton onClick={(e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
-        toggleVoice(user.userId, !allowedToUnmuteAudio, voiceToggle)
+        toggleVoice(user.userId, isMuted, voiceToggle)
       }}>
         <Icon iconName={isMuted ? 'mute' : 'unmute'} className={isMuted ? 'muted' : 'unmuted'} />
       </Styled.ToggleVoiceButton>
