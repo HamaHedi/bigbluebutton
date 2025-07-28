@@ -199,15 +199,15 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     ));
   }
 
-  const currentUserIndex = users.findIndex((u: User) => u.userId === currentUser?.userId);
+  // const currentUserIndex = users.findIndex((u: User) => u.userId === currentUser?.userId);
 
-  if (currentUserIndex !== -1) {
-    users.splice(currentUserIndex, 1);
-  }
+  // if (currentUserIndex !== -1) {
+  //   users.splice(currentUserIndex, 1);
+  // }
 
-  if (offset === 0) {
-    users.unshift(currentUser as User);
-  }
+  // if (offset === 0) {
+  //   users.unshift(currentUser as User);
+  // }
 
   return (
     <UsersListParticipantsPage

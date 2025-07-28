@@ -245,11 +245,10 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
   );
 
   const {
-    allowedToMuteAudio,
     allowedToUnmuteAudio
   } = actionsnPermitions
 
-  const canToggleVoice = (allowedToMuteAudio || allowedToUnmuteAudio) && currentUser?.isModerator
+  const canToggleVoice =  currentUser?.isModerator
 
 
   const renderToggleVoiceButton = () => {
