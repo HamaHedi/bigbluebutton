@@ -64,6 +64,7 @@ export const ACTIONS = {
   SET_SIDEBAR_CONTENT_PANEL: 'setSidebarcontentPanel',
 
   SET_ID_CHAT_OPEN: 'setIdChatOpen',
+  SET_IS_CHAT_BUBBLE_OPEN: 'setIsChatBubbleOpen',
 
   SET_BROWSER_SIZE: 'setBrowserSize',
 

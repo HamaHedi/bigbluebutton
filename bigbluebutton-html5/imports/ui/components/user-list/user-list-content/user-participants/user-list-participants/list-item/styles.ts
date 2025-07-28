@@ -350,12 +350,14 @@ const UserAdditionalInformationIcon = styled(Icon)`
 `;
 
 const pulse = (color: string) => keyframes`
-    0% {
-      box-shadow: 0 0 0 0 ${color}80;
-    }
-    100% {
-      box-shadow: 0 0 0 10px ${color}00;
-    }
+  0% {
+    box-shadow: 0 0 0 0 ${color}CC, 0 0 4px 1px ${color}99;
+  }
+  50% {
+    box-shadow: 0 0 0 12px ${color}40, 0 0 12px 2px ${color}66;
+  }
+  100% {
+    box-shadow: 0 0 0 12px ${color}00, 0 0 12px 2px ${color}00;
   }
 `;
 
@@ -418,6 +420,46 @@ const IconRightContainer = styled.div`
   margin: .25rem;  
 `;
 
+const ToggleVoiceButton = styled.div`
+  margin: .25rem;
+  cursor: pointer;
+  padding: 7px;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+
+  &:hover {
+    background-color: ${listItemBgHover};
+  }
+
+  i{
+    font-size: 17px;
+  }
+
+  .muted {
+    color: ${colorDanger};
+  }
+
+  .unmuted {
+    color: ${colorSuccess};
+  }
+`;
+
+const MoreIcon = styled.div`
+  cursor: pointer;
+  padding: 3px;
+  border: none;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export default {
   Avatar,
   Skeleton,
@@ -427,4 +469,6 @@ export default {
   UserNameSub,
   UserName,
   IconRightContainer,
+  ToggleVoiceButton,
+  MoreIcon
 };

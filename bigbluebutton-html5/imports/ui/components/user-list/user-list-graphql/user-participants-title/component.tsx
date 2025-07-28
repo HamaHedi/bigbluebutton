@@ -1,10 +1,15 @@
 import React from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { USER_AGGREGATE_COUNT_SUBSCRIPTION } from '/imports/ui/core/graphql/queries/users';
-import UserTitleOptionsContainer from './user-options-dropdown/component';
+import UserTitleOptionsContainer, { toggleMute } from './user-options-dropdown/component';
 import Styled from './styles';
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
 import { USER_WITH_AUDIO_AGGREGATE_COUNT_SUBSCRIPTION } from './queries';
+import { Icon } from '../../../chat/chat-graphql/chat-message-list/page/chat-message/message-content/notification-content/styles';
+import useWhoIsUnmuted from '/imports/ui/core/hooks/useWhoIsUnmuted';
+import { SET_MUTED } from './user-options-dropdown/mutations';
+import { useMutation } from '@apollo/client';
+import Tooltip from '../../../common/tooltip/component';
 import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
 import useMeeting from '/imports/ui/core/hooks/useMeeting';
 import { User } from '/imports/ui/Types/user';
@@ -32,7 +37,26 @@ const UserTitle: React.FC<UserTitleProps> = ({
   countWithAudio,
   hideUserList,
 }) => {
+  const { data: currentUserData } = useCurrentUser((user) => ({
+    presenter: user.presenter,
+    isModerator: user.isModerator,
+  }));
   const intl = useIntl();
+  const { data: unmutedUsers } = useWhoIsUnmuted();
+  const isNotAllMuted = Object.keys(unmutedUsers).length > 1;
+  const [setMuted] = useMutation(SET_MUTED);
+  const { data: meetingInfo } = useMeeting((meeting: Partial<Meeting>) => ({
+    voiceSettings: meeting?.voiceSettings,
+  }));
+
+  const toggleMuteHandler = () => {
+    const isMeetingMuted = meetingInfo?.voiceSettings?.muteOnStart;
+    toggleMute(!isMeetingMuted, false, setMuted);
+    toggleMute(!!isMeetingMuted, true, setMuted);
+  }
+
+  
+ 
   const userListLabel = hideUserList ? messages.lockedUsersTitle : messages.usersTitle;
 
   return (
@@ -50,6 +74,12 @@ const UserTitle: React.FC<UserTitleProps> = ({
           )}
         </span>
       </Styled.SmallTitle>
+      {currentUserData?.isModerator && 
+      <Tooltip title={"Mute All except presenter"}>
+        <Styled.MuteAll onClick={toggleMuteHandler}>
+          <Icon iconName="mute" className={isNotAllMuted ? 'inactive' : 'active'}/>
+        </Styled.MuteAll>
+      </Tooltip>}
       <UserTitleOptionsContainer />
     </Styled.Container>
   );

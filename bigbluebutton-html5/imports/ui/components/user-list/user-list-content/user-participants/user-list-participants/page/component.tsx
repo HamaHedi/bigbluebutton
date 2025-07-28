@@ -16,11 +16,52 @@ import { Layout } from '/imports/ui/components/layout/layoutTypes';
 import SkeletonUserListItem from '../list-item/skeleton/component';
 import { PluginsContext } from '/imports/ui/components/components-data/plugin-context/context';
 
+interface RaiseHandUser extends User {
+  raiseHandTime: string;
+}
+
+const sortUsersByRaiseHand = (users: User[], raiseHandUsers: RaiseHandUser[]) => {
+  const raiseHandUserMap = new Map<string, RaiseHandUser>();
+  raiseHandUsers.forEach(u => {
+    if (u.userId) {
+      raiseHandUserMap.set(u.userId, u);
+    }
+  });
+
+  const sortedUsers = [...users].sort((a, b) => {
+
+    const aIsMod = !!a.isModerator;
+    const bIsMod = !!b.isModerator;
+    if (aIsMod && !bIsMod) return -1;
+    if (!aIsMod && bIsMod) return 1;
+
+
+    const aRaiseHand = raiseHandUserMap.get(a.userId);
+    const bRaiseHand = raiseHandUserMap.get(b.userId);
+
+    const aHasRaiseHand  = !!aRaiseHand && aRaiseHand.raiseHandTime;
+    const bHasRaiseHand = !!bRaiseHand && bRaiseHand.raiseHandTime;
+
+    if (aHasRaiseHand && bHasRaiseHand) {
+      const aTime = new Date(aRaiseHand.raiseHandTime).getTime();
+      const bTime = new Date(bRaiseHand.raiseHandTime).getTime();
+      return  bTime - aTime;
+    }
+
+    if (aHasRaiseHand && !bHasRaiseHand) return -1;
+    if (!aHasRaiseHand && bHasRaiseHand) return 1;
+    return 0;
+  });
+
+  return sortedUsers;
+};
+
 interface UserListParticipantsContainerProps {
   index: number;
   isLastItem: boolean;
   restOfUsers: number;
   setVisibleUsers: React.Dispatch<React.SetStateAction<{ [key: number]: User[]; }>>;
+  raiseHandUsers: User[];
 }
 
 interface UsersListParticipantsPage {
@@ -65,7 +106,7 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
                 open={user.userId === openUserAction}
                 setOpenUserAction={setOpenUserAction}
               >
-                <ListItem index={offset + idx} user={user} lockSettings={meeting.lockSettings} />
+                <ListItem index={offset + idx} user={user} lockSettings={meeting.lockSettings} currentUser={currentUser as User} usersPolicies={meeting.usersPolicies} isBreakout={meeting.isBreakout} />
               </UserActions>
             </Styled.UserListItem>
           );
@@ -80,6 +121,7 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
   isLastItem,
   restOfUsers,
   setVisibleUsers,
+  raiseHandUsers,
 }) => {
   const offset = index * 50;
   const limit = useRef(50);
@@ -99,7 +141,7 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     data: usersData,
     loading: usersLoading,
   } = useLoadedUserList({ offset, limit: limit.current }, (u) => u) as GraphqlDataHookSubscriptionResponse<Array<User>>;
-  const users = usersData ?? [];
+  const users = sortUsersByRaiseHand(usersData ?? [], raiseHandUsers as RaiseHandUser[]) ?? [];
 
   const { data: currentUser, loading: currentUserLoading } = useCurrentUser((c: Partial<User>) => ({
     userId: c.userId,

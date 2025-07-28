@@ -127,6 +127,35 @@ const intlMessages = defineMessages({
   },
 });
 
+export const toggleMute = (muted: boolean, exceptPresenter: boolean, setMuted: ({ variables }: { variables: { muted: boolean, exceptPresenter: boolean } }) => void) => {
+  setMuted({
+    variables: {
+      muted,
+      exceptPresenter,
+    },
+  });
+
+  if (!muted) {
+    return logger.info(
+      {
+        logCode: 'useroptions_unmute_all',
+        extraInfo: { logType: 'moderator_action' },
+      },
+      'moderator disabled meeting mute',
+    );
+  }
+
+  const logCode = exceptPresenter ? 'useroptions_mute_all_except_presenter' : 'useroptions_mute_all';
+  const logMessage = exceptPresenter ? 'moderator enabled meeting mute, all users muted except presenter' : 'moderator enabled meeting mute, all users muted';
+  return logger.info(
+    {
+      logCode,
+      extraInfo: { logType: 'moderator_action' },
+    },
+    logMessage,
+  );
+};
+
 interface RenderModalProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
