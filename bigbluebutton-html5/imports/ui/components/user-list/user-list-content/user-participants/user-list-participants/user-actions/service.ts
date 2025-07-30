@@ -44,6 +44,8 @@ export const generateActionsPermissions = (
     && isMuted
     && (amISubjectUser || usersPolicies?.allowModsToUnmuteUsers);
 
+  console.log('allowedToUnmuteAudio' , { hasAuthority, subjectUserInAudio, subjectUserVoice, isMuted ,amISubjectUser, usersPolicies})
+
   // if currentUser is a moderator, allow removing other users
   const allowedToRemove = amIModerator
     && !amISubjectUser
