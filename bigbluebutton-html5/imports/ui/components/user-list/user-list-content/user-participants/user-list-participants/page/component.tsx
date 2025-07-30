@@ -88,6 +88,8 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
       ...pluginsExtensibleAreasAggregatedState.userListDropdownItems,
     ];
   }
+console.log("currentUsercurrentUsercurrentUser",currentUser)
+console.log("usersusersusersusers",users)
 
   return (
     <>
