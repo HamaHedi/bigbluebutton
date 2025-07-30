@@ -88,11 +88,14 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
       ...pluginsExtensibleAreasAggregatedState.userListDropdownItems,
     ];
   }
-
-  return (
+console.log("currentUsercurrentUsercurrentUser",currentUser)
+console.log("usersusersusersusers",users)
+const filteredUsers = currentUser?.isModerator 
+  ? users 
+  : users?.filter(user => user.isModerator === true || user?.userId === currentUser?.userId);  return (
     <>
       {
-        users.map((user, idx) => {
+        filteredUsers?.map((user, idx) => {
           return (
             <Styled.UserListItem key={user.userId} style={{ direction: isRTL }}>
               <UserActions
