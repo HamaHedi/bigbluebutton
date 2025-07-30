@@ -466,9 +466,10 @@ const UserActions: React.FC<UserActionsProps> = ({
       icon: 'mute',
     },
     {
-      allowed: allowedToUnmuteAudio
-        && !lockSettings?.disableMic
-        && !isBreakout,
+      allowed: true,
+      // allowed: allowedToUnmuteAudio
+      //   && !lockSettings?.disableMic
+      //   && !isBreakout,
       key: 'unmute',
       label: intl.formatMessage(messages.UnmuteUserAudioLabel),
       onClick: () => {
