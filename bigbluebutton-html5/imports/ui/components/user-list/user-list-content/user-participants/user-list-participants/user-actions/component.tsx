@@ -466,11 +466,12 @@ const UserActions: React.FC<UserActionsProps> = ({
       icon: 'mute',
     },
     {
-      allowed: true,
+      allowed: allowedToUnmuteAudio
+        && !lockSettings?.disableMic
+        && !isBreakout,
       key: 'unmute',
       label: intl.formatMessage(messages.UnmuteUserAudioLabel),
       onClick: () => {
-        console.log('unmute' , { allowedToUnmuteAudio , isBreakout ,lockSettings })
         toggleVoice(user.userId, false, voiceToggle);
         setOpenUserAction(null);
       },
