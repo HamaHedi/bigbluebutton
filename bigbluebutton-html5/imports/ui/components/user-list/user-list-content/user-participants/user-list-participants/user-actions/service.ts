@@ -113,6 +113,7 @@ export const isVideoPinEnabledForCurrentUser = (
 // session for chats the current user started
 
 export const toggleVoice = (userId: string, muted: boolean, voiceToggle: (userId: string, muted: boolean) => void) => {
+  console.log('toggleVoice' , { userId, muted ,userID: Auth.userID })
   if (userId === Auth.userID) {
     toggleMuteMicrophone(!muted, voiceToggle);
   } else {
