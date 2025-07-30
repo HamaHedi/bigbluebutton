@@ -325,6 +325,8 @@ const UserActions: React.FC<UserActionsProps> = ({
     (page: { pageId: string; userId: string }) => (page.pageId === pageId && page.userId === user.userId),
   );
 
+  console.log({allowedToUnmuteAudio , isBreakout ,lockSettings })
+
   const [setRole] = useMutation(SET_ROLE);
   const [chatCreateWithUser] = useMutation(CHAT_CREATE_WITH_USER);
   const [setCameraPinned] = useMutation(SET_CAMERA_PINNED);

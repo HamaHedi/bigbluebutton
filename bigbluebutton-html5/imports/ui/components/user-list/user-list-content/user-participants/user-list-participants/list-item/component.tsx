@@ -256,8 +256,7 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, lockSettings, index ,
       return <Styled.ToggleVoiceButton onClick={(e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
         voiceToggle(user.userId, !isMuted)
-        
-      }}>
+        }}>
         <Icon iconName={isMuted ? 'mute' : 'unmute'} className={isMuted ? 'muted' : 'unmuted'} />
       </Styled.ToggleVoiceButton>
     }
