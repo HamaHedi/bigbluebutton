@@ -90,11 +90,12 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
   }
 console.log("currentUsercurrentUsercurrentUser",currentUser)
 console.log("usersusersusersusers",users)
-
-  return (
+const filteredUsers = currentUser?.isModerator 
+  ? users 
+  : users?.filter(user => user.isModerator === true || user?.userId === currentUser?.userId);  return (
     <>
       {
-        users.map((user, idx) => {
+        filteredUsers?.map((user, idx) => {
           return (
             <Styled.UserListItem key={user.userId} style={{ direction: isRTL }}>
               <UserActions
