@@ -41,7 +41,6 @@ const ChatListItem = (props: ChatListItemProps) => {
   const sidebarContent = layoutSelectInput((i: Input) => i.sidebarContent);
   const idChatOpen = layoutSelect((i: Layout) => i.idChatOpen);
   const layoutContextDispatch = layoutDispatch();
-  const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
 
   const { sidebarContentPanel } = sidebarContent;
   const sidebarContentIsOpen = sidebarContent.isOpen;
@@ -135,7 +134,7 @@ const ChatListItem = (props: ChatListItemProps) => {
     e.stopPropagation();
     layoutContextDispatch({
       type: ACTIONS.SET_IS_CHAT_BUBBLE_OPEN,
-      value: !isChatBubbleOpen,
+      value: true,
     });
     closeChat()
     layoutContextDispatch({
