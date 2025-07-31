@@ -259,7 +259,7 @@ const OpenChatButton = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  margin: 0 3px;
+  margin-inline-end: 5px;
   svg {
     width: 16px;
     height: 16px;
