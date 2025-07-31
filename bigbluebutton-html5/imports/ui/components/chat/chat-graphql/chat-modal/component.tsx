@@ -6,7 +6,28 @@ import { Icon } from '../chat-message-list/page/chat-message/message-content/not
 import { layoutDispatch, layoutSelect } from '../../../layout/context'
 import { ACTIONS } from '../../../layout/enums'
 import { Layout } from '../../../layout/layoutTypes'
+import { defineMessages, useIntl } from 'react-intl';
+import { GET_CHAT_DATA, GetChatDataResponse } from '../chat-header/queries'
+import {  useQuery } from '@apollo/client';
 
+const intlMessages = defineMessages({
+    closeChatLabel: {
+      id: 'app.chat.closeChatLabel',
+      description: 'aria-label for closing chat button',
+    },
+    hideChatLabel: {
+      id: 'app.chat.hideChatLabel',
+      description: 'aria-label for hiding chat button',
+    },
+    titlePublic: {
+      id: 'app.chat.titlePublic',
+      description: 'Public chat title',
+    },
+    titlePrivate: {
+      id: 'app.chat.titlePrivate',
+      description: 'Private chat title',
+    },
+  });
 
 export const ChatModalContainer = () => {
     const fullscreen = layoutSelect((i : Layout) => i.fullscreen);
@@ -20,14 +41,23 @@ export const ChatModalContainer = () => {
 
 const ChatModal = () => {
     const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
-    
+    const intl = useIntl();
     const layoutContextDispatch = layoutDispatch();
+    const idChatOpen = layoutSelect((i: Layout) => i.idChatOpen);
     const closeChatModal = () => {
         layoutContextDispatch({
             type: ACTIONS.SET_IS_CHAT_BUBBLE_OPEN,
             value: false,
         })
     }
+
+    const {
+        data: chatData,
+      } = useQuery<GetChatDataResponse>(GET_CHAT_DATA, {
+        variables: { chatId: idChatOpen },
+      });
+
+    const isPublicChat = chatData?.chat?.[0]?.public;
 
     const [isDragging, setIsDragging] = useState(false)
     const [position, setPosition] = useState({ x: 20, y: 20 })
@@ -131,6 +161,10 @@ const ChatModal = () => {
         setIsResizing(true)
     }
 
+
+    const title = isPublicChat ? intl.formatMessage(intlMessages.titlePublic)
+    : intl.formatMessage(intlMessages.titlePrivate, { participantName: chatData?.chat[0]?.participant?.name });
+
   if (!isChatBubbleOpen) return null;
 
   return (
@@ -146,7 +180,7 @@ const ChatModal = () => {
         isResizing={isResizing}
     >
         <Styled.ChatHeader onMouseDown={handleDragStart}>
-            <Styled.HeaderTitle>Chat</Styled.HeaderTitle>
+            <Styled.HeaderTitle>{title}</Styled.HeaderTitle>
             <Styled.CloseButton onClick={closeChatModal}>
                 <Icon iconName="close" />
             </Styled.CloseButton>
