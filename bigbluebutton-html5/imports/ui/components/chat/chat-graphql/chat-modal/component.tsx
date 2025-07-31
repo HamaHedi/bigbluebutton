@@ -123,7 +123,7 @@ const ChatModal = () => {
         setIsResizing(true)
     }
 
-    if (!isChatBubbleOpen || !isScreenshareFullScreen) return null;
+  if (!isChatBubbleOpen) return null;
 
   return (
     <Styled.ChatModal
