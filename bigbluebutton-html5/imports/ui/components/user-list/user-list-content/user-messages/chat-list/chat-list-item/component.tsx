@@ -41,6 +41,7 @@ const ChatListItem = (props: ChatListItemProps) => {
   const sidebarContent = layoutSelectInput((i: Input) => i.sidebarContent);
   const idChatOpen = layoutSelect((i: Layout) => i.idChatOpen);
   const layoutContextDispatch = layoutDispatch();
+  const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
 
   const { sidebarContentPanel } = sidebarContent;
   const sidebarContentIsOpen = sidebarContent.isOpen;
@@ -76,23 +77,27 @@ const ChatListItem = (props: ChatListItemProps) => {
     }
   }, [idChatOpen, sidebarContentIsOpen, sidebarContentPanel, chat]);
 
+  const closeChat = ()=> {
+    layoutContextDispatch({
+      type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
+      value: false,
+    });
+    layoutContextDispatch({
+      type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
+      value: PANELS.NONE,
+    });
+    layoutContextDispatch({
+      type: ACTIONS.SET_ID_CHAT_OPEN,
+      value: '',
+    });
+  }
+
   const handleClickToggleChat = () => {
     // Verify if chat panel is open
 
     if (sidebarContentIsOpen && sidebarContentPanel === PANELS.CHAT) {
       if (idChatOpen === chat.chatId) {
-        layoutContextDispatch({
-          type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
-          value: false,
-        });
-        layoutContextDispatch({
-          type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
-          value: PANELS.NONE,
-        });
-        layoutContextDispatch({
-          type: ACTIONS.SET_ID_CHAT_OPEN,
-          value: '',
-        });
+        closeChat()
       } else {
         setTimeout(() => {
           layoutContextDispatch({
@@ -129,9 +134,9 @@ const ChatListItem = (props: ChatListItemProps) => {
     e.stopPropagation();
     layoutContextDispatch({
       type: ACTIONS.SET_IS_CHAT_BUBBLE_OPEN,
-      value: true,
+      value: !isChatBubbleOpen,
     });
-    handleClickToggleChat()
+    closeChat()
   }
 
   const localizedChatName = isPublicGroupChat(chat)

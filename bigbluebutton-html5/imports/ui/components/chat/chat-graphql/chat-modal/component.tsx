@@ -9,7 +9,10 @@ import { Layout } from '../../../layout/layoutTypes'
 
 const ChatModal = () => {
     const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
-
+    const fullscreen = layoutSelect((i : Layout) => i.fullscreen);
+    const { element } = fullscreen;
+    const isScreenshareFullScreen = (element === 'Screenshare');
+    
     const layoutContextDispatch = layoutDispatch();
     const closeChatModal = () => {
         layoutContextDispatch({
@@ -51,21 +54,34 @@ const ChatModal = () => {
             let newX = position.x
             let newY = position.y
             
+            // Calculate the current edges
+            const currentRight = position.x + size.width
+            const currentBottom = position.y + size.height
+            
             // Handle different resize directions
             if (resizeHandle.includes('right')) {
-                newWidth = Math.max(300, e.clientX - rect.left)
+                newWidth = Math.max(300, e.clientX - position.x)
             }
             if (resizeHandle.includes('left')) {
-                newWidth = Math.max(300, rect.right - e.clientX)
-                newX = Math.min(position.x, e.clientX)
+                const maxLeft = currentRight - 300 // Minimum width constraint
+                newX = Math.max(0, Math.min(e.clientX, maxLeft))
+                newWidth = currentRight - newX
             }
             if (resizeHandle.includes('bottom')) {
-                newHeight = Math.max(400, e.clientY - rect.top)
+                newHeight = Math.max(400, e.clientY - position.y)
             }
             if (resizeHandle.includes('top')) {
-                newHeight = Math.max(400, rect.bottom - e.clientY)
-                newY = Math.min(position.y, e.clientY)
+                const maxTop = currentBottom - 400 // Minimum height constraint
+                newY = Math.max(0, Math.min(e.clientY, maxTop))
+                newHeight = currentBottom - newY
             }
+            
+            // Ensure the modal stays within screen bounds
+            const maxX = window.innerWidth - newWidth
+            const maxY = window.innerHeight - newHeight
+            
+            newX = Math.max(0, Math.min(newX, maxX))
+            newY = Math.max(0, Math.min(newY, maxY))
             
             setSize({ width: newWidth, height: newHeight })
             setPosition({ x: newX, y: newY })
@@ -107,7 +123,7 @@ const ChatModal = () => {
         setIsResizing(true)
     }
 
-    if (!isChatBubbleOpen) return null;
+    if (!isChatBubbleOpen || !isScreenshareFullScreen) return null;
 
   return (
     <Styled.ChatModal
@@ -135,35 +151,35 @@ const ChatModal = () => {
         
         <Styled.ResizeHandle 
             position="top" 
-            onMouseDown={(e) => handleResizeStart(e, 'top')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'top')} 
         />
         <Styled.ResizeHandle 
             position="right" 
-            onMouseDown={(e) => handleResizeStart(e, 'right')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'right')} 
         />
         <Styled.ResizeHandle 
             position="bottom" 
-            onMouseDown={(e) => handleResizeStart(e, 'bottom')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'bottom')} 
         />
         <Styled.ResizeHandle 
             position="left" 
-            onMouseDown={(e) => handleResizeStart(e, 'left')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'left')} 
         />
         <Styled.ResizeHandle 
             position="top-right" 
-            onMouseDown={(e) => handleResizeStart(e, 'top-right')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'top-right')} 
         />
         <Styled.ResizeHandle 
             position="bottom-right" 
-            onMouseDown={(e) => handleResizeStart(e, 'bottom-right')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'bottom-right')} 
         />
         <Styled.ResizeHandle 
             position="bottom-left" 
-            onMouseDown={(e) => handleResizeStart(e, 'bottom-left')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'bottom-left')} 
         />
         <Styled.ResizeHandle 
             position="top-left" 
-            onMouseDown={(e) => handleResizeStart(e, 'top-left')} 
+            onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => handleResizeStart(e, 'top-left')} 
         />
     </Styled.ChatModal>
   )
