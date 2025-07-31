@@ -125,7 +125,7 @@ const ChatListItem = (props: ChatListItemProps) => {
     }
   };
 
-  const openChatModal = (e) => {
+  const openChatModal = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     layoutContextDispatch({
       type: ACTIONS.SET_IS_CHAT_BUBBLE_OPEN,

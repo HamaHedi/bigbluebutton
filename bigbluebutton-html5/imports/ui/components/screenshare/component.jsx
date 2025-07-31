@@ -405,10 +405,6 @@ class ScreenshareComponent extends React.Component {
     )
   }
 
-  renderChatModal() {
-    return (<ChatModal />)
-  }
-
   renderVolumeSlider() {
     const { showHoverToolBar } = this.state;
 
@@ -662,7 +658,6 @@ class ScreenshareComponent extends React.Component {
         >
           {this.renderScreenshareButtons()}
           {this.renderChatBubble()}
-          {this.renderChatModal()}
           {isPresenter
             ? this.renderScreensharePresenter()
             : this.renderScreenshareDefault()}
