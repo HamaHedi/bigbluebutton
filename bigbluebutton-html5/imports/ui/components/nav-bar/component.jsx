@@ -425,11 +425,11 @@ class NavBar extends Component {
             </Styled.Right>
           </Styled.Top>
         )}
-        <Styled.Bottom>
+       {/*<Styled.Bottom>
           <h2 className="sr-only">{intl.formatMessage(intlMessages.speakersListLabel)}</h2>
           {enableTalkingIndicator ? <TalkingIndicator amIModerator={amIModerator} /> : null}
           <TimerIndicatorContainer />
-        </Styled.Bottom>
+        </Styled.Bottom> */}
       </Styled.Navbar>
     );
   }
