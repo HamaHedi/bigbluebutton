@@ -8,12 +8,6 @@ import UserAvatar from '/imports/ui/components/user-avatar/component';
 import { ACTIONS, PANELS } from '../../layout/enums';
 import Icon from '/imports/ui/components/common/icon/component';
 
-const OpenInNewTabIcon = () => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g class="open-in-new-tab-outline"><g fill="#4e5a66" fill-rule="evenodd" class="Vector" clip-rule="evenodd"><path d="M5 4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5.263a1 1 0 1 1 2 0V19a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3h5.017a1 1 0 1 1 0 2z"/><path d="M21.411 2.572a.963.963 0 0 1 0 1.36l-8.772 8.786a.96.96 0 0 1-1.358 0a.963.963 0 0 1 0-1.36l8.773-8.786a.96.96 0 0 1 1.357 0"/><path d="M21.04 2c.53 0 .96.43.96.962V8c0 .531-.47 1-1 1s-1-.469-1-1V4h-4c-.53 0-1-.469-1-1s.43-1 .96-1z"/></g></g></svg>
-  );
-};
-
 const DEBOUNCE_TIME = 1000;
 
 let globalAppplyStateToProps = () => {};
@@ -134,19 +128,11 @@ const ChatListItem = ({
     }
   };
 
-  const openChatModal = (e) => {
-    e.stopPropagation();
-    layoutContextDispatch({
-      type: ACTIONS.SET_IS_CHAT_BUBBLE_OPEN,
-      value: true,
-    });
-    handleClickToggleChat()
-  }
+  
 
   const localizedChatName = isPublicChat(chat)
     ? intl.formatMessage(intlMessages.titlePublic)
     : chat.name;
-
   const arialabel = `${localizedChatName} ${
     stateUreadCount > 1
       ? intl.formatMessage(intlMessages.unreadPlural, { unreadCount: stateUreadCount })
@@ -196,9 +182,7 @@ const ChatListItem = ({
               </Styled.ChatNameMain>
             ) : null}
         </Styled.ChatName>
-          <Styled.OpenChatButton onClick={openChatModal}>
-          <OpenInNewTabIcon />
-        </Styled.OpenChatButton>
+       
         {(stateUreadCount > 0)
           ? (
             <Styled.UnreadMessages aria-label={arialabel}>

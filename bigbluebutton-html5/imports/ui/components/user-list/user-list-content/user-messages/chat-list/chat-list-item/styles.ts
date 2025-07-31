@@ -254,12 +254,25 @@ const UnreadMessagesText = styled.div`
   background-color: ${unreadMessagesBg};
 `;
 
+const OpenChatButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 3px;
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+`;
+
 export default {
   ChatListItemLink,
   ChatIcon,
   ChatName,
   ChatNameMain,
   ChatListItem,
+  OpenChatButton,
   ChatThumbnail,
   UnreadMessages,
   UnreadMessagesText,
