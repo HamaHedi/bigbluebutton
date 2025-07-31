@@ -93,17 +93,6 @@ const ChatThumbnail = styled.div`
   font-size: 175%;
 `;
 
-const OpenChatButton = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin: 0 3px;
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`;
 
 const UnreadMessages = styled(ContentStyled.UnreadMessages)``;
 const UnreadMessagesText = styled(ContentStyled.UnreadMessagesText)``;
