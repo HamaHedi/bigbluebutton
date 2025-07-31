@@ -86,10 +86,7 @@ const ChatListItem = (props: ChatListItemProps) => {
       type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
       value: PANELS.NONE,
     });
-    layoutContextDispatch({
-      type: ACTIONS.SET_ID_CHAT_OPEN,
-      value: '',
-    });
+    
   }
 
   const handleClickToggleChat = () => {
@@ -98,6 +95,10 @@ const ChatListItem = (props: ChatListItemProps) => {
     if (sidebarContentIsOpen && sidebarContentPanel === PANELS.CHAT) {
       if (idChatOpen === chat.chatId) {
         closeChat()
+        layoutContextDispatch({
+          type: ACTIONS.SET_ID_CHAT_OPEN,
+          value: '',
+        });
       } else {
         setTimeout(() => {
           layoutContextDispatch({
@@ -137,6 +138,10 @@ const ChatListItem = (props: ChatListItemProps) => {
       value: !isChatBubbleOpen,
     });
     closeChat()
+    layoutContextDispatch({
+      type: ACTIONS.SET_ID_CHAT_OPEN,
+      value: chat.chatId,
+    });
   }
 
   const localizedChatName = isPublicGroupChat(chat)
