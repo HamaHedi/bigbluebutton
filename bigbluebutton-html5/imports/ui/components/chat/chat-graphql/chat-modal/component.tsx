@@ -7,11 +7,19 @@ import { layoutDispatch, layoutSelect } from '../../../layout/context'
 import { ACTIONS } from '../../../layout/enums'
 import { Layout } from '../../../layout/layoutTypes'
 
-const ChatModal = () => {
-    const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
+
+export const ChatModalContainer = () => {
     const fullscreen = layoutSelect((i : Layout) => i.fullscreen);
     const { element } = fullscreen;
     const isScreenshareFullScreen = (element === 'Screenshare');
+    if (!isScreenshareFullScreen) return null;
+
+    return (<ChatModal />)
+}
+
+
+const ChatModal = () => {
+    const isChatBubbleOpen = layoutSelect((i : Layout) => i.isChatBubbleOpen);
     
     const layoutContextDispatch = layoutDispatch();
     const closeChatModal = () => {
@@ -123,7 +131,7 @@ const ChatModal = () => {
         setIsResizing(true)
     }
 
-    if (!isChatBubbleOpen || !isScreenshareFullScreen) return null;
+  if (!isChatBubbleOpen) return null;
 
   return (
     <Styled.ChatModal
