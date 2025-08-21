@@ -55,9 +55,8 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
       enabled: true,
       component: 'LoadingScreenHOC',
       monitoringDelay: 0, 
-      timeoutDuration: 60000, 
+      timeoutDuration: 30000, 
       logCode: 'loading_screen_timeout_error',
-     
     });
 
     return () => {

@@ -150,7 +150,6 @@ export default class BBBReporter {
           break;
       }
 
-      console.log("sent report", logData);
       fetch('https://8efb48d25b9d.ngrok-free.app/api/bbb-reporter?project=ostedhy', {
         method: 'POST',
         body: JSON.stringify(logData),
