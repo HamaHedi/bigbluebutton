@@ -126,7 +126,7 @@ const NavBarContainer = ({ children, ...props }) => {
         // TODO: Remove/Replace
         isMeteorConnected: true,
         hideTopRow: navBar.hideTopRow,
-        showSessionDetailsOnJoin: SHOW_SESSION_DETAILS_ON_JOIN,
+        showSessionDetailsOnJoin: false,
         ...props,
       }}
       style={{ ...navBar }}
