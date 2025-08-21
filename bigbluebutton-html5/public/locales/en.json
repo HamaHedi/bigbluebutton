@@ -749,7 +749,7 @@
     "app.audioModal.listenOnlyLabel": "Listen only",
     "app.audioModal.microphoneDesc": "Joins audio conference with mic",
     "app.audioModal.listenOnlyDesc": "Joins audio conference as listen only",
-    "app.audioModal.audioChoiceLabel": "How would you like to join the audio? Edited by Adem  fcgcfc",
+    "app.audioModal.audioChoiceLabel": "How would you like to join the audio? Edited by hazem",
     "app.audioModal.iOSBrowser": "Audio/Video not supported",
     "app.audioModal.iOSErrorDescription": "At this time audio and video are not supported on Chrome for iOS.",
     "app.audioModal.iOSErrorRecommendation": "We recommend using Safari iOS.",
