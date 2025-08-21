@@ -27,7 +27,7 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
   children,
 }) => {
   const [loading, setLoading] = React.useState<LoadingContent>({
-    isLoading: false,
+    isLoading: true,
   });
   
   const reporterRef = React.useRef<ReturnType<typeof createTimeoutReporter> | null>(null);
@@ -89,9 +89,9 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
     <LoadingContext.Provider value={{
       isLoading: loading.isLoading,
       setLoading: (isLoading: boolean) => {
-        setLoading({
-          isLoading,
-        });
+        // setLoading({
+        //   isLoading,
+        // });
       },
     }}
     >
