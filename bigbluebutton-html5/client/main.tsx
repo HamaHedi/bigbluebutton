@@ -11,6 +11,10 @@ import CustomUsersSettings from '/imports/ui/components/join-handler/custom-user
 import MeetingClient from '/client/meetingClient';
 import CustomStyles from '/imports/ui/components/custom-styles/component';
 import 'react-toastify/dist/ReactToastify.css';
+import { warnConsoleOpen } from '/imports/utils/warnConsoleOpen';
+
+// warn if console is open
+warnConsoleOpen();
 
 const STARTUP_CRASH_METADATA = { logCode: 'app_startup_crash', logMessage: 'Possible startup crash' };
 /* eslint-disable */
