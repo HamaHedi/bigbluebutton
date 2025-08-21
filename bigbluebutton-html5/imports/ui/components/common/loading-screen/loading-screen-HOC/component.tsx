@@ -45,6 +45,11 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
   const [loading, setLoading] = React.useState<LoadingContent>({
     isLoading: false,
   });
+
+  logger.info('LoadingScreenHOC', {
+    loading,
+    Auth,
+  });
   
   const loadingStartTimeRef = React.useRef<number | null>(null);
   const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -128,44 +133,7 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
 
   const sendErrorReport = async (errorReport: ErrorReport) => {
     try {
-      logger.error({
-        logCode: 'loading_screen_timeout_error',
-        extraInfo: {
-          errorReport,
-          errorType: 'LoadingTimeout',
-          component: 'LoadingScreenHOC',
-        },
-      }, `Loading screen stuck for ${Math.round(errorReport.loadingDuration / 1000)} seconds`);
-
-      // Also log individual components for better searchability
-      logger.warn({
-        logCode: 'loading_screen_performance_data',
-        extraInfo: {
-          loadingDuration: errorReport.loadingDuration,
-          memoryUsage: errorReport.performanceMetrics.memory,
-          sessionInfo: errorReport.sessionInfo,
-        },
-      }, 'Loading screen performance metrics');
-
-      if (errorReport.consoleErrors.length > 0) {
-        logger.error({
-          logCode: 'loading_screen_console_errors',
-          extraInfo: {
-            errors: errorReport.consoleErrors.slice(-20), // Last 20 errors
-            totalErrorCount: errorReport.consoleErrors.length,
-          },
-        }, `${errorReport.consoleErrors.length} console errors during loading`);
-      }
-
-      if (errorReport.networkRequests.length > 0) {
-        logger.info({
-          logCode: 'loading_screen_network_requests',
-          extraInfo: {
-            requests: errorReport.networkRequests.slice(-50), // Last 50 requests
-            totalRequestCount: errorReport.networkRequests.length,
-          },
-        }, `${errorReport.networkRequests.length} network requests during loading`);
-      }
+     logger.error('Sending error report:', errorReport);
 
     } catch (error) {
       console.error('Failed to send error report:', error);
@@ -185,7 +153,7 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
       timeoutRef.current = setTimeout(() => {
         const errorReport = collectErrorReport();
         sendErrorReport(errorReport);
-      }, 60000); // 60 seconds
+      }, 10000); // 60 seconds
 
     } else {
       // Clear timeout when loading stops
@@ -220,7 +188,7 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
           )
           : null
       }
-      {children}
+      {!loading.isLoading && children}
     </LoadingContext.Provider>
   );
 };
