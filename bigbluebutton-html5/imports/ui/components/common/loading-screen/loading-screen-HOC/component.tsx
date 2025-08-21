@@ -188,7 +188,7 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
           )
           : null
       }
-      {!loading.isLoading && children}
+      {children}
     </LoadingContext.Provider>
   );
 };
