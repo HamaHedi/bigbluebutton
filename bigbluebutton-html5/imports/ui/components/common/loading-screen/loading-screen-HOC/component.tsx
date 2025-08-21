@@ -70,6 +70,7 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
     if (loading.isLoading) {
       // Start the reporter
       if (reporterRef.current) {
+        logger.info('Starting reporter for loading screen');
         reporterRef.current.start({
           component: 'LoadingScreenHOC',
           loadingType: 'initial-load',

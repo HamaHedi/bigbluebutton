@@ -19,7 +19,7 @@ export default class BBBReporter {
   constructor(config: ReporterConfig) {
     this.config = {
       enabled: true,
-      monitoringDelay: 30000, // 30 seconds
+      monitoringDelay: 5000, // 5 seconds
       timeoutDuration: 60000, // 60 seconds
       maxConsoleErrors: 20,
       maxNetworkRequests: 50,
