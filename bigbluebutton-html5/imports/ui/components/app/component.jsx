@@ -49,6 +49,8 @@ import VoiceActivityAdapter from '../../core/adapters/voice-activity';
 import LayoutObserver from '../layout/observer';
 import BBBLiveKitRoomContainer from '/imports/ui/components/livekit/component';
 import { quickReport } from '/imports/utils/bbb-reporter';
+import ChatModal from '../chat/chat-graphql/chat-modal/component';
+
 
 const intlMessages = defineMessages({
   userListLabel: {
@@ -437,6 +439,7 @@ class App extends Component {
           {this.renderActionsBar()}
           <EmojiRainContainer />
           <VoiceActivityAdapter />
+          <ChatModal />
         </Styled.Layout>
       </>
     );

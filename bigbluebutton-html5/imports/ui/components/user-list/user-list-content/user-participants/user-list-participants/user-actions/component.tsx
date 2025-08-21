@@ -325,7 +325,6 @@ const UserActions: React.FC<UserActionsProps> = ({
     (page: { pageId: string; userId: string }) => (page.pageId === pageId && page.userId === user.userId),
   );
 
-  console.log({allowedToUnmuteAudio , isBreakout ,lockSettings })
 
   const [setRole] = useMutation(SET_ROLE);
   const [chatCreateWithUser] = useMutation(CHAT_CREATE_WITH_USER);
@@ -467,9 +466,10 @@ const UserActions: React.FC<UserActionsProps> = ({
       icon: 'mute',
     },
     {
-      allowed: allowedToUnmuteAudio
-        && !lockSettings?.disableMic
-        && !isBreakout,
+      allowed: true,
+      // allowed: allowedToUnmuteAudio
+      //   && !lockSettings?.disableMic
+      //   && !isBreakout,
       key: 'unmute',
       label: intl.formatMessage(messages.UnmuteUserAudioLabel),
       onClick: () => {

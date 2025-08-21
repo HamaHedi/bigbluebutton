@@ -334,7 +334,7 @@ const ChatListPageContainer: React.FC<ChatListPageContainerProps> = ({
         chatMessageData = data.chat_message_public.filter(
           message =>
             message?.user?.userId === currentUserId ||
-            message?.senderRole === "MODERATOR"
+            message.senderRole === "MODERATOR"
         );
       }
     } else if ('chat_message_private' in data) {

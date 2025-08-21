@@ -79,6 +79,7 @@ const ChatListItem = ({
     setStateUreadCount(chat.unreadCounter);
   }
 
+
   useEffect(() => {
     if (chat.userId !== PUBLIC_CHAT_KEY && chat.userId === idChatOpen) {
       layoutContextDispatch({
@@ -127,10 +128,11 @@ const ChatListItem = ({
     }
   };
 
+  
+
   const localizedChatName = isPublicChat(chat)
     ? intl.formatMessage(intlMessages.titlePublic)
     : chat.name;
-
   const arialabel = `${localizedChatName} ${
     stateUreadCount > 1
       ? intl.formatMessage(intlMessages.unreadPlural, { unreadCount: stateUreadCount })
@@ -180,6 +182,7 @@ const ChatListItem = ({
               </Styled.ChatNameMain>
             ) : null}
         </Styled.ChatName>
+       
         {(stateUreadCount > 0)
           ? (
             <Styled.UnreadMessages aria-label={arialabel}>

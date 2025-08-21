@@ -44,6 +44,8 @@ export const generateActionsPermissions = (
     && isMuted
     && (amISubjectUser || usersPolicies?.allowModsToUnmuteUsers);
 
+  console.log('allowedToUnmuteAudio' , { hasAuthority, subjectUserInAudio, subjectUserVoice, isMuted ,amISubjectUser, usersPolicies})
+
   // if currentUser is a moderator, allow removing other users
   const allowedToRemove = amIModerator
     && !amISubjectUser
@@ -113,6 +115,7 @@ export const isVideoPinEnabledForCurrentUser = (
 // session for chats the current user started
 
 export const toggleVoice = (userId: string, muted: boolean, voiceToggle: (userId: string, muted: boolean) => void) => {
+  console.log('toggleVoice' , { userId, muted ,userID: Auth.userID })
   if (userId === Auth.userID) {
     toggleMuteMicrophone(!muted, voiceToggle);
   } else {

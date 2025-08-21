@@ -31,7 +31,7 @@ import deviceInfo from '/imports/utils/deviceInfo';
 import { uniqueId } from '/imports/utils/string-utils';
 import Session from '/imports/ui/services/storage/in-memory';
 import ChatBubble from '../chat/chat-graphql/chat-bubble/component';
-import ChatModal from '../chat/chat-graphql/chat-modal/component';
+import ChatModal, { ChatModalContainer } from '../chat/chat-graphql/chat-modal/component';
 import { layoutSelect } from '../layout/context';
 
 const MOBILE_HOVER_TIMEOUT = 5000;
@@ -406,7 +406,7 @@ class ScreenshareComponent extends React.Component {
   }
 
   renderChatModal() {
-    return (<ChatModal />)
+    return (<ChatModalContainer/>)
   }
 
   renderVolumeSlider() {

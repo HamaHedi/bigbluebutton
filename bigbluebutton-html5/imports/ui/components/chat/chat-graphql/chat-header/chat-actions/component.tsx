@@ -106,29 +106,29 @@ const ChatActions: React.FC = () => {
 
   const actions = useMemo(() => {
     const dropdownActions = [
-      {
-        key: uniqueIdsRef.current[0],
-        enable: enableSaveAndCopyPublicChat,
-        icon: 'download',
-        dataTest: 'chatSave',
-        label: intl.formatMessage(intlMessages.save),
-        onClick: () => {
-          getChatMessageHistory();
-          downloadOrCopyRef.current = 'download';
-        },
-      },
-      {
-        key: uniqueIdsRef.current[1],
-        enable: enableSaveAndCopyPublicChat,
-        icon: 'copy',
-        id: 'clipboardButton',
-        dataTest: 'chatCopy',
-        label: intl.formatMessage(intlMessages.copy),
-        onClick: () => {
-          getChatMessageHistory();
-          downloadOrCopyRef.current = 'copy';
-        },
-      },
+      // {
+      //   key: uniqueIdsRef.current[0],
+      //   enable: enableSaveAndCopyPublicChat,
+      //   icon: 'download',
+      //   dataTest: 'chatSave',
+      //   label: intl.formatMessage(intlMessages.save),
+      //   onClick: () => {
+      //     getChatMessageHistory();
+      //     downloadOrCopyRef.current = 'download';
+      //   },
+      // },
+      // {
+      //   key: uniqueIdsRef.current[1],
+      //   enable: enableSaveAndCopyPublicChat,
+      //   icon: 'copy',
+      //   id: 'clipboardButton',
+      //   dataTest: 'chatCopy',
+      //   label: intl.formatMessage(intlMessages.copy),
+      //   onClick: () => {
+      //     getChatMessageHistory();
+      //     downloadOrCopyRef.current = 'copy';
+      //   },
+      // },
       {
         key: uniqueIdsRef.current[2],
         enable: true,

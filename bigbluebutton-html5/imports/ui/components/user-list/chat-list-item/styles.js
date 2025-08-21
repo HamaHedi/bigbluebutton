@@ -93,6 +93,7 @@ const ChatThumbnail = styled.div`
   font-size: 175%;
 `;
 
+
 const UnreadMessages = styled(ContentStyled.UnreadMessages)``;
 const UnreadMessagesText = styled(ContentStyled.UnreadMessagesText)``;
 

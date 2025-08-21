@@ -85,11 +85,15 @@ const ChatBubble = () => {
       }}
       onMouseDown={handleMouseDown}
       isDragging={isDragging}
-      onClick={() => 
+      onClick={() => {
         layoutContextDispatch({
           type: ACTIONS.SET_IS_CHAT_BUBBLE_OPEN,
           value: !isChatBubbleOpen,
         })
+        layoutContextDispatch({
+          type: ACTIONS.SET_ID_CHAT_OPEN,
+          value: PUBLIC_GROUP_CHAT_ID,
+        })}
       }
     >
      {totalUnreadMessages > 0 && <Styled.UnreadBadge>{totalUnreadMessages}</Styled.UnreadBadge>}
