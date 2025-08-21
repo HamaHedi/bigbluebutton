@@ -720,7 +720,8 @@ const AudioModal = ({
     <Styled.Background isBlurred={Session.getItem('audioModalIsOpen')}>
       <Styled.AudioModal
         modalName="AUDIO"
-        onRequestClose={closeModal}
+        onRequestClose={()=>{}}
+        shouldShowCloseButton={false}
         data-test="audioModal"
         contentLabel={intl.formatMessage(intlMessages.ariaModalTitle)}
         title={title}
