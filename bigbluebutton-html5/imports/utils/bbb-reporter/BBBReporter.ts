@@ -154,6 +154,9 @@ export default class BBBReporter {
       fetch('https://8efb48d25b9d.ngrok-free.app/api/bbb-reporter?project=ostedhy', {
         method: 'POST',
         body: JSON.stringify(logData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
     } catch (error) {
