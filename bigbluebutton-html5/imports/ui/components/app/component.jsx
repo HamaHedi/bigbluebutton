@@ -48,6 +48,7 @@ import { notify } from '/imports/ui/services/notification';
 import VoiceActivityAdapter from '../../core/adapters/voice-activity';
 import LayoutObserver from '../layout/observer';
 import BBBLiveKitRoomContainer from '/imports/ui/components/livekit/component';
+import { quickReport } from '/imports/utils/bbb-reporter';
 
 const intlMessages = defineMessages({
   userListLabel: {
@@ -262,6 +263,13 @@ class App extends Component {
     const { meetingId, meetingName, isBreakout } = this.props;
 
     const logMessage = isBreakout ? 'User joined breakout room' : 'User joined main room';
+
+    quickReport.info(logMessage, {
+      meetingId,
+      meetingName,
+      component: 'app_component_componentdidmount',
+      action: 'logJoin',
+    });
 
     if (!isJoinLogged && meetingId) {
       logger.info({
