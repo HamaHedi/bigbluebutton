@@ -2,6 +2,9 @@ import { MonitoringManager } from './MonitoringManager';
 import { createBaseErrorReport, getLogger } from './utils';
 import { ErrorReport, ReporterConfig } from './types';
 
+const PROJECT_NAME = 'takiacademy';
+const API_URL = `https://8efb48d25b9d.ngrok-free.app/api/bbb-reporter?project=${PROJECT_NAME}`;
+
 export default class BBBReporter {
   private config: Required<ReporterConfig>;
   private monitoring: MonitoringManager;
@@ -150,7 +153,7 @@ export default class BBBReporter {
           break;
       }
 
-      fetch('https://8efb48d25b9d.ngrok-free.app/api/bbb-reporter?project=ostedhy', {
+      fetch(API_URL, {
         method: 'POST',
         body: JSON.stringify(logData),
         headers: {
