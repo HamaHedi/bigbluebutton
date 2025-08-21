@@ -43,7 +43,7 @@ const LoadingScreenHOC: React.FC<LoadingScreenHOCProps> = ({
   children,
 }) => {
   const [loading, setLoading] = React.useState<LoadingContent>({
-    isLoading: false,
+    isLoading: true,
   });
 
   logger.info('LoadingScreenHOC', {
