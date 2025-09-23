@@ -432,7 +432,7 @@ class App extends Component {
             !hideNotificationToasts
             && isNotificationEnabled) && <ToastContainer rtl /> }
           <ChatAlertContainerGraphql />
-          {isRaiseHandEnabled && <RaiseHandNotifier />}
+          {/* {isRaiseHandEnabled && <RaiseHandNotifier />} */}
           <ManyWebcamsNotifier />
           <PollingContainer />
           <WakeLockContainer />
