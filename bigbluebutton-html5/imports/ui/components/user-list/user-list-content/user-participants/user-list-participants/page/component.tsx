@@ -72,7 +72,6 @@ interface UserListParticipantsContainerProps {
   restOfUsers: number;
   setVisibleUsers: React.Dispatch<React.SetStateAction<{ [key: number]: User[]; }>>;
   raiseHandUsers: User[];
-  searchQuery?: string;
 }
 
 interface UsersListParticipantsPage {
@@ -81,7 +80,6 @@ interface UsersListParticipantsPage {
   currentUser: Partial<User>;
   pageId: string;
   offset: number;
-  searchQuery?: string;
 }
 
 const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
@@ -90,7 +88,6 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
   meeting,
   pageId,
   offset,
-  searchQuery,
 }) => {
   const [openUserAction, setOpenUserAction] = React.useState<string | null>(null);
   const isRTL = layoutSelect((i: Layout) => i.isRTL);
@@ -102,22 +99,9 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
     ];
   }
 
-
-let searchFilteredUsers = users;
-if (searchQuery && searchQuery.trim()) {
-  const lowerSearchQuery = searchQuery.toLowerCase();
-  searchFilteredUsers = users?.filter((user: User) => {
-    return (
-      user.name?.toLowerCase().includes(lowerSearchQuery) ||
-      user.role?.toLowerCase().includes(lowerSearchQuery) ||
-      user.userId?.toLowerCase().includes(lowerSearchQuery)
-    );
-  }) || [];
-}
-
 const filteredUsers = currentUser?.isModerator 
-  ? searchFilteredUsers 
-  : searchFilteredUsers?.filter(user => user.isModerator === true || user?.userId === currentUser?.userId);
+  ? users 
+  : users?.filter(user => user.isModerator === true || user?.userId === currentUser?.userId);
 
   return (
     <>
@@ -152,7 +136,6 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
   restOfUsers,
   setVisibleUsers,
   raiseHandUsers,
-  searchQuery,
 }) => {
   const offset = index * 50;
   const limit = useRef(50);
@@ -248,7 +231,6 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
       currentUser={currentUser ?? {}}
       pageId={pageId}
       offset={offset}
-      searchQuery={searchQuery}
     />
   );
 };
