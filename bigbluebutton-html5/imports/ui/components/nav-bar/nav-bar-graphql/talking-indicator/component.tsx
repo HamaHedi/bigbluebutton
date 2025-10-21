@@ -255,6 +255,7 @@ const TalkingIndicatorContainer: React.FC = () => {
 
   if (isBreakoutError) {
     connectionStatus.setSubscriptionFailed(true);
+    console.info("isBreakoutError",  {isBreakoutError})
     logger.error(
       {
         logCode: 'subscription_Failed',

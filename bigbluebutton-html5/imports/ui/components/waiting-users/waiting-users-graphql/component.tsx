@@ -423,6 +423,7 @@ const GuestUsersManagementPanelContainer: React.FC = () => {
 
   if (guestWaitingUsersError) {
     connectionStatus.setSubscriptionFailed(true);
+    console.info("guestWaitingUsersError",  {guestWaitingUsersError})
     logger.error(
       {
         logCode: 'subscription_Failed',
