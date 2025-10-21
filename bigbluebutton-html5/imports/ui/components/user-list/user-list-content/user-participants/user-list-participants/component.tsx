@@ -35,71 +35,37 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const userListRef = React.useRef<HTMLUListElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
-  const filteredVisibleUsers = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return visibleUsers;
-    }
-
-    const filtered: { [key: number]: User[] } = {};
-    const lowerSearchQuery = searchQuery.toLowerCase();
-
+  // Get all visible users as a flat array for search
+  const allVisibleUsers = useMemo(() => {
+    const allUsers: User[] = [];
     Object.keys(visibleUsers).forEach((key) => {
       const pageUsers = visibleUsers[parseInt(key)];
-      const filteredPageUsers = pageUsers.filter((user: User) => {
-        // Search in user name, role, or any other relevant fields
-        return (
-          user.name?.toLowerCase().includes(lowerSearchQuery) ||
-          user.role?.toLowerCase().includes(lowerSearchQuery) ||
-          user.userId?.toLowerCase().includes(lowerSearchQuery)
-        );
-      });
-      
-      if (filteredPageUsers.length > 0) {
-        filtered[parseInt(key)] = filteredPageUsers;
-      }
+      allUsers.push(...pageUsers);
     });
+    return allUsers;
+  }, [visibleUsers]);
 
-    return filtered;
-  }, [visibleUsers, searchQuery]);
-
-
-
-  // Calculate filtered count
-  const filteredCount = useMemo(() => {
+  // Filter users based on search query
+  const filteredUsers = useMemo(() => {
     if (!searchQuery.trim()) {
-      return count;
+      return allVisibleUsers;
     }
-    
-    return Object.values(filteredVisibleUsers).reduce((total, users) => {
-      return total + users.length;
-    }, 0);
-  }, [filteredVisibleUsers, count, searchQuery]);
 
+    const lowerSearchQuery = searchQuery.toLowerCase().trim();
+    return allVisibleUsers.filter((user: User) => {
+      return (
+        user.name?.toLowerCase().includes(lowerSearchQuery) ||
+        user.userId?.toLowerCase().includes(lowerSearchQuery)
+      );
+    });
+  }, [allVisibleUsers, searchQuery]);
+
+  // Update local user list when filtered users change
   useEffect(() => {
-    const keys = Object.keys(filteredVisibleUsers);
-    if (keys.length > 0) {
-      // eslint-disable-next-line
-      const visibleUserArr = keys.sort().reduce((acc, key) => {
-        return [
-          ...acc,
-          // @ts-ignore
-          ...filteredVisibleUsers[key],
-        ];
-      }, [] as User[]);
-      // eslint-disable-next-line
-      setLocalUserList(visibleUserArr);
-    } else if (searchQuery.trim()) {
-      // If searching and no results, set empty array
-      setLocalUserList([]);
-    }
-  }, [filteredVisibleUsers, searchQuery]);
+    setLocalUserList(filteredUsers);
+  }, [filteredUsers]);
 
   const rove = useMemo(() => roveBuilder(selectedUserRef, 'user-index'), []);
-
-  // Clear visible users when search query changes to force re-fetch
-  useEffect(() => {
-    setVisibleUsers({});
-  }, [searchQuery]);
 
   // --- Plugin related code ---
   useEffect(() => {
@@ -134,10 +100,8 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   }, []);
   // --- End of plugin related code ---
 
-  const amountOfPages = Math.ceil((searchQuery.trim() ? filteredCount : count) / 50);
-
   // Show "No users found" message when searching with no results
-  if (searchQuery.trim() && filteredCount === 0) {
+  if (searchQuery.trim() && filteredUsers.length === 0) {
     return (
       <Styled.UserListColumn
         // @ts-ignore
@@ -156,21 +120,64 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     );
   }
 
-  return (
-    (
+  // If searching, render single page container with filtered results
+  if (searchQuery.trim()) {
+    return (
       <Styled.UserListColumn
         onKeyDown={rove}
         tabIndex={0}
         role="list"
       >
         <Styled.VirtualizedList as="ul" ref={userListRef}>
-          {
-            Array.from({ length: amountOfPages }).map((_, i) => {
-              const isLastItem = amountOfPages === (i + 1);
-              const restOfUsers = (searchQuery.trim() ? filteredCount : count) % 50;
-              const key = i;
-              return i === 0
-                ? (
+          <UserListParticipantsPageContainer
+            key="search-results"
+            index={0}
+            isLastItem={true}
+            restOfUsers={filteredUsers.length}
+            setVisibleUsers={setVisibleUsers}
+            raiseHandUsers={raiseHandUsers}
+            searchMode={true}
+            searchResults={filteredUsers}
+          />
+        </Styled.VirtualizedList>
+      </Styled.UserListColumn>
+    );
+  }
+
+  // Normal pagination view when not searching
+  const amountOfPages = Math.ceil(count / 50);
+
+  return (
+    <Styled.UserListColumn
+      onKeyDown={rove}
+      tabIndex={0}
+      role="list"
+    >
+      <Styled.VirtualizedList as="ul" ref={userListRef}>
+        {
+          Array.from({ length: amountOfPages }).map((_, i) => {
+            const isLastItem = amountOfPages === (i + 1);
+            const restOfUsers = count % 50;
+            const key = i;
+            return i === 0
+              ? (
+                <UserListParticipantsPageContainer
+                  key={key}
+                  index={i}
+                  isLastItem={isLastItem}
+                  restOfUsers={isLastItem ? restOfUsers : 50}
+                  setVisibleUsers={setVisibleUsers}
+                  raiseHandUsers={raiseHandUsers}
+                />
+              )
+              : (
+                <IntersectionWatcher
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={i}
+                  ParentRef={userListRef}
+                  isLastItem={isLastItem}
+                  restOfUsers={isLastItem ? restOfUsers : 50}
+                >
                   <UserListParticipantsPageContainer
                     key={key}
                     index={i}
@@ -179,41 +186,23 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                     setVisibleUsers={setVisibleUsers}
                     raiseHandUsers={raiseHandUsers}
                   />
-                )
-                : (
-                  <IntersectionWatcher
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={i}
-                    ParentRef={userListRef}
-                    isLastItem={isLastItem}
-                    restOfUsers={isLastItem ? restOfUsers : 50}
-                  >
-                    <UserListParticipantsPageContainer
-                      key={key}
-                      index={i}
-                      isLastItem={isLastItem}
-                      restOfUsers={isLastItem ? restOfUsers : 50}
-                      setVisibleUsers={setVisibleUsers}
-                      raiseHandUsers={raiseHandUsers}
-                    />
-                  </IntersectionWatcher>
-                );
-            })
-          }
-        </Styled.VirtualizedList>
-      </Styled.UserListColumn>
-    )
+                </IntersectionWatcher>
+              );
+          })
+        }
+      </Styled.VirtualizedList>
+    </Styled.UserListColumn>
   );
 };
 
 const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ searchQuery = '' }) => {
   const [internalSearchQuery, setInternalSearchQuery] = useState(searchQuery);
-    const { data: currentUserData } = useCurrentUser((user) => ({
-      away: user.away,
-      isModerator: user.isModerator,
-      userId: user.userId,
-    }));
-    const isModerator = currentUserData?.isModerator;
+  const { data: currentUserData } = useCurrentUser((user) => ({
+    away: user.away,
+    isModerator: user.isModerator,
+    userId: user.userId,
+  }));
+  const isModerator = currentUserData?.isModerator;
 
   const {
     data: countData,
@@ -244,72 +233,71 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
   } = useDeduplicatedSubscription(RAISED_HAND_USERS);
   const raiseHandUsers = usersData?.user || [];
 
-  
   const lowerAllHands = () => {
     raiseHandUsers.forEach((user: User) => 
       lowerUserHands(user.userId)
     );
   };
 
-
   return (
     <>
-    {isModerator &&  
-      <div>
-        {raiseHandUsers.length > 0 && <Styled.LowerHnads onClick={lowerAllHands}>
-          <Styled.LowerHnadsTitle >Down All Hands ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
-        </Styled.LowerHnads>}
-       <div style={{ 
-        position: 'relative', 
-        margin: '8px 12px',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={internalSearchQuery}
-          onChange={handleSearchChange}
-          aria-label="Search users"
-          style={{
-            width: '100%',
-            padding: '8px 12px',
-            paddingRight: '32px',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            fontSize: '14px',
-            backgroundColor: '#fff',
-            color: '#333',
-            boxSizing: 'border-box'
-          }}
-        />
-        {internalSearchQuery && (
-          <button
-            onClick={clearSearch}
-            aria-label="Clear search"
-            style={{
-              position: 'absolute',
-              right: '8px',
-              background: 'none',
-              border: 'none',
-              fontSize: '18px',
-              cursor: 'pointer',
-              color: '#666',
-              width: '24px',
-              height: '24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            ×
-          </button>
-        )}
-       </div>
-      </div>
-    }
+      {isModerator && (
+        <div>
+          {raiseHandUsers.length > 0 && (
+            <Styled.LowerHnads onClick={lowerAllHands}>
+              <Styled.LowerHnadsTitle>Down All Hands ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
+            </Styled.LowerHnads>
+          )}
+          <div style={{ 
+            position: 'relative', 
+            margin: '8px 12px',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={internalSearchQuery}
+              onChange={handleSearchChange}
+              aria-label="Search users"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                paddingRight: '32px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                color: '#333',
+                boxSizing: 'border-box'
+              }}
+            />
+            {internalSearchQuery && (
+              <button
+                onClick={clearSearch}
+                aria-label="Clear search"
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  color: '#666',
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
-  
       <UserListParticipants
         count={count ?? 0}
         searchQuery={internalSearchQuery}
