@@ -96,6 +96,11 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
   const rove = useMemo(() => roveBuilder(selectedUserRef, 'user-index'), []);
 
+  // Clear visible users when search query changes to force re-fetch
+  useEffect(() => {
+    setVisibleUsers({});
+  }, [searchQuery]);
+
   // --- Plugin related code ---
   useEffect(() => {
     const updateUiDataHookUserListForPlugin = () => {
@@ -131,25 +136,25 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
   const amountOfPages = Math.ceil((searchQuery.trim() ? filteredCount : count) / 50);
 
-  // // Show "No users found" message when searching with no results
-  // if (searchQuery.trim() && filteredCount === 0) {
-  //   return (
-  //     <Styled.UserListColumn
-  //       // @ts-ignore
-  //       onKeyDown={rove}
-  //       tabIndex={0}
-  //     >
-  //       <div style={{
-  //         padding: '20px',
-  //         textAlign: 'center',
-  //         color: '#666',
-  //         fontSize: '14px'
-  //       }}>
-  //         No users found matching "{searchQuery}"
-  //       </div>
-  //     </Styled.UserListColumn>
-  //   );
-  // }
+  // Show "No users found" message when searching with no results
+  if (searchQuery.trim() && filteredCount === 0) {
+    return (
+      <Styled.UserListColumn
+        // @ts-ignore
+        onKeyDown={rove}
+        tabIndex={0}
+      >
+        <div style={{
+          padding: '20px',
+          textAlign: 'center',
+          color: '#666',
+          fontSize: '14px'
+        }}>
+          No users found matching "{searchQuery}"
+        </div>
+      </Styled.UserListColumn>
+    );
+  }
 
   return (
     (
@@ -172,7 +177,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                     isLastItem={isLastItem}
                     restOfUsers={isLastItem ? restOfUsers : 50}
                     setVisibleUsers={setVisibleUsers}
-                    searchQuery={searchQuery}
                     raiseHandUsers={raiseHandUsers}
                   />
                 )
@@ -190,7 +194,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
                       isLastItem={isLastItem}
                       restOfUsers={isLastItem ? restOfUsers : 50}
                       setVisibleUsers={setVisibleUsers}
-                      searchQuery={searchQuery}
                       raiseHandUsers={raiseHandUsers}
                     />
                   </IntersectionWatcher>
