@@ -201,6 +201,7 @@ const TypingIndicatorContainer: React.FC = () => {
 
   if (typingUsersError) {
     connectionStatus.setSubscriptionFailed(true);
+    console.info("typingUsersError",  {typingUsersError})
     logger.error(
       {
         logCode: 'subscription_Failed',

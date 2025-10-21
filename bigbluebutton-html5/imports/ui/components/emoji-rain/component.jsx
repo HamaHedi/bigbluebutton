@@ -6,7 +6,7 @@ import useCurrentUser from '../../core/hooks/useCurrentUser';
 
 const EmojiRain = ({ reactions }) => {
   const { data: currentUserData } = useCurrentUser((user) => ({
-    isModerator: user.isModerator,
+    isModerator: user?.isModerator,
   }));
   
   const Settings = getSettingsSingletonInstance();

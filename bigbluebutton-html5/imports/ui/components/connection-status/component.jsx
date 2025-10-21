@@ -146,6 +146,7 @@ const ConnectionStatusContainer = () => {
 
   if (error) {
     connectionStatus.setSubscriptionFailed(true);
+    console.info("error",  {error})
     logger.error(
       {
         logCode: 'subscription_Failed',
