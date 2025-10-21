@@ -153,13 +153,13 @@ export default class BBBReporter {
           break;
       }
 
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(logData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // fetch(API_URL, {
+      //   method: 'POST',
+      //   body: JSON.stringify(logData),
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
 
     } catch (error) {
       console.error('Failed to send BBB report:', error);
