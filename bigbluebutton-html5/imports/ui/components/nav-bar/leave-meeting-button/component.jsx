@@ -5,6 +5,7 @@ import EndMeetingConfirmationContainer from '/imports/ui/components/end-meeting-
 import BBBMenu from '/imports/ui/components/common/menu/component';
 import Styled from './styles';
 import Session from '/imports/ui/services/storage/in-memory';
+import { colorDanger, colorWhite } from '/imports/ui/stylesheets/styled-components/palette';
 
 const intlMessages = defineMessages({
   leaveMeetingBtnLabel: {
