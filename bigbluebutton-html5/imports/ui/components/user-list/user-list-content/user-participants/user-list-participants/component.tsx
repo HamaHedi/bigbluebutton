@@ -35,7 +35,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const userListRef = React.useRef<HTMLUListElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
-  // Filter users based on search query
   const filteredVisibleUsers = useMemo(() => {
     if (!searchQuery.trim()) {
       return visibleUsers;
@@ -255,8 +254,7 @@ const UserListParticipantsContainer: React.FC<{ searchQuery?: string }> = ({ sea
     {isModerator &&  
       <div>
         {raiseHandUsers.length > 0 && <Styled.LowerHnads onClick={lowerAllHands}>
-          {/* <Styled.HandIcon iconName="hand" /> */}
-          <Styled.LowerHnadsTitle >Down All Hnads ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
+          <Styled.LowerHnadsTitle >Down All Hands ({raiseHandUsers.length})</Styled.LowerHnadsTitle>
         </Styled.LowerHnads>}
        <div style={{ 
         position: 'relative', 

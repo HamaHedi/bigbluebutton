@@ -90,6 +90,23 @@ class LeaveMeetingButton extends PureComponent {
 
     this.menuItems = [];
 
+
+    if (allowedToEndMeeting && connected) {
+      const endMeetingCustomStyles = { background: colorDanger, color: colorWhite };
+
+      this.menuItems.push(
+        {
+          key: 'list-item-end-meeting',
+          dataTest: 'endMeetingButton',
+          icon: 'close',
+          customStyles: endMeetingCustomStyles,
+          label: intl.formatMessage(intlMessages.endMeetingLabel),
+          description: intl.formatMessage(intlMessages.endMeetingDesc),
+          onClick: () => this.setEndMeetingConfirmationModalIsOpen(true),
+        },
+      );
+    }
+
     if (allowLogoutSetting && connected) {
       this.menuItems.push(
         {
@@ -103,18 +120,7 @@ class LeaveMeetingButton extends PureComponent {
       );
     }
 
-    if (allowedToEndMeeting && connected) {
-      this.menuItems.push(
-        {
-          key: 'list-item-end-meeting',
-          dataTest: 'endMeetingButton',
-          icon: 'close',
-          label: intl.formatMessage(intlMessages.endMeetingLabel),
-          description: intl.formatMessage(intlMessages.endMeetingDesc),
-          onClick: () => this.setEndMeetingConfirmationModalIsOpen(true),
-        },
-      );
-    }
+   
 
     return this.menuItems;
   }

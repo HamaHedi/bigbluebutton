@@ -20,7 +20,7 @@ interface RaiseHandUser extends User {
   raiseHandTime: string;
 }
 
-const sortUsersByRaiseHand = (users: User[], raiseHandUsers: RaiseHandUser[]) => {
+const sortUsersByRaiseHand = (users: User[], raiseHandUsers: RaiseHandUser[], currentUser: User) => {
   const raiseHandUserMap = new Map<string, RaiseHandUser>();
   raiseHandUsers.forEach(u => {
     if (u.userId) {
@@ -29,27 +29,37 @@ const sortUsersByRaiseHand = (users: User[], raiseHandUsers: RaiseHandUser[]) =>
   });
 
   const sortedUsers = [...users].sort((a, b) => {
+    const aIsCurrentUser = a.userId === currentUser?.userId;
+    const bIsCurrentUser = b.userId === currentUser?.userId;
+    
+    if (aIsCurrentUser && !bIsCurrentUser) return -1;
+    if (!aIsCurrentUser && bIsCurrentUser) return 1;
+    
+    if (aIsCurrentUser || bIsCurrentUser) return 0;
 
     const aIsMod = !!a.isModerator;
     const bIsMod = !!b.isModerator;
-    if (aIsMod && !bIsMod) return -1;
-    if (!aIsMod && bIsMod) return 1;
-
-
     const aRaiseHand = raiseHandUserMap.get(a.userId);
     const bRaiseHand = raiseHandUserMap.get(b.userId);
-
-    const aHasRaiseHand  = !!aRaiseHand && aRaiseHand.raiseHandTime;
+    const aHasRaiseHand = !!aRaiseHand && aRaiseHand.raiseHandTime;
     const bHasRaiseHand = !!bRaiseHand && bRaiseHand.raiseHandTime;
 
-    if (aHasRaiseHand && bHasRaiseHand) {
-      const aTime = new Date(aRaiseHand.raiseHandTime).getTime();
-      const bTime = new Date(bRaiseHand.raiseHandTime).getTime();
-      return  bTime - aTime;
-    }
+    if (aIsMod && !bIsMod) return -1;
+    if (!aIsMod && bIsMod) return 1;
+    
+    if (aIsMod && bIsMod) return 0;
 
+    if (aHasRaiseHand && bHasRaiseHand) {
+      return a.name.localeCompare(b.name);
+    }
+    
     if (aHasRaiseHand && !bHasRaiseHand) return -1;
     if (!aHasRaiseHand && bHasRaiseHand) return 1;
+
+    if (!aHasRaiseHand && !bHasRaiseHand && !aIsMod && !bIsMod) {
+      return 0;
+    }
+
     return 0;
   });
 
@@ -62,6 +72,7 @@ interface UserListParticipantsContainerProps {
   restOfUsers: number;
   setVisibleUsers: React.Dispatch<React.SetStateAction<{ [key: number]: User[]; }>>;
   raiseHandUsers: User[];
+  searchQuery?: string;
 }
 
 interface UsersListParticipantsPage {
@@ -70,6 +81,7 @@ interface UsersListParticipantsPage {
   currentUser: Partial<User>;
   pageId: string;
   offset: number;
+  searchQuery?: string;
 }
 
 const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
@@ -78,6 +90,7 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
   meeting,
   pageId,
   offset,
+  searchQuery,
 }) => {
   const [openUserAction, setOpenUserAction] = React.useState<string | null>(null);
   const isRTL = layoutSelect((i: Layout) => i.isRTL);
@@ -88,11 +101,27 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
       ...pluginsExtensibleAreasAggregatedState.userListDropdownItems,
     ];
   }
-console.log("currentUsercurrentUsercurrentUser",currentUser)
-console.log("usersusersusersusers",users)
+
+
+// Apply search filter first if there's a search query
+let searchFilteredUsers = users;
+if (searchQuery && searchQuery.trim()) {
+  const lowerSearchQuery = searchQuery.toLowerCase();
+  searchFilteredUsers = users?.filter((user: User) => {
+    return (
+      user.name?.toLowerCase().includes(lowerSearchQuery) ||
+      user.role?.toLowerCase().includes(lowerSearchQuery) ||
+      user.userId?.toLowerCase().includes(lowerSearchQuery)
+    );
+  }) || [];
+}
+
+// Then apply moderator visibility filter
 const filteredUsers = currentUser?.isModerator 
-  ? users 
-  : users?.filter(user => user.isModerator === true || user?.userId === currentUser?.userId);  return (
+  ? searchFilteredUsers 
+  : searchFilteredUsers?.filter(user => user.isModerator === true || user?.userId === currentUser?.userId);
+
+  return (
     <>
       {
         filteredUsers?.map((user, idx) => {
@@ -125,6 +154,7 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
   restOfUsers,
   setVisibleUsers,
   raiseHandUsers,
+  searchQuery,
 }) => {
   const offset = index * 50;
   const limit = useRef(50);
@@ -144,7 +174,6 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     data: usersData,
     loading: usersLoading,
   } = useLoadedUserList({ offset, limit: limit.current }, (u) => u) as GraphqlDataHookSubscriptionResponse<Array<User>>;
-  const users = sortUsersByRaiseHand(usersData ?? [], raiseHandUsers as RaiseHandUser[]) ?? [];
 
   const { data: currentUser, loading: currentUserLoading } = useCurrentUser((c: Partial<User>) => ({
     userId: c.userId,
@@ -168,6 +197,8 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     presPagesWritable: c.presPagesWritable,
   }));
 
+  const users = sortUsersByRaiseHand(usersData ?? [], raiseHandUsers as RaiseHandUser[], currentUser as User) ?? [];
+  
   const {
     data: presentationData,
     loading: presentationLoading,
@@ -219,6 +250,7 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
       currentUser={currentUser ?? {}}
       pageId={pageId}
       offset={offset}
+      searchQuery={searchQuery}
     />
   );
 };
