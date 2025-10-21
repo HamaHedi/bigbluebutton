@@ -103,7 +103,6 @@ const UsersListParticipantsPage: React.FC<UsersListParticipantsPage> = ({
   }
 
 
-// Apply search filter first if there's a search query
 let searchFilteredUsers = users;
 if (searchQuery && searchQuery.trim()) {
   const lowerSearchQuery = searchQuery.toLowerCase();
@@ -116,7 +115,6 @@ if (searchQuery && searchQuery.trim()) {
   }) || [];
 }
 
-// Then apply moderator visibility filter
 const filteredUsers = currentUser?.isModerator 
   ? searchFilteredUsers 
   : searchFilteredUsers?.filter(user => user.isModerator === true || user?.userId === currentUser?.userId);

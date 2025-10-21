@@ -131,25 +131,25 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
 
   const amountOfPages = Math.ceil((searchQuery.trim() ? filteredCount : count) / 50);
 
-  // Show "No users found" message when searching with no results
-  if (searchQuery.trim() && filteredCount === 0) {
-    return (
-      <Styled.UserListColumn
-        // @ts-ignore
-        onKeyDown={rove}
-        tabIndex={0}
-      >
-        <div style={{
-          padding: '20px',
-          textAlign: 'center',
-          color: '#666',
-          fontSize: '14px'
-        }}>
-          No users found matching "{searchQuery}"
-        </div>
-      </Styled.UserListColumn>
-    );
-  }
+  // // Show "No users found" message when searching with no results
+  // if (searchQuery.trim() && filteredCount === 0) {
+  //   return (
+  //     <Styled.UserListColumn
+  //       // @ts-ignore
+  //       onKeyDown={rove}
+  //       tabIndex={0}
+  //     >
+  //       <div style={{
+  //         padding: '20px',
+  //         textAlign: 'center',
+  //         color: '#666',
+  //         fontSize: '14px'
+  //       }}>
+  //         No users found matching "{searchQuery}"
+  //       </div>
+  //     </Styled.UserListColumn>
+  //   );
+  // }
 
   return (
     (
