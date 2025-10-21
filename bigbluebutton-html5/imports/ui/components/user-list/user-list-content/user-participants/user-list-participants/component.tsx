@@ -35,7 +35,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   const userListRef = React.useRef<HTMLUListElement | null>(null);
   const selectedUserRef = React.useRef<HTMLElement | null>(null);
 
-  // Get all visible users as a flat array for search
   const allVisibleUsers = useMemo(() => {
     const allUsers: User[] = [];
     Object.keys(visibleUsers).forEach((key) => {
@@ -45,7 +44,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     return allUsers;
   }, [visibleUsers]);
 
-  // Filter users based on search query
   const filteredUsers = useMemo(() => {
     if (!searchQuery.trim()) {
       return allVisibleUsers;
@@ -100,7 +98,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   }, []);
   // --- End of plugin related code ---
 
-  // Show "No users found" message when searching with no results
   if (searchQuery.trim() && filteredUsers.length === 0) {
     return (
       <Styled.UserListColumn
@@ -120,7 +117,6 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     );
   }
 
-  // If searching, render single page container with filtered results
   if (searchQuery.trim()) {
     return (
       <Styled.UserListColumn
@@ -144,7 +140,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
     );
   }
 
-  // Normal pagination view when not searching
+
   const amountOfPages = Math.ceil(count / 50);
 
   return (

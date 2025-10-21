@@ -14,12 +14,14 @@ const EmojiRainContainer = () => {
     },
   });
   const emojisArray = emojisToRainData?.user_reaction_stream || [];
+  console.log({emojisToRainData})
 
   const reactions = emojisArray.length === 0 ? []
     : emojisArray.map((reaction) => ({
       reaction: reaction.reactionEmoji,
       creationDate: new Date(reaction.createdAt),
     }));
+
 
   return <EmojiRain reactions={reactions} />;
 };
