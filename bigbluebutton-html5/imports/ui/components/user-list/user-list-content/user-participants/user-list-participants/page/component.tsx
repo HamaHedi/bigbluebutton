@@ -72,6 +72,8 @@ interface UserListParticipantsContainerProps {
   restOfUsers: number;
   setVisibleUsers: React.Dispatch<React.SetStateAction<{ [key: number]: User[]; }>>;
   raiseHandUsers: User[];
+  searchMode?: boolean;
+  searchResults?: User[];
 }
 
 interface UsersListParticipantsPage {
@@ -136,6 +138,8 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
   restOfUsers,
   setVisibleUsers,
   raiseHandUsers,
+  searchMode = false,
+  searchResults = [],
 }) => {
   const offset = index * 50;
   const limit = useRef(50);
@@ -178,7 +182,9 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     presPagesWritable: c.presPagesWritable,
   }));
 
-  const users = sortUsersByRaiseHand(usersData ?? [], raiseHandUsers as RaiseHandUser[], currentUser as User) ?? [];
+  const users = searchMode 
+    ? searchResults 
+    : sortUsersByRaiseHand(usersData ?? [], raiseHandUsers as RaiseHandUser[], currentUser as User) ?? [];
   
   const {
     data: presentationData,
@@ -205,7 +211,7 @@ const UserListParticipantsPageContainer: React.FC<UserListParticipantsContainerP
     };
   }, []);
 
-  if (usersLoading || meetingLoading || currentUserLoading || presentationLoading) {
+  if (!searchMode && (usersLoading || meetingLoading || currentUserLoading || presentationLoading)) {
     return Array.from({ length: isLastItem ? restOfUsers : 50 }).map((_, i) => (
       <Styled.UserListItem key={`not-visible-item-${i + 1}`}>
         {/* eslint-disable-next-line */}
