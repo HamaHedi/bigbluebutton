@@ -48,10 +48,10 @@ class UserList extends PureComponent {
 
     return (
       <Styled.UserList>
-        {showBranding && !compact && logoUrl && (
+        {/* {showBranding && !compact && logoUrl && (
           <CustomLogo CustomLogoUrl={logoUrl} />
         )}
-        
+         */}
       
         <UserContentContainer 
           compact={compact}
