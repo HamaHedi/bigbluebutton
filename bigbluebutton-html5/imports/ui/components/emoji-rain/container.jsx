@@ -14,7 +14,6 @@ const EmojiRainContainer = () => {
     },
   });
   const emojisArray = emojisToRainData?.user_reaction_stream || [];
-  console.log({emojisToRainData})
 
   const reactions = emojisArray.length === 0 ? []
     : emojisArray.map((reaction) => ({

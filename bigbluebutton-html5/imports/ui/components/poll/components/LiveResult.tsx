@@ -319,7 +319,6 @@ const LiveResultContainer: React.FC = () => {
 
   if (currentPollDataError) {
     connectionStatus.setSubscriptionFailed(true);
-    console.info("currentPollDataError",  {currentPollDataError})
     logger.error(
       {
         logCode: 'subscription_Failed',

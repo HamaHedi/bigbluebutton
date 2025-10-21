@@ -324,7 +324,6 @@ const BreakoutRoomContainer: React.FC = () => {
 
   if (breakoutError) {
     connectionStatus.setSubscriptionFailed(true);
-    console.info("breakoutError",  {breakoutError})
     logger.error(
       {
         logCode: 'subscription_Failed',
