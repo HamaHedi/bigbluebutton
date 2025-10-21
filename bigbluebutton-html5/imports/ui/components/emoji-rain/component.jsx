@@ -8,6 +8,8 @@ const EmojiRain = ({ reactions }) => {
   const { data: currentUserData } = useCurrentUser((user) => ({
     isModerator: user?.isModerator,
   }));
+
+  console.log("currentUserData", {currentUserData})
   
   const Settings = getSettingsSingletonInstance();
   const containerRef = useRef(null);

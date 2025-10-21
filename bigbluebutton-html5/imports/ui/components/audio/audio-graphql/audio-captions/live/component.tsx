@@ -80,8 +80,6 @@ const AudioCaptionsLiveContainer: React.FC = () => {
   if (AudioCaptionsLiveError) {
     connectionStatus.setSubscriptionFailed(true);
 
-    console.info("AudioCaptionsLiveError",  {AudioCaptionsLiveError})
-
     logger.error(
       {
         logCode: 'subscription_Failed',

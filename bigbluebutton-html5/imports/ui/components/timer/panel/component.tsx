@@ -440,7 +440,6 @@ const TimerPanelContaier: React.FC = () => {
 
   if (timerError) {
     connectionStatus.setSubscriptionFailed(true);
-    console.info("timerError",  {timerError})
     logger.error(
       {
         logCode: 'subscription_Failed',
