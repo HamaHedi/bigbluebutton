@@ -254,8 +254,9 @@ const AudioContainer = (props) => {
   useEffect(() => {
     if (Service.isConnected() && !Service.isListenOnly()) {
       if (userLocks.userMic && !currentUserMuted) {
-        toggleMuteMicrophone(!currentUserMuted, toggleVoice);
-        notify(intl.formatMessage(intlMessages.reconectingAsListener), 'info', 'volume_level_2');
+        console.log("userLocks.userMic and !currentUserMuted" , {currentUserMuted})
+        // toggleMuteMicrophone(!currentUserMuted, toggleVoice);
+        // notify(intl.formatMessage(intlMessages.reconectingAsListener), 'info', 'volume_level_2');
       }
     }
   }, [userLocks.userMic, currentUserMuted]);
