@@ -8,7 +8,6 @@ const useToggleVoice = () => {
 
   const toggleVoice = async (userId: string, muted: boolean) => {
     try {
-      console.log({muted, userId})
       await userSetMuted({ variables: { muted, userId } });
     } catch (e) {
       logger.error('Error on trying to toggle muted');
