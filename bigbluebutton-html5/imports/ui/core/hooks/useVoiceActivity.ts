@@ -9,6 +9,8 @@ const useVoiceActivity = (skip = false) => {
     error,
   } = useDeduplicatedSubscription<VoiceActivityResponse>(VOICE_ACTIVITY, { skip });
 
+  console.log("data useVoiceActivity fired", {data})
+
   if (error) {
     logger.error({
       logCode: 'voice_activity_sub_error',
@@ -18,6 +20,8 @@ const useVoiceActivity = (skip = false) => {
       },
     }, 'useVoiceActivity hook failed.');
   }
+
+
 
   return {
     error,
