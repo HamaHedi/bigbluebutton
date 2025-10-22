@@ -253,14 +253,15 @@ const AudioContainer = (props) => {
   
   console.log("userLocks.userMic and !currentUserMuted" , {currentUserMuted})
 
-  useEffect(() => {
-    if (Service.isConnected() && !Service.isListenOnly()) {
-      if (userLocks.userMic && !currentUserMuted) {
-        // toggleMuteMicrophone(!currentUserMuted, toggleVoice);
-        // notify(intl.formatMessage(intlMessages.reconectingAsListener), 'info', 'volume_level_2');
-      }
-    }
-  }, [userLocks.userMic, currentUserMuted]);
+  // Disabled: Auto mute/unmute when moderator controls user microphone
+  // useEffect(() => {
+  //   if (Service.isConnected() && !Service.isListenOnly()) {
+  //     if (userLocks.userMic && !currentUserMuted) {
+  //       // toggleMuteMicrophone(!currentUserMuted, toggleVoice);
+  //       // notify(intl.formatMessage(intlMessages.reconectingAsListener), 'info', 'volume_level_2');
+  //     }
+  //   }
+  // }, [userLocks.userMic, currentUserMuted]);
 
   return (
     <>
