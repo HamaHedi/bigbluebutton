@@ -195,7 +195,7 @@ const ChatListItem = (props: ChatListItemProps) => {
           ? (
             <Styled.UnreadMessages data-test="unreadMessages" aria-label={arialabel}>
               <Styled.UnreadMessagesText aria-hidden="true">
-                {countUnreadMessages}
+                {/* {countUnreadMessages} */}
               </Styled.UnreadMessagesText>
             </Styled.UnreadMessages>
           )

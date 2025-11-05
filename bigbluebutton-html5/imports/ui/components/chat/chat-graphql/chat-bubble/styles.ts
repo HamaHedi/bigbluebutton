@@ -99,6 +99,9 @@ const UnreadBadge = styled.div`
   padding: 0px 0.4rem;
   border-radius: 0.5rem / 50%;
   text-align: center;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
 `;
 
 export default {

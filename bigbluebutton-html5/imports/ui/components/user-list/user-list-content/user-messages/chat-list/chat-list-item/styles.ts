@@ -247,11 +247,14 @@ const UnreadMessagesText = styled.div`
   justify-content: center;
   color: ${colorWhite};
   line-height: calc(1rem + 1px);
-  padding: 0 0.5rem;
   text-align: center;
-  border-radius: 0.5rem/50%;
+  border-radius: 50%;
   font-size: 0.8rem;
   background-color: ${unreadMessagesBg};
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  margin-inline-end: 5px;
 `;
 
 const OpenChatButton = styled.div`
