@@ -7,6 +7,7 @@ import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedS
 import ConnectionStatus from '/imports/ui/core/graphql/singletons/connectionStatus';
 import { GET_MEETING_RECORDING_DATA, GET_MEETING_RECORDING_POLICIES } from '/imports/ui/components/nav-bar/nav-bar-graphql/recording-indicator/queries';
 import Service from '/imports/ui/components/nav-bar/nav-bar-graphql/recording-indicator/service';
+import RecordingService from '/imports/ui/components/recording/service';
 
 interface RecordingContainerProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,6 +35,9 @@ const RecordingContainer: React.FC<RecordingContainerProps> = (props) => {
   const allowStartStopRecording = recordingPoliciesData?.meeting_recordingPolicies[0]?.allowStartStopRecording ?? false;
 
   const toggleRecording = () => {
+    if (!recording) RecordingService.playStartRecordingSound();
+    else RecordingService.playStopRecordingSound();
+
     setRecordingStatus({
       variables: {
         recording: !recording,
