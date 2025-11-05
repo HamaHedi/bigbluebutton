@@ -96,7 +96,7 @@ const ChatBubble = () => {
         })}
       }
     >
-     {totalUnreadMessages > 0 && <Styled.UnreadBadge>{totalUnreadMessages}</Styled.UnreadBadge>}
+     {totalUnreadMessages > 0 && <Styled.UnreadBadge/>}
       <Styled.Icon>
         <Icon iconName="chat" />
       </Styled.Icon>

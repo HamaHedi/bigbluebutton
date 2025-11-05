@@ -208,8 +208,7 @@ const InputStreamLiveSelector: React.FC<InputStreamLiveSelectorProps> = ({
     // they need to be *muted* by the system. Further attempts to unmute
     // will open the audio settings modal instead.
     if (inputDeviceId === 'listen-only' && isConnected && !muted) {
-      console.log('toggleMuteMicrophoneSystem', muted);
-      // toggleMuteMicrophoneSystem(muted, toggleVoice);
+      toggleMuteMicrophoneSystem(muted, toggleVoice);
     }
   }, [inputDeviceId, isConnected, muted]);
 
