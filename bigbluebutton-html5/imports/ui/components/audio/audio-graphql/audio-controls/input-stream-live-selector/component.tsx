@@ -208,17 +208,11 @@ const InputStreamLiveSelector: React.FC<InputStreamLiveSelectorProps> = ({
     // they need to be *muted* by the system. Further attempts to unmute
     // will open the audio settings modal instead.
     if (inputDeviceId === 'listen-only' && isConnected && !muted) {
-      toggleMuteMicrophoneSystem(muted, toggleVoice);
+      console.log('toggleMuteMicrophoneSystem', muted);
+      // toggleMuteMicrophoneSystem(muted, toggleVoice);
     }
   }, [inputDeviceId, isConnected, muted]);
 
-  // Disabled: Prevent automatic muting when audio becomes locked
-  // useEffect(() => {
-  //   if (isAudioLocked && isConnected && !muted) {
-  //     // Normally would auto-mute when locked, but we're disabling this
-  //     // toggleMuteMicrophoneSystem(false, toggleVoice);
-  //   }
-  // }, [isAudioLocked, isConnected, muted]);
 
   return (
     <>
