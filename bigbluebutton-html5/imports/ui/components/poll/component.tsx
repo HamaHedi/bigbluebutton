@@ -253,7 +253,7 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
   const [isQuiz, setIsQuiz] = React.useState(false);
   const [question, setQuestion] = useState<string[] | string>('');
   const [questionAndOptions, setQuestionAndOptions] = useState<string[] | string>('');
-  const [optList, setOptList] = useState<Array<{ key: string, val: string }>>([]);
+  const [optList, setOptList] = useState<Array<{key: string, val: string}>>([]);
   const [error, setError] = useState<string | null>(null);
   const [multipleResponse, setMultipleResponse] = useState(false);
   const [secretPoll, setSecretPoll] = useState(false);
@@ -279,7 +279,7 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
     if (quickPollVariables) {
       const {
         answers,
-        multipleResponse: multipleResponse,
+        multipleResponse,
         pollType,
         question,
         secretPoll,
@@ -663,7 +663,7 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
                       : intl.formatMessage(intlMessages.off)}
                   </Styled.ToggleLabel>
                   <Toggle
-                    // @ts-ignore - JS component wrapped by intl
+                  // @ts-ignore - JS component wrapped by intl
                     icons={false}
                     checked={customInput}
                     onChange={() => {
