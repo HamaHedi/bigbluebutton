@@ -328,29 +328,29 @@ class OptionsDropdown extends PureComponent {
         description: intl.formatMessage(intlMessages.settingsDesc),
         onClick: () => this.setOptionsMenuModalIsOpen(true),
       },
-      {
-        key: 'list-item-about',
-        icon: 'about',
-        dataTest: 'aboutModal',
-        label: intl.formatMessage(intlMessages.aboutLabel),
-        description: intl.formatMessage(intlMessages.aboutDesc),
-        onClick: () => this.setAboutModalIsOpen(true),
-      },
+      // {
+      //   key: 'list-item-about',
+      //   icon: 'about',
+      //   dataTest: 'aboutModal',
+      //   label: intl.formatMessage(intlMessages.aboutLabel),
+      //   description: intl.formatMessage(intlMessages.aboutDesc),
+      //   onClick: () => this.setAboutModalIsOpen(true),
+      // },
     );
 
-    if (helpButton) {
-      this.menuItems.push(
-        {
-          key: 'list-item-help',
-          icon: 'help',
-          iconRight: 'popout_window',
-          label: intl.formatMessage(intlMessages.helpLabel),
-          dataTest: 'helpButton',
-          description: intl.formatMessage(intlMessages.helpDesc),
-          onClick: () => window.open(`${helpLink}`),
-        },
-      );
-    }
+    // if (helpButton) {
+    //   this.menuItems.push(
+    //     {
+    //       key: 'list-item-help',
+    //       icon: 'help',
+    //       iconRight: 'popout_window',
+    //       label: intl.formatMessage(intlMessages.helpLabel),
+    //       dataTest: 'helpButton',
+    //       description: intl.formatMessage(intlMessages.helpDesc),
+    //       onClick: () => window.open(`${helpLink}`),
+    //     },
+    //   );
+    // }
 
     if (isIos &&
       !isTabletApp &&
