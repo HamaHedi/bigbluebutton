@@ -39,7 +39,7 @@ export const POLL_CREATE = gql`
     $pollId: String!,
     $secretPoll: Boolean!,
     $question: String!,
-    $isMultipleResponse: Boolean!,
+    $multipleResponse: Boolean!,
     $quiz: Boolean!,
     $answers: [String]!
     $correctAnswer: String,
@@ -49,7 +49,7 @@ export const POLL_CREATE = gql`
       pollId: $pollId,
       secretPoll: $secretPoll,
       question: $question,
-      isMultipleResponse: $isMultipleResponse,
+      multipleResponse: $multipleResponse,
       quiz: $quiz,
       answers: $answers,
       correctAnswer: $correctAnswer,
