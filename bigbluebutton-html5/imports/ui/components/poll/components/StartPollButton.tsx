@@ -53,7 +53,7 @@ const intlMessages = defineMessages({
 });
 
 interface StartPollButtonProps {
-  optList: Array<{val: string}>;
+  optList: Array<{ val: string }>;
   question: string | string[];
   type: string | null;
   setError: (err: string) => void;
@@ -101,7 +101,7 @@ const StartPollButton: React.FC<StartPollButtonProps> = ({
         pollId: `${pollId}/${new Date().getTime()}`,
         secretPoll,
         question,
-        isMultipleResponse: multipleResponse,
+        multipleResponse: multipleResponse,
         quiz: isQuiz,
         answers,
         correctAnswer: correctAnswerText,
