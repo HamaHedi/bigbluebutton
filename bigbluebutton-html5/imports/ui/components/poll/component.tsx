@@ -266,7 +266,7 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
   }>({ text: '', index: -1 });
 
   const quickPollVariables = useStorageKey('quickPollVariables') as {
-    multipleResponse: boolean;
+    isMultipleResponse: boolean;
     pollType: string;
     question: string;
     secretPoll: boolean;
@@ -279,7 +279,7 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
     if (quickPollVariables) {
       const {
         answers,
-        multipleResponse,
+        isMultipleResponse: multipleResponse,
         pollType,
         question,
         secretPoll,

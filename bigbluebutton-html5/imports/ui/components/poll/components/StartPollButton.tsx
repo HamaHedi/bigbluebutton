@@ -101,7 +101,7 @@ const StartPollButton: React.FC<StartPollButtonProps> = ({
         pollId: `${pollId}/${new Date().getTime()}`,
         secretPoll,
         question,
-        multipleResponse,
+        isMultipleResponse: multipleResponse,
         quiz: isQuiz,
         answers,
         correctAnswer: correctAnswerText,
