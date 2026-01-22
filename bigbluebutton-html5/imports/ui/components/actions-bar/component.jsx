@@ -260,19 +260,15 @@ class ActionsBar extends PureComponent {
             </Styled.Gap>
             <Styled.Separator />
             <Styled.LeaveButton
-              icon="logout"
-              color="danger"
-              size="lg"
-              circle={false}
-              hideLabel
-              label={intl.formatMessage(intlMessages.leaveMeetingLabel)}
               aria-label={intl.formatMessage(intlMessages.leaveMeetingLabel)}
               data-test="leaveButton"
               onClick={() => {
                 console.log('Leave meeting button clicked');
                 // Leave meeting logic will be implemented later
               }}
-            />
+            >
+              <i className="icon-bbb-close" />
+            </Styled.LeaveButton>
           </Styled.Right>
         </Styled.ActionsBar>
       </Styled.ActionsBarWrapper>

@@ -1,24 +1,24 @@
 import styled from 'styled-components';
 import { smallOnly } from '/imports/ui/stylesheets/styled-components/breakpoints';
-import { smPaddingX, smPaddingY, barsPadding } from '/imports/ui/stylesheets/styled-components/general';
-import { colorWhite, colorDanger, colorDangerDark } from '/imports/ui/stylesheets/styled-components/palette';
+import { smPaddingX, smPaddingY } from '/imports/ui/stylesheets/styled-components/general';
+import { colorWhite } from '/imports/ui/stylesheets/styled-components/palette';
 import Button from '/imports/ui/components/common/button/component';
 
 const ActionsBar = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: #1a1a1a;
-  border-radius: 12px;
-  padding: 0.5rem 0.75rem;
-  gap: 0.25rem;
+  background-color: #1c1c1c;
+  border-radius: 8px;
+  padding: 6px 8px;
+  gap: 2px;
 `;
 
 const ActionsBarWrapper = styled.section`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: ${barsPadding};
+  padding: 8px;
   position: relative;
   order: 3;
 `;
@@ -46,7 +46,7 @@ const Left = styled.div`
 const Center = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 0.25rem;
+  gap: 2px;
   flex: 1;
   justify-content: center;
   align-items: center;
@@ -63,7 +63,7 @@ const Right = styled.div`
   justify-content: center;
   align-items: center;
   position: relative;
-  gap: 0.25rem;
+  gap: 2px;
   [dir="rtl"] & {
     right: auto;
     left: ${smPaddingX};
@@ -115,41 +115,48 @@ const Wrapper = styled.div`
 `;
 
 const Separator = styled.div`
-  height: 1.5rem;
+  height: 24px;
   width: 1px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.15);
   align-self: center;
-  margin: 0 0.25rem;
+  margin: 0 4px;
 `;
 
 const Gap = styled.div`
   display: flex;
-  gap: 0.25rem;
+  gap: 2px;
   align-items: center;
 `;
 
-const LeaveButton = styled(Button)`
-  && {
-    background-color: ${colorDanger};
-    border: none;
-    border-radius: 8px;
-    
-    &:hover {
-      background-color: ${colorDangerDark};
-    }
+const LeaveButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
 
-    & > span {
-      background-color: ${colorDanger};
-      border: none;
-      
-      &:hover {
-        background-color: ${colorDangerDark};
-      }
-    }
+  &:hover {
+    background-color: #b91c1c;
+  }
 
-    i {
-      color: ${colorWhite};
-    }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.5);
+  }
+
+  &:active {
+    background-color: #991b1b;
+  }
+
+  i {
+    color: ${colorWhite};
+    font-size: 1.2rem;
   }
 `;
 

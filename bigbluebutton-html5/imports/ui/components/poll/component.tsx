@@ -787,8 +787,8 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
       <span className="sr-only" id="add-item-button">{intl.formatMessage(intlMessages.addRespDesc)}</span>
       <span className="sr-only" id="start-poll-button">{intl.formatMessage(intlMessages.startPollDesc)}</span> */}
       <div style={{ textAlign: 'center', padding: '20px', fontSize: '1.2rem' }}>
-        Poll is <b>not</b> enabled<br />
-        will be enabled <b>soon</b>
+        Poll is under development <br />
+        will be available <b>soon</b>
       </div>
     </div>
   );
