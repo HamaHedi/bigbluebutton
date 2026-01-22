@@ -17,6 +17,7 @@ import RaiseHandButtonContainer from '/imports/ui/components/actions-bar/raise-h
 import Selector from '/imports/ui/components/common/selector/component';
 import ToggleGroup from '/imports/ui/components/common/toggle-group/component';
 import Separator from '/imports/ui/components/common/separator/component';
+import LeaveMeetingButtonContainer from '../nav-bar/leave-meeting-button/container';
 
 const intlMessages = defineMessages({
   actionsBarLabel: {
@@ -236,6 +237,8 @@ class ActionsBar extends PureComponent {
             {isReactionsButtonEnabled && this.renderReactionsButton()}
             {isRaiseHandEnabled && <RaiseHandButtonContainer />}
             {this.renderPluginsActionBarItems(ActionsBarPosition.RIGHT)}
+            <Styled.Separator />
+            <LeaveMeetingButtonContainer amIModerator={amIModerator} />
           </Styled.Center>
           <Styled.Right>
             <Styled.Gap>
@@ -258,17 +261,6 @@ class ActionsBar extends PureComponent {
                 )
                 : null}
             </Styled.Gap>
-            <Styled.Separator />
-            <Styled.LeaveButton
-              aria-label={intl.formatMessage(intlMessages.leaveMeetingLabel)}
-              data-test="leaveButton"
-              onClick={() => {
-                console.log('Leave meeting button clicked');
-                // Leave meeting logic will be implemented later
-              }}
-            >
-              <i className="icon-bbb-close" />
-            </Styled.LeaveButton>
           </Styled.Right>
         </Styled.ActionsBar>
       </Styled.ActionsBarWrapper>
