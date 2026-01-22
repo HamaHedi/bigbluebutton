@@ -1,31 +1,25 @@
 import styled from 'styled-components';
 import { smallOnly } from '/imports/ui/stylesheets/styled-components/breakpoints';
-import { smPaddingX, smPaddingY } from '/imports/ui/stylesheets/styled-components/general';
-import { colorWhite } from '/imports/ui/stylesheets/styled-components/palette';
+import { smPaddingX, smPaddingY, barsPadding } from '/imports/ui/stylesheets/styled-components/general';
+import { colorWhite, colorBackground } from '/imports/ui/stylesheets/styled-components/palette';
 import Button from '/imports/ui/components/common/button/component';
 
 const ActionsBar = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: #1c1c1c;
-  border-radius: 8px;
-  padding: 6px 8px;
-  gap: 2px;
 `;
 
 const ActionsBarWrapper = styled.section`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px;
+  flex: 1;
+  padding: ${barsPadding};
+  background-color: ${colorBackground};
   position: relative;
   order: 3;
 `;
 
 const Left = styled.div`
-  display: flex;
-  align-items: center;
+  display: inherit;
   flex: 0;
   > *:not(span) {
     @media ${smallOnly} {
@@ -46,10 +40,9 @@ const Left = styled.div`
 const Center = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 2px;
+  gap: ${smPaddingX};
   flex: 1;
   justify-content: center;
-  align-items: center;
   > *:not(span):not(:last-child) {
     @media ${smallOnly} {
       margin: 0 ${smPaddingY};
@@ -61,9 +54,7 @@ const Right = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: center;
   position: relative;
-  gap: 2px;
   [dir="rtl"] & {
     right: auto;
     left: ${smPaddingX};
@@ -115,49 +106,16 @@ const Wrapper = styled.div`
 `;
 
 const Separator = styled.div`
-  height: 24px;
-  width: 1px;
-  background-color: rgba(255, 255, 255, 0.15);
+  height: 2.5rem;
+  width: 0;
+  border: 1px solid ${colorWhite};
   align-self: center;
-  margin: 0 4px;
+  opacity: .75;
 `;
 
 const Gap = styled.div`
   display: flex;
-  gap: 2px;
-  align-items: center;
-`;
-
-const LeaveButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background-color: #dc2626;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 4px;
-
-  &:hover {
-    background-color: #b91c1c;
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.5);
-  }
-
-  &:active {
-    background-color: #991b1b;
-  }
-
-  i {
-    color: ${colorWhite};
-    font-size: 1.2rem;
-  }
+  gap: .5rem;
 `;
 
 export default {
@@ -172,5 +130,4 @@ export default {
   ActionsBarWrapper,
   Gap,
   Separator,
-  LeaveButton,
 };
