@@ -253,7 +253,7 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
   const [isQuiz, setIsQuiz] = React.useState(false);
   const [question, setQuestion] = useState<string[] | string>('');
   const [questionAndOptions, setQuestionAndOptions] = useState<string[] | string>('');
-  const [optList, setOptList] = useState<Array<{key: string, val: string}>>([]);
+  const [optList, setOptList] = useState<Array<{ key: string, val: string }>>([]);
   const [error, setError] = useState<string | null>(null);
   const [multipleResponse, setMultipleResponse] = useState(false);
   const [secretPoll, setSecretPoll] = useState(false);
@@ -663,7 +663,7 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
                       : intl.formatMessage(intlMessages.off)}
                   </Styled.ToggleLabel>
                   <Toggle
-                  // @ts-ignore - JS component wrapped by intl
+                    // @ts-ignore - JS component wrapped by intl
                     icons={false}
                     checked={customInput}
                     onChange={() => {
@@ -782,10 +782,14 @@ const PollCreationPanel: React.FC<PollCreationPanelProps> = ({
         }}
         customRightButton={null}
       />
-      {pollOptions()}
+      {/* {pollOptions()}
       <span className="sr-only" id="poll-config-button">{intl.formatMessage(intlMessages.showRespDesc)}</span>
       <span className="sr-only" id="add-item-button">{intl.formatMessage(intlMessages.addRespDesc)}</span>
-      <span className="sr-only" id="start-poll-button">{intl.formatMessage(intlMessages.startPollDesc)}</span>
+      <span className="sr-only" id="start-poll-button">{intl.formatMessage(intlMessages.startPollDesc)}</span> */}
+      <div style={{ textAlign: 'center', padding: '20px', fontSize: '1.2rem' }}>
+        Poll is <b>not</b> enabled<br />
+        will be enabled <b>soon</b>
+      </div>
     </div>
   );
 };
@@ -831,6 +835,7 @@ const PollCreationPanelContainer: React.FC = () => {
       layoutContextDispatch={layoutContextDispatch}
       hasPoll={currentMeeting.componentsFlags?.hasPoll ?? false}
     />
+
   );
 };
 
