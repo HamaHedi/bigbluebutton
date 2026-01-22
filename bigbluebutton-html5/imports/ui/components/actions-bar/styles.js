@@ -146,7 +146,7 @@ const Right = styled.div`
 const RaiseHandButton = styled(Button)`
   ${buttonEnhancement}
   
-  ${({ ghost }) => ghost && `
+  ${({ ghost }) => ghost && css`
     & > span {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
                   inset 0 0 0 1.5px ${colorWhite};
@@ -162,7 +162,7 @@ const RaiseHandButton = styled(Button)`
   `}
   
   /* Raised hand active state - subtle pulse */
-  ${({ ghost }) => !ghost && `
+  ${({ ghost }) => !ghost && css`
     & > span {
       animation: ${subtlePulse} 2s ease-in-out infinite;
     }
