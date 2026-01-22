@@ -238,7 +238,9 @@ class ActionsBar extends PureComponent {
             {isRaiseHandEnabled && <RaiseHandButtonContainer />}
             {this.renderPluginsActionBarItems(ActionsBarPosition.RIGHT)}
             <Styled.Separator />
-            <LeaveMeetingButtonContainer amIModerator={amIModerator} />
+            <Styled.LeaveButton>
+              <LeaveMeetingButtonContainer amIModerator={amIModerator} />
+            </Styled.LeaveButton>
           </Styled.Center>
           <Styled.Right>
             <Styled.Gap>
