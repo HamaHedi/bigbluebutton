@@ -43,6 +43,11 @@ const Center = styled.div`
   gap: ${smPaddingX};
   flex: 1;
   justify-content: center;
+  
+ span {
+    border-radius: 8px !important;
+  }
+
   > *:not(span):not(:last-child) {
     @media ${smallOnly} {
       margin: 0 ${smPaddingY};
@@ -118,6 +123,34 @@ const Gap = styled.div`
   gap: .5rem;
 `;
 
+const LeaveButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
+  &:hover {
+    background-color: #b91c1c;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.5);
+  }
+  &:active {
+    background-color: #991b1b;
+  }
+  i {
+    color: ${colorWhite};
+    font-size: 1.2rem;
+  }
+`;
+
 export default {
   ActionsBar,
   Left,
@@ -130,4 +163,5 @@ export default {
   ActionsBarWrapper,
   Gap,
   Separator,
+  LeaveButton,
 };

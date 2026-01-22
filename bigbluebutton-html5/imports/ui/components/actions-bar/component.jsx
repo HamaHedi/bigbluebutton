@@ -17,11 +17,16 @@ import RaiseHandButtonContainer from '/imports/ui/components/actions-bar/raise-h
 import Selector from '/imports/ui/components/common/selector/component';
 import ToggleGroup from '/imports/ui/components/common/toggle-group/component';
 import Separator from '/imports/ui/components/common/separator/component';
+import LeaveMeetingButtonContainer from '../nav-bar/leave-meeting-button/container';
 
 const intlMessages = defineMessages({
   actionsBarLabel: {
     id: 'app.actionsBar.label',
     description: 'Aria-label for ActionsBar Section',
+  },
+  leaveMeetingLabel: {
+    id: 'app.navBar.leaveMeetingBtnLabel',
+    description: 'Leave meeting button label',
   },
 });
 
@@ -232,6 +237,8 @@ class ActionsBar extends PureComponent {
             {isReactionsButtonEnabled && this.renderReactionsButton()}
             {isRaiseHandEnabled && <RaiseHandButtonContainer />}
             {this.renderPluginsActionBarItems(ActionsBarPosition.RIGHT)}
+            <Styled.Separator />
+            <LeaveMeetingButtonContainer amIModerator={amIModerator} />
           </Styled.Center>
           <Styled.Right>
             <Styled.Gap>
