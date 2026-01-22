@@ -123,8 +123,8 @@ const Gap = styled.div`
   gap: .5rem;
 `;
 
-const LeaveButton = styled.button`
-  & > button{
+const LeaveButtonWrapper = styled.div`
+  button{
     margin : 0 !important;
     height : 42px;
     border-radius : 8px !important;
@@ -144,5 +144,5 @@ export default {
   ActionsBarWrapper,
   Gap,
   Separator,
-  LeaveButton,
+  LeaveButtonWrapper,
 };
