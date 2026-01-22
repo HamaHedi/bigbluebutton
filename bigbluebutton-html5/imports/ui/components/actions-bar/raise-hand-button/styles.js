@@ -1,5 +1,5 @@
-import styled, { keyframes } from 'styled-components';
-import { colorWhite, btnPrimaryBg } from '/imports/ui/stylesheets/styled-components/palette';
+import styled, { css, keyframes } from 'styled-components';
+import { colorWhite } from '/imports/ui/stylesheets/styled-components/palette';
 import Button from '/imports/ui/components/common/button/component';
 
 // Gentle wave animation for raised hand
@@ -30,7 +30,7 @@ const glowPulse = keyframes`
 const RaiseHandButton = styled(Button)`
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-  ${({ ghost }) => ghost && `
+  ${({ ghost }) => ghost && css`
     & > span {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
                   inset 0 0 0 1.5px ${colorWhite};
@@ -52,7 +52,7 @@ const RaiseHandButton = styled(Button)`
   `}
   
   /* When hand is raised (not ghost) - show active state with animation */
-  ${({ ghost }) => !ghost && `
+  ${({ ghost }) => !ghost && css`
     & > span {
       box-shadow: 0 2px 8px rgba(15, 112, 215, 0.3);
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
