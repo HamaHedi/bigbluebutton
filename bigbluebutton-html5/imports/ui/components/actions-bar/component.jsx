@@ -23,6 +23,10 @@ const intlMessages = defineMessages({
     id: 'app.actionsBar.label',
     description: 'Aria-label for ActionsBar Section',
   },
+  leaveMeetingLabel: {
+    id: 'app.navBar.leaveMeetingBtnLabel',
+    description: 'Leave meeting button label',
+  },
 });
 
 class ActionsBar extends PureComponent {
@@ -254,6 +258,21 @@ class ActionsBar extends PureComponent {
                 )
                 : null}
             </Styled.Gap>
+            <Styled.Separator />
+            <Styled.LeaveButton
+              icon="logout"
+              color="danger"
+              size="lg"
+              circle={false}
+              hideLabel
+              label={intl.formatMessage(intlMessages.leaveMeetingLabel)}
+              aria-label={intl.formatMessage(intlMessages.leaveMeetingLabel)}
+              data-test="leaveButton"
+              onClick={() => {
+                console.log('Leave meeting button clicked');
+                // Leave meeting logic will be implemented later
+              }}
+            />
           </Styled.Right>
         </Styled.ActionsBar>
       </Styled.ActionsBarWrapper>
