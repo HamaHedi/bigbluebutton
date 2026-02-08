@@ -55,8 +55,8 @@ const UserTitle: React.FC<UserTitleProps> = ({
     toggleMute(!!isMeetingMuted, true, setMuted);
   }
 
-  
- 
+
+
   const userListLabel = hideUserList ? messages.lockedUsersTitle : messages.usersTitle;
 
   return (
@@ -69,17 +69,17 @@ const UserTitle: React.FC<UserTitleProps> = ({
           {intl.formatMessage(
             userListLabel,
             {
-              userCount: count.toLocaleString('en-US', { notation: 'standard' }),
+              userCount: currentUserData.isModerator ? count.toLocaleString('en-US', { notation: 'standard' }) : 2,
             },
           )}
         </span>
       </Styled.SmallTitle>
-      {currentUserData?.isModerator && 
-      <Tooltip title={"Mute All except presenter"}>
-        <Styled.MuteAll onClick={toggleMuteHandler}>
-          <Icon iconName="mute" className={isNotAllMuted ? 'inactive' : 'active'}/>
-        </Styled.MuteAll>
-      </Tooltip>}
+      {currentUserData?.isModerator &&
+        <Tooltip title={"Mute All except presenter"}>
+          <Styled.MuteAll onClick={toggleMuteHandler}>
+            <Icon iconName="mute" className={isNotAllMuted ? 'inactive' : 'active'} />
+          </Styled.MuteAll>
+        </Tooltip>}
       <UserTitleOptionsContainer />
     </Styled.Container>
   );
