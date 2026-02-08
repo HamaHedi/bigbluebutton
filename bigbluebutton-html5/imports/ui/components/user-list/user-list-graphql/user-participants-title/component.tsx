@@ -59,6 +59,8 @@ const UserTitle: React.FC<UserTitleProps> = ({
 
   const userListLabel = hideUserList ? messages.lockedUsersTitle : messages.usersTitle;
 
+  console.log({ currentUserData })
+
   return (
     <Styled.Container>
       <Styled.SmallTitle>
@@ -69,7 +71,7 @@ const UserTitle: React.FC<UserTitleProps> = ({
           {intl.formatMessage(
             userListLabel,
             {
-              userCount: currentUserData.isModerator ? count.toLocaleString('en-US', { notation: 'standard' }) : 2,
+              userCount: currentUserData?.isModerator ? count.toLocaleString('en-US', { notation: 'standard' }) : 2,
             },
           )}
         </span>
