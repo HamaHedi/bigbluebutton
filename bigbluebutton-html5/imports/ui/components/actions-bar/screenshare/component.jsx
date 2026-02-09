@@ -26,9 +26,11 @@ const propTypes = {
   intl: PropTypes.objectOf(Object).isRequired,
   enabled: PropTypes.bool.isRequired,
   amIPresenter: PropTypes.bool,
+  amIModerator: PropTypes.bool,
   isScreenBroadcasting: PropTypes.bool.isRequired,
   isScreenGloballyBroadcasting: PropTypes.bool.isRequired,
   isConnected: PropTypes.bool.isRequired,
+  handleTakePresenter: PropTypes.func,
 };
 
 const intlMessages = defineMessages({
@@ -151,8 +153,10 @@ const ScreenshareButton = ({
   isScreenBroadcasting,
   isScreenGloballyBroadcasting,
   amIPresenter = false,
+  amIModerator = false,
   isConnected,
   screenshareDataSavingSetting,
+  handleTakePresenter,
 }) => {
   const TROUBLESHOOTING_URLS =
     window.meetingClientSettings.public.media.screenshareTroubleshootingLinks;
@@ -225,10 +229,15 @@ const ScreenshareButton = ({
     </Styled.ScreenShareModal>
   );
 
-  const amIBroadcasting = isScreenBroadcasting && amIPresenter;
+  const amIBroadcasting =
+    isScreenBroadcasting && (amIPresenter || amIModerator);
+
+  // Moderators can always share screen (like Google Meet)
+  // If moderator is not presenter, they will automatically become presenter when sharing
+  const canShare = amIPresenter || amIModerator;
 
   // this part handles the label/desc intl for the screenshare button
-  // basically: if you are not a presenter, the label/desc will be 'the screen cannot be shared'.
+  // basically: if you are not a presenter/moderator, the label/desc will be 'the screen cannot be shared'.
   // if you are: the label/desc intl will be 'stop/start screenshare'.
   let info = screenshareDataSavingSetting
     ? "desktopShare"
@@ -250,6 +259,53 @@ const ScreenshareButton = ({
     ? "stopScreenShare"
     : "startScreenShare";
   const loading = isScreenBroadcasting && !isScreenGloballyBroadcasting;
+
+  // Handle screenshare click - like Google Meet:
+  // 1. First open browser picker so user can select what to share
+  // 2. After user selects, take presenter role if needed
+  // 3. Then share the screen (this allows moderators to override existing shares)
+  const handleScreenshareClick = async () => {
+    if (isSafari && !ScreenshareBridgeService.HAS_DISPLAY_MEDIA) {
+      openScreenshareUnavailableModal();
+      return;
+    }
+
+    // For moderators: First get the screen stream (opens browser picker)
+    // This allows user to select what to share BEFORE taking presenter
+    if (amIModerator) {
+      try {
+        // Step 1: Open browser picker and get the stream
+        const stream = await ScreenshareBridgeService.getScreenStream();
+
+        // Step 2: User selected something, now take presenter if not already
+        if (!amIPresenter) {
+          await handleTakePresenter();
+          // Wait for presenter role to be assigned
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        // Step 3: Share with the obtained stream
+        // Pass the stream in options so shareScreen doesn't open picker again
+        shareScreen(
+          isCameraAsContentBroadcasting,
+          stopExternalVideoShare,
+          true, // We're presenter now (or already were)
+          handleFailure,
+          { stream, contentType: CONTENT_TYPE_SCREENSHARE },
+        );
+      } catch (error) {
+        handleFailure(error);
+      }
+    } else {
+      // Non-moderator presenter, use normal flow
+      shareScreen(
+        isCameraAsContentBroadcasting,
+        stopExternalVideoShare,
+        amIPresenter,
+        handleFailure,
+      );
+    }
+  };
 
   return (
     <>
