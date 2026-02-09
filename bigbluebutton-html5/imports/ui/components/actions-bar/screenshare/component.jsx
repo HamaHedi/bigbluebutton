@@ -13,6 +13,7 @@ import {
   screenshareHasEnded,
   useIsCameraAsContentBroadcasting,
   useShowButtonForNonPresenters,
+  CONTENT_TYPE_SCREENSHARE,
 } from "/imports/ui/components/screenshare/service";
 import { SCREENSHARING_ERRORS } from "/imports/api/screenshare/client/bridge/errors";
 import Button from "/imports/ui/components/common/button/component";
@@ -260,31 +261,44 @@ const ScreenshareButton = ({
     : "startScreenShare";
   const loading = isScreenBroadcasting && !isScreenGloballyBroadcasting;
 
-  // Handle screenshare click - for moderators who aren't presenter, take presenter first
+  // Handle screenshare click - like Google Meet:
+  // 1. First open browser picker so user can select what to share
+  // 2. After user selects, take presenter role if needed
+  // 3. Then share the screen (this allows moderators to override existing shares)
   const handleScreenshareClick = async () => {
     if (isSafari && !ScreenshareBridgeService.HAS_DISPLAY_MEDIA) {
       openScreenshareUnavailableModal();
       return;
     }
 
-    // If moderator but not presenter, take presenter role first, then share screen
-    if (amIModerator && !amIPresenter) {
+    // For moderators: First get the screen stream (opens browser picker)
+    // This allows user to select what to share BEFORE taking presenter
+    if (amIModerator) {
       try {
-        await handleTakePresenter();
-        // Small delay to ensure presenter role is assigned before sharing
-        setTimeout(() => {
-          shareScreen(
-            isCameraAsContentBroadcasting,
-            stopExternalVideoShare,
-            true,
-            handleFailure,
-          );
-        }, 500);
+        // Step 1: Open browser picker and get the stream
+        const stream = await ScreenshareBridgeService.getScreenStream();
+
+        // Step 2: User selected something, now take presenter if not already
+        if (!amIPresenter) {
+          await handleTakePresenter();
+          // Wait for presenter role to be assigned
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+
+        // Step 3: Share with the obtained stream
+        // Pass the stream in options so shareScreen doesn't open picker again
+        shareScreen(
+          isCameraAsContentBroadcasting,
+          stopExternalVideoShare,
+          true, // We're presenter now (or already were)
+          handleFailure,
+          { stream, contentType: CONTENT_TYPE_SCREENSHARE },
+        );
       } catch (error) {
         handleFailure(error);
       }
     } else {
-      // Already presenter, just share screen
+      // Non-moderator presenter, use normal flow
       shareScreen(
         isCameraAsContentBroadcasting,
         stopExternalVideoShare,
