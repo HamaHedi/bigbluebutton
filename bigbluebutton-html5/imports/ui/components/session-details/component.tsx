@@ -116,8 +116,11 @@ const SessionDetails: React.FC<SessionDetailsProps> = (props) => {
         isFullWidth={isMobile || !(loginUrl || (formattedDialNum && formattedTelVoice))}
       >
         <div>
-          <Styled.WelcomeMessage dangerouslySetInnerHTML={{ __html: welcomeMessage }} />
-          <Styled.WelcomeMessage dangerouslySetInnerHTML={{ __html: welcomeMsgForModerators }} />
+          <Styled.WelcomeMessage dangerouslySetInnerHTML={{
+            __html:
+              "Welcome to the meeting!"
+          }} />
+          {/* <Styled.WelcomeMessage dangerouslySetInnerHTML={{ __html: welcomeMsgForModerators }} /> */}
         </div>
         <div>
           {loginUrl && (
