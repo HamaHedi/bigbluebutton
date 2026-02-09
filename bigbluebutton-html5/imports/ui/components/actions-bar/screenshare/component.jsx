@@ -13,7 +13,6 @@ import {
   screenshareHasEnded,
   useIsCameraAsContentBroadcasting,
   useShowButtonForNonPresenters,
-  CONTENT_TYPE_SCREENSHARE,
 } from "/imports/ui/components/screenshare/service";
 import { SCREENSHARING_ERRORS } from "/imports/api/screenshare/client/bridge/errors";
 import Button from "/imports/ui/components/common/button/component";
@@ -243,7 +242,7 @@ const ScreenshareButton = ({
   let info = screenshareDataSavingSetting
     ? "desktopShare"
     : "lockedDesktopShare";
-  if (!canShare) {
+  if (!amIPresenter) {
     info = "notPresenterDesktopShare";
   } else if (isScreenBroadcasting) {
     info = "stopDesktopShare";
@@ -254,7 +253,7 @@ const ScreenshareButton = ({
   const shouldAllowScreensharing =
     enabled &&
     (!isMobile || isTabletApp) &&
-    (amIPresenter || amIModerator || showButtonForNonPresenters);
+    (amIPresenter || showButtonForNonPresenters);
 
   const dataTest = isScreenBroadcasting
     ? "stopScreenShare"
@@ -316,7 +315,7 @@ const ScreenshareButton = ({
             disabled={
               (!isConnected && !isScreenBroadcasting) ||
               !screenshareDataSavingSetting ||
-              !canShare
+              !amIPresenter
             }
             icon={amIBroadcasting ? "desktop" : "desktop_off"}
             data-test={dataTest}
@@ -328,7 +327,24 @@ const ScreenshareButton = ({
             size="lg"
             loading={loading}
             onClick={
-              amIBroadcasting ? screenshareHasEnded : handleScreenshareClick
+              amIBroadcasting
+                ? screenshareHasEnded
+                : () => {
+                    if (
+                      isSafari &&
+                      !ScreenshareBridgeService.HAS_DISPLAY_MEDIA
+                    ) {
+                      openScreenshareUnavailableModal();
+                    } else {
+                      // eslint-disable-next-line max-len
+                      shareScreen(
+                        isCameraAsContentBroadcasting,
+                        stopExternalVideoShare,
+                        amIPresenter,
+                        handleFailure,
+                      );
+                    }
+                  }
             }
             id={
               amIBroadcasting ? "unshare-screen-button" : "share-screen-button"
