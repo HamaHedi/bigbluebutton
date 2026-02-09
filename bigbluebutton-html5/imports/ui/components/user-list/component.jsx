@@ -20,6 +20,21 @@ const defaultProps = {
 };
 
 class UserList extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchQuery: '',
+    };
+  }
+
+  handleSearchChange = (event) => {
+    this.setState({ searchQuery: event.target.value });
+  };
+
+  clearSearch = () => {
+    this.setState({ searchQuery: '' });
+  };
+
   render() {
     const {
       compact,
@@ -28,17 +43,20 @@ class UserList extends PureComponent {
       DarkModeIsEnabled,
       showBranding,
     } = this.props;
+    const { searchQuery } = this.state;
     const logoUrl = DarkModeIsEnabled ? CustomDarkLogoUrl : CustomLogoUrl;
 
     return (
-      <Styled.UserList data-test="userListContainer">
-        {
-          showBranding
-            && !compact
-            && logoUrl
-            ? <CustomLogo CustomLogoUrl={logoUrl} /> : null
-        }
-        <UserContentContainer compact={compact} />
+      <Styled.UserList>
+        {showBranding && !compact && logoUrl && (
+          <CustomLogo CustomLogoUrl={logoUrl} />
+        )}
+        
+      
+        <UserContentContainer 
+          compact={compact}
+          searchQuery={searchQuery}
+        />
       </Styled.UserList>
     );
   }
